@@ -1,32 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@theme {
+  --color-primary: #05a845;
+  --color-secondary: #5772B3;
+}
+
+
 @layer base {
   .Container {
     @apply 2xl:px-56 xl:px-20 lg:px-10 md:px-10 px-4;
-  }
-
-  .text-primary {
-    @apply text-[#1C3E92]
-  }
-
-  .bg-primary {
-    @apply bg-[#FF6C0C]
-  }
-
-  .text-secondary {
-    @apply text-[#5772B3]
-  }
-
-  .bg-secondary {
-    @apply bg-[#5772B3]
-  }
-
-  .button-primary {
-    @apply bg-[#1D4092] text-white font-bold py-1.5 rounded-md cursor-pointer;
-  }
-  .button-primary:hover {
-    @apply bg-blue-800;
   }
 
   .policy-page-text {
@@ -141,7 +124,17 @@
 }
 
 @keyframes spinner-fzua35 {
-  0%, 10%, 20%, 30%, 50%, 60%, 70%, 80%, 90%, 100% {
+
+  0%,
+  10%,
+  20%,
+  30%,
+  50%,
+  60%,
+  70%,
+  80%,
+  90%,
+  100% {
     transform: rotate(calc(var(--rotation) * 1deg)) translate(0, calc(var(--translation) * 1%));
   }
 
@@ -199,12 +192,13 @@
     left: -200px;
     transform: scale(1) rotate(0deg);
   }
+
   50% {
     transform: scale(1.1) rotate(-2deg);
   }
+
   100% {
     left: 100vw;
     transform: scale(1) rotate(0deg);
   }
 }
-

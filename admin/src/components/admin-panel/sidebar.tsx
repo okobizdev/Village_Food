@@ -12,15 +12,10 @@ import Image from "next/image";
 // import { getSetting } from "@/services/settings";
 import React from "react";
 import { fileUrlGenerator } from "@/utils/helpers";
-import logo from "@/assets/logo/logo_sidebar.png";
+
 
 export function Sidebar() {
   const sidebar = useStore(useSidebarToggle, (state) => state);
-  // const [setting, setSetting] = React.useState<Settings>();
-
-  // React.useEffect(() => {
-  //   getSetting().then((data) => setSetting(data));
-  // }, []);
 
   if (!sidebar) return null;
   const brandName = process.env.NEXT_PUBLIC_BRAND_NAME;
@@ -33,7 +28,7 @@ export function Sidebar() {
       )}
     >
       <SidebarToggle isOpen={sidebar?.isOpen} setIsOpen={sidebar?.setIsOpen} />
-      <div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800">
+      <div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800 pt-10">
         <Button
           className={cn(
             "transition-transform ease-in-out duration-300 mb-1",
@@ -55,7 +50,7 @@ export function Sidebar() {
               )}
             >
               <Image
-                src={logo}
+                src="/logo/sidebar-logo.png"
                 alt={String(brandName)}
                 height={60}
                 width={150}

@@ -6,19 +6,18 @@ const CategoryService = require("./category.service.js");
 class CategoryController {
   createCategory = withTransaction(async (req, res, next, session) => {
     try {
- 
-      const payloadFiles = {
-        files: req.files,
-      };
+
       const payload = {
         name: req.body.name,
         slug: req.body.slug,
-        orderBy: req.body.orderBy ? Number(req.body.orderBy) : null,
-        landingPageStatus: req.body.landingPageStatus === "true" || req.body.landingPageStatus === true,
-        status: req.body.status === "true" || req.body.status === true,
+        status: req.body.status,
+        image: req?.body?.image,
+        imagePublicId: req?.body?.imagePublicId,
+        vectorImage: req?.body?.vectorImage,
+        vectorImagePublicId: req?.body?.vectorImagePublicId,
       };
+
       const categoryResult = await CategoryService.createCategory(
-        payloadFiles,
         payload,
         session
       );
@@ -122,7 +121,7 @@ class CategoryController {
   updateCategoryStatus = catchError(async (req, res, next) => {
     const id = req.params.id;
     const { status } = req.body;
-    
+
     if (status === undefined) {
       throw new Error("Status is required");
     }
@@ -138,7 +137,7 @@ class CategoryController {
   updateLandingPageStatus = catchError(async (req, res, next) => {
     const id = req.params.id;
     const { landingPageStatus, orderBy } = req.body;
-    
+
     if (landingPageStatus === undefined) {
       throw new Error("Landing Page Status is required");
     }

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { formatDate } from "date-fns";
-import logo from "@/assets/logo/logo_sidebar.png";
 import Barcode from "react-barcode";
 import { TOrder } from "@/types/shared";
 import { upperCase, upperFirst } from "lodash";
@@ -30,17 +29,17 @@ const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
       Number(orderData.subTotalPrice || 0) +
       Number(orderData.shippingCost || 0) -
       Number(orderData.totalPrice || 0);
-// console.log(calculatedShipping)
+    // console.log(calculatedShipping)
     return (
       <div
         ref={ref}
         className="print-area w-[60mm] mx-auto px-2 py-4 text-[11px] font-medium"
       >
         <div className="w-full flex flex-col justify-center items-center text-center py-2">
-         <Image
-            src={logo} alt={""}   
-            className="h-[0.8cm] object-cover"        
-           />
+          <Image
+            src="./logo/sidebar-logo.png" alt={""}
+            className="h-[0.8cm] object-cover"
+          />
           <p className="mt-2">{BRAND_NAME}</p>
           <p className="text-[10px]">
             Address: Miprur 2, Oposite of Stadium Gate no. 1. Dhaka.
@@ -88,15 +87,13 @@ const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
             >
               <div className="flex w-5/6">
                 <p>#{index + 1}.</p>
-                <p>{`${item?.productRef?.name} - ${
-                  item?.inventoryRef?.name
-                    ? upperCase(item?.inventoryRef?.name)
-                    : "N/A"
-                } - ${
-                  item?.inventoryRef?.level
+                <p>{`${item?.productRef?.name} - ${item?.inventoryRef?.name
+                  ? upperCase(item?.inventoryRef?.name)
+                  : "N/A"
+                  } - ${item?.inventoryRef?.level
                     ? upperCase(item?.inventoryRef?.level)
                     : "N/A"
-                }, Unit: ${item?.quantity} x ${makeBDPrice(item?.price)}`}</p>
+                  }, Unit: ${item?.quantity} x ${makeBDPrice(item?.price)}`}</p>
               </div>
 
               <h1 className="font-bold w-1/6">

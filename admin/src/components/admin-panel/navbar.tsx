@@ -1,6 +1,6 @@
 "use client";
 
-import { ModeToggle } from "@/components/mode-toggle";
+// import { ModeToggle } from "@/components/mode-toggle";
 import { UserNav } from "@/components/admin-panel/user-nav";
 import { SheetMenu } from "@/components/admin-panel/sheet-menu";
 import { useStore } from "@/hooks/store/use-store";
@@ -23,10 +23,7 @@ export function Navbar({ title }: NavbarProps) {
           <h1 className="font-bold">{title}</h1>
         </div>
         <div className="flex flex-1 items-center space-x-2 justify-end">
-          {/* {branch && (
-            <Badge variant="secondary">{branch.name || "undefined"}</Badge>
-          )} */}
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           <UserNav />
         </div>
       </div>

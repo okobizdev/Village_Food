@@ -21,8 +21,8 @@ export default function RootLayout({
         <NextTopLoader showSpinner={false} color="#FF6C0C" />
         <LanguageProvider>
           {children}
-          </LanguageProvider>
-       
+        </LanguageProvider>
+
       </body>
     </html>
   );

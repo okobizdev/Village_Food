@@ -52,14 +52,13 @@ export default function AdminDashboard() {
     });
   }, [selectRadialsChart]);
 
-  console.log(counts)
-  console.log(selectRadialsChart)
-  
+
+
   return (
     <div>
       <div className="flex flex-col   mb-4">
         <div className="flex items-center justify-between">
-          <Label className="text-lg font-semibold text-slate-900 dark:text-slate-200">
+          <Label className="text-lg font-semibold text-gray-600">
             {selectChartLabel}
           </Label>
           <div className="">
@@ -67,7 +66,7 @@ export default function AdminDashboard() {
           </div>
 
         </div>
-        <div className="p-4 flex flex-col items-center justify-between gap-5">
+        <div className="p-4 flex flex-col lg:flex-row items-center justify-between gap-5">
           <div className="flex items-center justify-between w-full gap-3">
             <Card className="group hover:bg-primary hover:text-white flex justify-between w-full h-36 ">
               <div className="flex items-center justify-start pl-6  rounded-sm">
@@ -126,7 +125,6 @@ export default function AdminDashboard() {
           {/* <BarChart SelectDuration={selectRadialsChart} />  */}
           <BarChart selectChartDuration={selectRadialsChart} />
           {/* <RadialsChart  selectChartDuration={selectRadialsChart}/>  */}
-
         </div>
 
       </div>

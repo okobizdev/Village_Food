@@ -14,14 +14,12 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { fileUrlGenerator, makeFormData } from "@/utils/helpers";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "./action";
 // import { useStore } from "@/hooks/store/use-store";
 // import { useBranch } from "@/hooks/store/use-branch";
 import Image from "next/image";
-import logo from "@/assets/logo/main.png";
 import { Eye, EyeOff } from "lucide-react";
 import { saveAuthData } from "@/utils/auth";
 import Link from "next/link";
@@ -99,7 +97,7 @@ export default function LoginPage() {
                     <FormControl>
                       <Input placeholder="user@email.com" {...field} />
                     </FormControl>
-                    <FormDescription className="text-red-400 text-xs">
+                    <FormDescription className="text-red-400 text-xs focus-visible:ring-2 focus-visible:ring-primary/50">
                       {form.formState.errors.email?.message}
                     </FormDescription>
                   </FormItem>
@@ -139,7 +137,7 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button loading={loading} type="submit" className="w-full">
+              <Button loading={loading} type="submit" className="w-full text-white cursor-pointer">
                 Login
               </Button>
             </Form>
@@ -156,10 +154,10 @@ export default function LoginPage() {
       </div>
       <div className="max-h-screen flex justify-center items-center">
         <Image
-          src={logo}
+          src="/logo/logo.png"
           alt="Login to Silk thread"
-          // height={1600}
-          // width={800}
+          height={1600}
+          width={800}
           quality={100}
           className="w-1/2 rounded-md"
         />

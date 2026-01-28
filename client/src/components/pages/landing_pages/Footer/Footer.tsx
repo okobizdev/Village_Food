@@ -55,7 +55,7 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
       <div className="Container bg-[#F3F3F3]">
         <div className="max-w-6xl grid grid-cols-2 lg:grid-cols-4 lg:justify-center mx-auto py-5 lg:py-10 px-1 gap-y-4 gap-x-2">
           <div className="flex items-center space-x-2 lg:space-x-4">
-            <div className="lg:text-xl text-white bg-[#FF6C0C] p-3 rounded-full">
+            <div className="lg:text-xl text-white bg-primary p-3 rounded-full">
               <FaTruck />
             </div>
             <div className="flex flex-col space-y-1">
@@ -66,7 +66,7 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
             </div>
           </div>
           <div className="flex items-center space-x-2 lg:space-x-4">
-            <div className="lg:text-xl text-white bg-[#FF6C0C] p-3 rounded-full">
+            <div className="lg:text-xl text-white bg-primary p-3 rounded-full">
               <FaRightLeft />
             </div>
             <div className="flex flex-col space-y-1">
@@ -77,7 +77,7 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
             </div>
           </div>
           <div className="flex items-center space-x-2 lg:space-x-4">
-            <div className="lg:text-xl text-white bg-[#FF6C0C] p-3 rounded-full">
+            <div className="lg:text-xl text-white bg-primary p-3 rounded-full">
               <FaRegMessage />
             </div>
             <div className="flex flex-col space-y-1">
@@ -88,7 +88,7 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
             </div>
           </div>
           <div className="flex items-center space-x-2 lg:space-x-4">
-            <div className="lg:text-xl text-white bg-[#FF6C0C] p-3 rounded-full">
+            <div className="lg:text-xl text-white bg-primary p-3 rounded-full">
               <FaRegCreditCard />
             </div>
             <div className="flex flex-col space-y-1">

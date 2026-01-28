@@ -33,7 +33,7 @@ const page = async () => {
 
   // ------for campaign----
 
-  const { data: campaign } = await getCampaign();
+  const campaign = await getCampaign();
 
   // const user = await getUser();
   // const userId = user?.id;
@@ -45,7 +45,7 @@ const page = async () => {
       {/* <NavBar userCartProducts={products?.data} /> */}
       <div className="">
         <Banner banners={[]} />
-        <Category />
+        {/* <Category /> */}
         <SubCategory />
         {/* <ChildCategory />   */}
         <TopChildCategory childCategoriesList={topChildCategoriesList?.data} />
@@ -59,7 +59,7 @@ const page = async () => {
           <HomeProductSection products={middleRes?.data} />
         )}
 
-        <Campaign campaign={campaign[0]} />
+        {campaign && campaign.length > 0 && <Campaign campaign={campaign[0]} />}
 
         <LowerMiddleChildCategory
           childCategoriesList={lowerMiddleChildCategoriesList?.data}
@@ -72,7 +72,7 @@ const page = async () => {
         <ButtomChildCategory
           childCategoriesList={buttomChildCategoriesList?.data}
         />
-        
+
         {buttomRes?.status === "success" && (
           <HomeProductSection products={buttomRes?.data} />
         )}

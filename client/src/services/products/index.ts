@@ -14,7 +14,7 @@ export const getAllProductsForShop = async (
   categorySlug?: string,
   subCategorySlug?: string,
   childCategorySlug?: string,
-  page?: number 
+  page?: number
 ) => {
   const searchParams = new URLSearchParams();
 
@@ -40,12 +40,14 @@ export const getAllProductsForShop = async (
   }
 
   if (page) {
-    searchParams.append("page", page.toString()); // ✅ Add page to URL
+    searchParams.append("page", page.toString());
   }
 
   const url = `${apiBaseUrl}/product/pagination?${searchParams.toString()}`;
 
   const res = await fetch(url);
+
+
   if (!res.ok) {
     throw new Error("Failed to fetch products");
   }

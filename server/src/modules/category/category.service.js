@@ -27,8 +27,7 @@ class CategoryService extends BaseService {
     this.#repository = repository;
   }
 
-  async createCategory(payloadFiles, payload, session) {
-    const { files } = payloadFiles;
+  async createCategory(payload, session) {
     const { name, slug, orderBy, landingPageStatus, status } = payload;
 
     // If landingPageStatus is enabled, validate orderBy
@@ -49,13 +48,6 @@ class CategoryService extends BaseService {
     } else {
       // If landingPageStatus is disabled, set orderBy to null
       payload.orderBy = null;
-    }
-
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
     }
 
     const categoryData = await this.#repository.createCategory(

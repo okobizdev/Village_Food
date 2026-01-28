@@ -14,6 +14,15 @@ const Categoryschema = new Schema(
     image: {
       type: String,
     },
+    imagePublicId: {
+      type: String,
+    },
+    vectorImage: {
+      type: String,
+    },
+    vectorImagePublicId: {
+      type: String,
+    },
     orderBy: {
       type: Number,
       default: null,

@@ -1,7 +1,7 @@
 
 "use client";
 import { useState } from "react";
-import userImage from "@/assets/loader/userScleton.avif";
+import userImage from "@/assets/loader/userScleton.webp";
 import {
   Popover,
   PopoverContent,
@@ -20,7 +20,7 @@ const UserPopover = () => {
   // const router = useRouter(); // Assuming you're using Next.js router
   const handleLogout = async () => {
     try {
-       await logout();
+      await logout();
 
       toast.success("Logout successful");
       setOpen(false); // Close the popover after logout
