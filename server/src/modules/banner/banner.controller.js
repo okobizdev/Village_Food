@@ -5,26 +5,14 @@ const BannerService = require("./banner.service.js");
 
 class BannerController {
   createBanner = withTransaction(async (req, res, next, session) => {
-    const payloadFiles = {
-      files: req.files,
-    };
     const payload = {
-      title: req?.body?.title,
-      details: req?.body?.details,
-      type: req?.body?.type,
-      bannerCategory: req?.body?.bannerCategory,
-      status: req?.body?.status,
+      image: req.body.image,
+      imagePublicId: req.body.imagePublicId,
     };
-    // console.log(req, "request from controller????????????????????????????????");
-    // console.log(
-    //   payloadFiles,
-    //   "files from banner controller >>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    // );
-    // console.log(payload, "payload from banner controller ================");
 
     const bannerResult = await BannerService.createBanner(
       payload,
-      payloadFiles,
+      {},
       session
     );
     const resDoc = responseHandler(
@@ -68,23 +56,15 @@ class BannerController {
 
   updateBanner = catchError(async (req, res, next) => {
     const id = req.params.id;
-    console.log("id", id);
-    const payloadFiles = {
-      files: req.files,
-    };
     const payload = {
-      title: req?.body?.title,
-      details: req?.body?.details,
-      type: req?.body?.type,
-      bannerCategory: req?.body?.bannerCategory,
-      status: req?.body?.status,
+      image: req.body.image,
+      imagePublicId: req.body.imagePublicId,
     };
 
-    console.log({ payload: payload, payloadFiles: payloadFiles });
     const bannerResult = await BannerService.updateBanner(
       id,
       payload,
-      payloadFiles
+      {}
     );
     const resDoc = responseHandler(201, "Banner Update successfully");
     res.status(resDoc.statusCode).json(resDoc);

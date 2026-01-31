@@ -1,8 +1,9 @@
-import { TBanner } from "@/types/shared";
+
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { BannerDetailsSheet } from "./details";
-import { fileUrlGenerator } from "@/utils/helpers";
+import { TBanner } from "./types";
+
 
 export const columns: ColumnDef<TBanner>[] = [
   {
@@ -17,8 +18,8 @@ export const columns: ColumnDef<TBanner>[] = [
         <div>
           {row.original.image && (
             <Image
-              src={fileUrlGenerator(row.original.image)}
-              alt={row.original.title || ""}
+              src={row.original.image}
+              alt="Banner Image"
               width={600}
               height={200}
               className="w-32 object-cover"
@@ -27,26 +28,6 @@ export const columns: ColumnDef<TBanner>[] = [
         </div>
       );
     },
-  },
-  {
-    header: "Title",
-    accessorKey: "title",
-  },
-  {
-    header: "Details",
-    accessorKey: "details",
-  },
-  {
-    header: "Category",
-    accessorKey: "bannerCategory",
-  },
-  {
-    header: "Banner Type",
-    accessorKey: "type",
-  },
-  {
-    header: "Status",
-    accessorKey: "status",
   },
   {
     header: "Action",

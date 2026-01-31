@@ -4,7 +4,7 @@ import {
   createSubCategory,
   deleteSubCategory,
   updateSubCategory,
-} from "@/services/sub-category";
+} from "@/app/(admin-panel)/category/subcategory/sub-category";
 import { revalidatePath } from "next/cache";
 
 export async function createFormAction(data: FormData) {
@@ -20,7 +20,7 @@ export async function createFormAction(data: FormData) {
 
 export async function updateFormAction(id: string, data: FormData) {
   try {
- 
+
     await updateSubCategory(id, data);
     revalidatePath("/");
     return true;

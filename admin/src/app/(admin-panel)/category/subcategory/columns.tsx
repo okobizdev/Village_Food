@@ -12,44 +12,6 @@ export const columns: ColumnDef<TSubCategory>[] = [
     cell: ({ row }) => row.index + 1,
   },
   {
-    header: "Media",
-    accessorKey: "image",
-    cell: ({ row }) => {
-      return (
-        <div>
-          {row.original.image && (
-            <Image
-              src={fileUrlGenerator(row.original.image)}
-              alt={row.original.name || ""}
-              width={600}
-              height={200}
-              className="w-32 object-cover"
-            />
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    header: "Banner Image",
-    accessorKey: "bannerImage",
-    cell: ({ row }) => {
-      return (
-        <div>
-          {row.original.bannerImage && (
-            <Image
-              src={fileUrlGenerator(row.original.bannerImage)}
-              alt={row.original.name || ""}
-              width={600}
-              height={200}
-              className="w-32 object-cover"
-            />
-          )}
-        </div>
-      );
-    },
-  },
-  {
     header: "Name",
     size: 200,
     accessorKey: "name",

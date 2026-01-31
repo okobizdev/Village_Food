@@ -31,34 +31,12 @@ const Productschema = new Schema(
     mrpPrice: {
       type: Number,
     },
-    warehousePrice: {
-      type: Number,
-      default: 0,
-    },
-    warehouseProfit: {
-      type: Number,
-      default: 0,
-    },
-    wholesalePrice: {
-      type: Number,
-      default: 0,
-    },
-    wholesaleProfit: {
-      type: Number,
-      default: 0,
-    },
     thumbnailImage: {
       type: String,
       required: true,
     },
-    backViewImage: {
-      type: String,
-    },
-    images: {
+    optionalImages: {
       type: [String],
-    },
-    sizeChartImage: {
-      type: String,
     },
     videoUrl: {
       type: String,
@@ -107,10 +85,6 @@ const Productschema = new Schema(
     childCategoryRef: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "childCategory",
-    },
-    subChildCategoryRef: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "subChildCategory",
     },
     priority: {
       type: Boolean,

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import logo from "@/assets/logo/logo_navbar_taller.png";
 // import SearchForm from "../SearchForm/SearchForm";
 import Link from "next/link";
 import { BsCart2 } from "react-icons/bs";
@@ -93,7 +92,7 @@ const NavBar: React.FC<NavBarProps> = ({ userCartProducts }) => {
   return (
     <>
       {/* Main Navbar - Sticky */}
-      <div className="py-2 lg:px-[220px] px-4 fixed w-full z-40 top-0  bg-[#fffeea] shadow-md backdrop-blur-lg">
+      <div className="py-2 lg:px-[220px] px-4 fixed w-full z-40 top-0 bg-gray-100 shadow-md backdrop-blur-lg">
         <div className="flex items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-4">
@@ -107,11 +106,11 @@ const NavBar: React.FC<NavBarProps> = ({ userCartProducts }) => {
                 <RiMenuAddFill className="text-2xl" />
               )}
             </div>
-            <div className="md:w-[150px] w-[100px]">
+            <div className="w-[100px]">
               <Link href="/">
                 <Image
-                  src={logo || null}
-                  alt="Unicrescent | Best E-commerce platform in BD"
+                  src="/assets/logo/logo.png"
+                  alt="village food logo"
                   width={150}
                   height={60}
                   className="w-full h-full"
@@ -151,7 +150,7 @@ const NavBar: React.FC<NavBarProps> = ({ userCartProducts }) => {
               <FiPhone className="text-primary text-lg" />
               <div className="flex flex-col">
                 <span className="text-xs text-gray-500">Call Us</span>
-                <span className="text-xs font-semibold text-gray-700">+8801623-726069</span>
+                <span className="text-xs font-semibold text-gray-700">+88+88 01714-028-279</span>
               </div>
             </div>
 

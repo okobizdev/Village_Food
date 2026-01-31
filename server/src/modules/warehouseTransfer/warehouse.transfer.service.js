@@ -142,10 +142,6 @@ class WarehouseTransferService extends BaseService {
             discountAmount: product.discountAmount,
             price: product.price,
             mrpPrice: product.mrpPrice,
-            warehousePrice: product.warehousePrice,
-            warehouseProfit: product.warehouseProfit,
-            wholesalePrice: product.wholesalePrice,
-            wholesaleProfit: product.wholesaleProfit,
             thumbnailImage: product.thumbnailImage,
             backViewImage: product.backViewImage,
             images: product.images,
@@ -157,13 +153,12 @@ class WarehouseTransferService extends BaseService {
             categoryRef: product.categoryRef,
             subCategoryRef: product.subCategoryRef,
             childCategoryRef: product.childCategoryRef,
-            subChildCategoryRef: product.subChildCategoryRef,
           }
         }
 
 
         const newProduct = await this.#productRepository.createProduct(productPayload, session);
- 
+
         // inventory crete //
         const newInventoryID = await idGenerate('INV-', "inventoryID", this.#inventoryRepository);
         const inventoryPayload = {
@@ -178,7 +173,7 @@ class WarehouseTransferService extends BaseService {
           level: inventory?.level,
           inventoryID: newInventoryID
         }
- 
+
         const newInventory = await this.#inventoryRepository.createInventory(inventoryPayload, session);
         if (newInventory) {
           await this.#productRepository.addProductInventory(
@@ -187,12 +182,12 @@ class WarehouseTransferService extends BaseService {
             session,
           );
         }
-        
+
         //send warehousr inventory quantity dicrices //
         const newQuantity = inventory?.quantity - warehouseTransfer?.quantity
         const newAvailableQuantity = inventory?.availableQuantity - warehouseTransfer?.quantity
         await this.#inventoryRepository.updateById(warehouseTransfer?.inventoryRef, { quantity: newQuantity, availableQuantity: newAvailableQuantity }, session);
-    
+
         warehouseTransferResult = await this.#repository.updateWarehouseTransfer(id, { status });
 
       }

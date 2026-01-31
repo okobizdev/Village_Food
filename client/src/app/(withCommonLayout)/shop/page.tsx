@@ -12,7 +12,7 @@ import { getAllBanners } from "@/services/banners";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Silk Thread | All Product",
+  title: "Village Food | All Product",
   description: "Best E-commerce platform in BD",
 };
 
@@ -52,7 +52,7 @@ export default async function ShopPage({
   const { data: banners } = await getAllBanners();
 
   const sortedData = [...products.result].sort((a, b) => (a.priority === b.priority ? 0 : a.priority ? -1 : 1));
-  
+
 
   return (
     <>

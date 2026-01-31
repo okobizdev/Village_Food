@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Login | Silk Thread",
+  title: "Login | Village Food",
 };
 
 export default function RootLayout({

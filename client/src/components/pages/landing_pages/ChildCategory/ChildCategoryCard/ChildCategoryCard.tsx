@@ -11,12 +11,11 @@ interface ChildCategoryProps {
 const ChildCategoryCard: React.FC<ChildCategoryProps> = ({ childCategory }) => {
   const { name, bannerImage, _id, slug } = childCategory;
 
-
   return (
     <div className="text-center relative group overflow-hidden rounded">
       <Link href={`/shop?childCategory=${slug || _id}`}>
         <Image
-          src={bannerImage ? apiBaseUrl + bannerImage : "/default-image.png"}
+          src={bannerImage}
           alt={name}
           width={500}
           height={500}

@@ -11,22 +11,12 @@ const ChildCategoryschema = new Schema(
       required: true,
       trim: true,
     },
-    image: {
-      type: String,
-    },
-    bannerImage: {
-      type: String,
-    },
     slug: {
       type: String,
     },
     status: {
       type: Boolean,
       default: true,
-    },
-    viewType: {
-      type: String,
-      enum: ["top", "middle", "lowerMiddle", "buttom"],
     },
     subCategoryRef: {
       type: mongoose.Schema.Types.ObjectId,

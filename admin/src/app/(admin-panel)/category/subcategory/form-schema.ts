@@ -2,25 +2,7 @@ import { z } from "zod";
 
 export const subCategoryFormSchema = z.object({
   name: z.string().min(1),
-  viewType: z.string().optional(),
   categoryRef: z.string().nonempty("Category is required"),
-
-  image: z
-    .array(
-      z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-        message: "File size must be less than 8 MB",
-      })
-    )
-    .optional()
-    .default([]),
-  bannerImage: z
-    .array(
-      z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-        message: "File size must be less than 8 MB",
-      })
-    )
-    .optional()
-    .default([]),
 });
 
 export const dropZoneConfig = {

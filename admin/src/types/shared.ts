@@ -1,4 +1,8 @@
-import { File } from "buffer";
+
+import { TCategory } from "@/app/(admin-panel)/category/category/types";
+import { TSubCategory } from "@/app/(admin-panel)/category/subcategory/types";
+import { TInventory, TProduct } from "@/app/(admin-panel)/products/types";
+
 
 export type Submenu = {
   href: string;
@@ -51,19 +55,6 @@ export type TUser = {
   updatedAt?: Date;
 };
 
-export type TBanner = {
-  _id?: string;
-  image?: string;
-  files?: File[];
-  title?: string;
-  details?: string;
-  bannerCategory?: string;
-  type?: string;
-  status?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
 export type TOrder = {
   _id?: string;
   warehouseRef?: string;
@@ -87,9 +78,9 @@ export type TOrder = {
   userRef?: TUser;
   couponRef?: TCoupon;
   note?: string;
-  paymentMethod?: "CashOnDelivery" | "Online" | "MobileBanking"; 
-  mobileBankingProvider?: string; 
-  mobileNumber?: string; 
+  paymentMethod?: "CashOnDelivery" | "Online" | "MobileBanking";
+  mobileBankingProvider?: string;
+  mobileNumber?: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -105,18 +96,6 @@ export type TPagination = {
   nextPageLimit: number;
 };
 
-export type TCategory = {
-  _id: string;
-  name: string;
-  image: string;
-  vectorImage: string;
-  slug: string;
-  status: boolean;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  priority?: boolean;
-};
 
 export interface TProductReview {
   _id: string;
@@ -129,44 +108,12 @@ export interface TProductReview {
   productRef: TProduct;
 }
 
-export type AllCategoryResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TCategory[];
-};
 
 export type AllSubCategoryResponse = {
   statusCode: number;
   status: string;
   message: string;
   data: TSubCategory[];
-};
-
-export type AllChildCategoryResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TChildCategory[];
-};
-
-export type AllCategoryWithPaginationResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: {
-    result: TCategory[];
-    pagination: {
-      currentPage: number;
-      currentPageLimit: number;
-      total: number;
-      totalPage: number;
-      prevPage: number | null;
-      prevPageLimit: number;
-      nextPage: number | null;
-      nextPageLimit: number;
-    };
-  };
 };
 
 export type AllProductReviewWithPaginationResponse = {
@@ -207,103 +154,6 @@ export type AllSubCategoryWithPaginationResponse = {
   };
 };
 
-export type AllChildCategoryWithPaginationResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: {
-    result: TChildCategory[];
-    pagination: {
-      currentPage: number;
-      currentPageLimit: number;
-      total: number;
-      totalPage: number;
-      prevPage: number | null;
-      prevPageLimit: number;
-      nextPage: number | null;
-      nextPageLimit: number;
-    };
-  };
-};
-
-export type SingleCategoryResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TCategory;
-};
-
-export type SingleSubCategoryResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TSubCategory;
-};
-
-export type SingleChildCategoryResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TChildCategory;
-};
-
-export type TInventory = {
-  _id: string;
-  quantity: number;
-  barcode: string;
-  availableQuantity: number;
-  soldQuantity: number;
-  holdQuantity: number;
-  color: string;
-  name: string;
-  level: string;
-  inventoryID: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  productRef: string;
-};
-
-export type TSubCategory = {
-  _id: string;
-  name: string;
-  image: string;
-  bannerImage?: string;
-  viewType?: string;
-  slug: string;
-  status: boolean;
-  categoryRef: TCategory;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-};
-
-export type TChildCategory = {
-  _id: string;
-  name: string;
-  image: string;
-  bannerImage?: string;
-  viewType?: string;
-  slug: string;
-  status: boolean;
-  subCategoryRef: TSubCategory;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-};
-
-export type TSubChildCategory = {
-  _id: string;
-  name: string;
-  image: string;
-  bannerImage?: string;
-  slug: string;
-  status: boolean;
-  childCategoryRef: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-};
 
 export type TCoupon = {
   _id: string;
@@ -333,59 +183,6 @@ export const couponTypes = [
   { name: "Subcategory Wise", key: "subCategory" },
 ];
 
-export type TProduct = {
-  _id: string;
-  productId: string;
-  name: string;
-  description?: string;
-  discountType?: "flat" | "percent";
-  discount?: number;
-  discountAmount?: number;
-  price: number;
-  mrpPrice?: number;
-  warehousePrice?: number;
-  warehouseProfit?: number;
-  wholesalePrice?: number;
-  wholesaleProfit?: number;
-  thumbnailImage: string;
-  backViewImage?: string;
-  images?: string[];
-  sizeChartImage?: string;
-  videoUrl?: string;
-  status?: string;
-  slug?: string;
-  freeShipping: boolean;
-  brandRef: string | null;
-  mainInventory?: number;
-  quantity?: number;
-  inventoryType?:
-    | "colorInventory"
-    | "levelInventory"
-    | "colorLevelInventory"
-    | "inventory";
-  inventoryRef?: TInventory[];
-  categoryRef?: TCategory;
-  subCategoryRef?: TSubCategory;
-  childCategoryRef?: TChildCategory;
-  subChildCategoryRef?: TSubChildCategory | null;
-  priority?: boolean;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-};
-
-export interface TBulkOrder {
-  _id?: string;
-  name: string;
-  email?: string;
-  phone: string;
-  address?: string;
-  companyName?: string;
-  productType?: string;
-  deliveryDate?: Date | string | null;
-  quantity?: number;
-  description?: string;
-}
 
 export interface TCampaign {
   _id: string;
@@ -403,12 +200,6 @@ export type AllCouponResponse = {
   data: TCoupon[];
 };
 
-export type AllBulkOrderResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TBulkOrder[];
-};
 
 export type AllCouponWithPaginationResponse = {
   statusCode: number;
@@ -429,24 +220,6 @@ export type AllCouponWithPaginationResponse = {
   };
 };
 
-export type AllBulkOrderWithPaginationResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: {
-    result: TBulkOrder[];
-    pagination: {
-      currentPage: number;
-      currentPageLimit: number;
-      total: number;
-      totalPage: number;
-      prevPage: number | null;
-      prevPageLimit: number;
-      nextPage: number | null;
-      nextPageLimit: number;
-    };
-  };
-};
 
 export interface AllCampaignResponse {
   statusCode: number;
@@ -506,29 +279,6 @@ export type AllUserResponse = {
   data: TUser[];
 };
 
-export type AllBannerResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TBanner[];
-};
-
-export type AllBannerWithPaginationResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: {
-    result: TBanner[];
-    pagination: TPagination;
-  };
-};
-
-export type SingleBannerResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TBanner;
-};
 
 export type AllProductResponse = {
   statusCode: number;

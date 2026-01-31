@@ -1,11 +1,10 @@
-import { TCategory, TCoupon } from "@/types/shared";
+
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-// import { DetailsSheet } from "./details";
 import { BASE_URL } from "@/config/config";
 import { DetailsSheet } from "./details";
-import { fileUrlGenerator } from "@/utils/helpers";
 import { useState } from "react";
+import { TCategory } from "./types";
 export const columns: ColumnDef<TCategory>[] = [
   {
     header: "SL",
@@ -23,7 +22,7 @@ export const columns: ColumnDef<TCategory>[] = [
       return (
         <div className="w-20 h-20 relative">
           <Image
-            src={fileUrlGenerator(image)}
+            src={image}
             alt="category"
             fill
             className="object-cover rounded-lg"
@@ -40,19 +39,13 @@ export const columns: ColumnDef<TCategory>[] = [
       return (
         <div className="w-20 h-20 relative">
           <Image
-            src={fileUrlGenerator(vectorImage)}
+            src={vectorImage}
             alt="category"
             fill
             className="object-cover rounded-lg"
           />
         </div>
       );
-    },
-  },
-  {
-    header: "Action",
-    cell: ({ row }) => {
-      return <DetailsSheet item={row.original} />;
     },
   },
   {
@@ -77,13 +70,24 @@ export const columns: ColumnDef<TCategory>[] = [
       return (
         <button
           onClick={togglePriority}
-          className={`px-3 py-1 rounded-md font-bold ${value ? "bg-red-600" : "bg-green-600"
+          className={`px-3 py-1 rounded-md font-bold cursor-pointer ${value ? "bg-red-600" : "bg-green-600"
             } text-white`}
         >
           {value ? "High" : "Low"}
         </button>
       );
     },
-  }
+  },
+  {
+    header: "Action",
+    cell: ({ row }) => {
+      return (
+        <div className="cursor-pointer">
+          <DetailsSheet item={row.original} />
+        </div>
+      );
+    },
+  },
+
 
 ];

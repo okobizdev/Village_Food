@@ -5,7 +5,7 @@ import MainCheckOut from "@/components/pages/checkoutPage/MainCheckOut/MainCheck
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Silk Thread | Checkout",
+  title: "Village Food | Checkout",
   description: "Best E-commerce platform in BD",
 };
 
@@ -19,12 +19,12 @@ const Checkout = async () => {
   // const user = await getUser();
   // const userId = user?.id;
   // const products = await getCartProducts(userId, coupon || "");
-  
+
 
   return (
     <div>
       {/* <NavBar userCartProducts={products?.data} /> */}
-      <MainCheckOut  />
+      <MainCheckOut />
     </div>
   );
 };

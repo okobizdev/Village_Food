@@ -26,6 +26,5 @@ ChildCategoryRoute.route("/:id")
   .put(upload.any(), controller.updateChildCategory)
   .delete(controller.deleteChildCategory);
 
-ChildCategoryRoute.put("/status/:id", controller.updateChildCategoryStatus);
 
 module.exports = ChildCategoryRoute;

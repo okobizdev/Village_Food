@@ -14,15 +14,7 @@ class ChildCategoryService extends BaseService {
     this.#repository = repository;
   }
 
-  async createChildCategory(payloadFiles, payload, session) {
-    const { files } = payloadFiles;
-    const { name, status, slug } = payload;
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
+  async createChildCategory(payload, session) {
 
     const childCategoryData = await this.#repository.createChildCategory(
       payload,
@@ -32,11 +24,6 @@ class ChildCategoryService extends BaseService {
   }
 
   async getAllChildCategory(payload) {
-    // const payload = {
-    //   viewType: "",
-    //   limit: 10,
-    // };
-
     return await this.#repository.getAllChildCategory(payload);
   }
 
@@ -63,16 +50,7 @@ class ChildCategoryService extends BaseService {
     return childCategoryData;
   }
 
-  async updateChildCategory(id, payloadFiles, payload, session) {
-    const { files } = payloadFiles;
-    const { name, status, slug } = payload;
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
-
+  async updateChildCategory(id, payload, session) {
     // Update the database with the new data
     const childCategoryData = await this.#repository.updateChildCategory(
       id,
@@ -80,33 +58,14 @@ class ChildCategoryService extends BaseService {
       session
     );
 
-    // Remove old files if they’re being replaced
-    if (files?.length && childCategoryData.image) {
- 
-      await removeUploadFile(childCategoryData?.image);
-    }
-
     return childCategoryData;
   }
 
-  async updateChildCategoryStatus(id, status) {
-    if (!status) throw new NotFoundError("Status is required");
-    status = status === "true";
-    const childCategory = await this.#repository.updateChildCategoryStatus(id, {
-      status: status,
-    });
-
-    if (!childCategory) throw new NotFoundError("ChildCategory not found");
-    return childCategory;
-  }
 
   async deleteChildCategory(id) {
     const childCategory = await this.#repository.findById(id);
     if (!childCategory) throw new NotFoundError("ChildCategory not found");
     const deletedChildCategory = await this.#repository.deleteById(id);
-    if (deletedChildCategory) {
-      await removeUploadFile(childCategory?.image);
-    }
     return deletedChildCategory;
   }
 }

@@ -27,16 +27,16 @@ const ConfirmModal: React.FC<ConfirmDialogProps<Props, boolean>> = ({
 }) => {
   return (
     <AlertDialog open={show}>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
           <AlertDialogTitle>Alert!</AlertDialogTitle>
           <AlertDialogDescription>{confirmation}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => proceed(false)}>
+          <AlertDialogCancel className=" cursor-pointer" onClick={() => proceed(false)}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={() => proceed(true)}>
+          <AlertDialogAction className=" cursor-pointer" onClick={() => proceed(true)}>
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>

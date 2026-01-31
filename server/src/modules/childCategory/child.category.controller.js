@@ -6,20 +6,15 @@ const ChildCategoryService = require("./child.category.service.js");
 class ChildCategoryController {
   createChildCategory = withTransaction(async (req, res, next, session) => {
     try {
-    
-      const payloadFiles = {
-        files: req.files,
-      };
+
       const payload = {
         name: req.body.name,
         status: req.body.status,
         slug: req.body.slug,
-        viewType: req.body.viewType,
         subCategoryRef: req.body.subCategoryRef,
       };
       const childCategoryResult =
         await ChildCategoryService.createChildCategory(
-          payloadFiles,
           payload,
           session
         );
@@ -33,18 +28,13 @@ class ChildCategoryController {
       if (error.code === 11000) {
         return res
           .status(400)
-          .json({ message: "Product title already exists." });
+          .json({ message: "ChildCategory name already exists." });
       }
     }
   });
 
   getAllChildCategory = catchError(async (req, res, next) => {
-    const payload = {
-      viewType: req.query.viewType,
-      limit: req.query.limit,
-    };
     const childCategoryResult = await ChildCategoryService.getAllChildCategory(
-      payload
     );
     const resDoc = responseHandler(
       200,
@@ -97,45 +87,29 @@ class ChildCategoryController {
   updateChildCategory = withTransaction(async (req, res, next, session) => {
     try {
       const id = req.params.id;
-      const payloadFiles = {
-        files: req?.files,
-      };
       const payload = {
         name: req.body.name,
         status: req.body.status,
-        viewType: req.body.viewType,
         subCategoryRef: req.body.subCategoryRef,
       };
-      const childCategoryResult =
-        await ChildCategoryService.updateChildCategory(
-          id,
-          payloadFiles,
-          payload,
-          session
-        );
+
+      const childCategoryResult = await ChildCategoryService.updateChildCategory(
+        id,
+        payload,
+        session
+      );
       const resDoc = responseHandler(201, "ChildCategory Update successfully");
       res.status(resDoc.statusCode).json(resDoc);
     } catch (error) {
       if (error.code === 11000) {
         return res
           .status(400)
-          .json({ message: "Product title already exists." });
+          .json({ message: "ChildCategory name already exists." });
       }
       next(error);
     }
   });
 
-  updateChildCategoryStatus = catchError(async (req, res, next) => {
-    const id = req.params.id;
-    const status = req.query.status;
-    const childCategoryResult =
-      await ChildCategoryService.updateChildCategoryStatus(id, status);
-    const resDoc = responseHandler(
-      201,
-      "ChildCategory Status Update successfully"
-    );
-    res.status(resDoc.statusCode).json(resDoc);
-  });
 
   deleteChildCategory = catchError(async (req, res, next) => {
     const id = req.params.id;

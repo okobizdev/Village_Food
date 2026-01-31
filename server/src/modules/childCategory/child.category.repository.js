@@ -11,36 +11,11 @@ class ChildCategoryRepository extends BaseRepository {
   }
 
   async createChildCategory(payload, session) {
-    const { viewType } = payload;
-    if (viewType) {
-      const validViewTypes = ["top", "middle", "lowerMiddle", "buttom"];
-      if (!validViewTypes.includes(viewType)) {
-        throw new Error("Invalid viewType provided");
-      }
-      // await this.#model.findOneAndUpdate(
-      //   {  viewType: viewType },
-      //   { viewType: '' },
-      //   { new: true, session }
-      // );
-    }
-
     const newChildCategory = await this.#model.create([payload], { session });
     return newChildCategory;
   }
 
   async updateChildCategory(id, payload, session) {
-    const { viewType } = payload;
-    if (viewType) {
-      const validViewTypes = ["top", "middle", "lowerMiddle", "buttom"];
-      if (!validViewTypes.includes(viewType)) {
-        throw new Error("Invalid viewType provided");
-      }
-      // await this.#model.findOneAndUpdate(
-      //   {  viewType: viewType },
-      //   { viewType: '' },
-      //   { new: true, session }
-      // );
-    }
     const updatedChildCategory = await this.#model.findByIdAndUpdate(
       id,
       payload
@@ -51,19 +26,9 @@ class ChildCategoryRepository extends BaseRepository {
     return updatedChildCategory;
   }
 
-  async getAllChildCategory(payload) {
-    const { viewType, limit } = payload;
-    let query = {};
-    if (viewType) {
-      const validViewTypes = ["top", "middle", "lowerMiddle", "buttom"];
-      if (!validViewTypes.includes(viewType)) {
-        throw new Error("Invalid viewType provided");
-      }
-      query = { viewType: viewType };
-    }
+  async getAllChildCategory() {
     const childCategorys = await this.#model
-      .find(query)
-      .limit(limit)
+      .find()
       .sort({ createdAt: -1 })
       .populate("subCategoryRef");
     return childCategorys;
@@ -80,7 +45,6 @@ class ChildCategoryRepository extends BaseRepository {
             .skip(offset)
             .limit(limit)
             .populate("subCategoryRef");
-          // .populate('')
           const totalChildCategory = await this.#model.countDocuments();
 
           return { doc: childCategorys, totalDoc: totalChildCategory };

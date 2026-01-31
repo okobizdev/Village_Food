@@ -1,16 +1,11 @@
 "use server";
 
 import { BASE_URL } from "@/config/config";
-import {
-  AllProductResponse,
-  AllProductWithPaginationResponse,
-  SingleProductResponse,
-  TProduct,
-} from "@/types/shared";
+import { AllBannerResponse, AllBannerWithPaginationResponse, SingleBannerResponse } from "./types";
 
-export async function createProduct(data: any) {
 
-  const response = await fetch(`${BASE_URL}/product`, {
+export async function createBanner(data: any) {
+  const response = await fetch(`${BASE_URL}/banners`, {
     method: "POST",
     body: data,
   });
@@ -20,24 +15,24 @@ export async function createProduct(data: any) {
   return response.json();
 }
 
-export async function getAllProduct(): Promise<AllProductResponse> {
-  const response = await fetch(`${BASE_URL}/product`);
+export async function getAllBanner(): Promise<AllBannerResponse> {
+  const response = await fetch(`${BASE_URL}/banners`);
   if (!response.ok) {
     throw new Error(`Error: ${response.status} - ${response.statusText}`);
   }
   return response.json();
 }
 
-export async function getProductWithPagination(
+export async function getBannerWithPagination(
   page?: string,
   limit?: string
-): Promise<AllProductWithPaginationResponse> {
+): Promise<AllBannerWithPaginationResponse> {
   const queryParams = new URLSearchParams();
   if (page) queryParams.set("page", page);
   if (limit) queryParams.set("limit", limit);
 
   const response = await fetch(
-    `${BASE_URL}/product/pagination?${queryParams.toString()}`,
+    `${BASE_URL}/banners/pagination?${queryParams.toString()}`,
     { cache: "no-store" }
   );
 
@@ -48,19 +43,21 @@ export async function getProductWithPagination(
   return response.json();
 }
 
-export async function getProductById(
-  id: string
-): Promise<SingleProductResponse> {
-  const response = await fetch(`${BASE_URL}/product/${id}`);
+export async function getBannerById(id: string): Promise<SingleBannerResponse> {
+  const response = await fetch(`${BASE_URL}/banners/${id}`);
   if (!response.ok) {
     throw new Error(`Error: ${response.status} - ${response.statusText}`);
   }
   return response.json();
 }
 
-export async function updateProduct(id: string, data: any) {
-  const response = await fetch(`${BASE_URL}/product/${id}`, {
+export async function updateBanner(id: string, data: any) {
+  const response = await fetch(`${BASE_URL}/banners/${id}`, {
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
     method: "PUT",
+    // body: JSON.stringify(data),
     body: data,
   });
   if (!response.ok) {
@@ -69,8 +66,8 @@ export async function updateProduct(id: string, data: any) {
   return response.json();
 }
 
-export async function deleteProduct(id: string) {
-  const response = await fetch(`${BASE_URL}/product/${id}`, {
+export async function deleteBanner(id: string) {
+  const response = await fetch(`${BASE_URL}/banners/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {

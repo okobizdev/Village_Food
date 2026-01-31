@@ -6,34 +6,8 @@ const Bannerschema = new Schema(
     image: {
       type: String,
     },
-    title: {
+    imagePublicId: {
       type: String,
-      trim: true,
-    },
-    details: {
-      type: String,
-      trim: true,
-    },
-    bannerCategory: {
-      type: String, //promotion, offer, announcement etc.
-      trim: true,
-    },
-    type: {
-      type: String,
-      enum: [
-        "MAIN BANNER",
-        "CATEGORY BANNER",
-        "BEST SALE BANNER",
-        "NEWSLETTER BANNER",
-        "SHOP BANNER",
-        "PROMO BANNER",
-        "UPCOMING BANNER"
-      ],
-      default: "MAIN BANNER",
-    },
-    status: {
-      type: Boolean,
-      default: true,
     },
   },
   { timestamps: true }

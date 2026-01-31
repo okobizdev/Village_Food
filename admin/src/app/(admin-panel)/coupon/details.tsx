@@ -20,11 +20,11 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileUp, MoreHorizontal, Paperclip } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteCouponAction, updateFormAction } from "./actions";
-import { TCategory, TCoupon, TSubCategory } from "@/types/shared";
+import { TCoupon, TSubCategory } from "@/types/shared";
 import { confirmation } from "@/components/modals/confirm-modal";
 import { couponFormSchema } from "./form-schema";
 import {
@@ -35,13 +35,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { couponTypes } from "./form";
-import { Upload } from "antd";
-import { humanFileSize, makeFormData } from "@/utils/helpers";
-import { UploadOutlined } from "@ant-design/icons";
-import Image from "next/image";
+import { makeFormData } from "@/utils/helpers";
 import { DatePicker } from "@/components/ui/date-picker";
-import { getAllCategory } from "@/services/category";
-import { getAllSubCategory } from "@/services/sub-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { TCategory } from "../category/category/types";
+import { getAllCategory } from "../category/category/service";
 
 interface Props {
   coupon: TCoupon;
@@ -50,12 +48,11 @@ interface Props {
 export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
   const { toast } = useToast();
 
-  const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [updating, setUpdating] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
-  const [fileList, setFileList] = React.useState([]);
-  const [categories, setCategories] = React.useState<TCategory[]>([]);
-  const [subCategories, setSubCategories] = React.useState<TSubCategory[]>([]);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [categories, setCategories] = useState<TCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<TSubCategory[]>([]);
 
   // console.log(coupon, "coupon from colum detail");
   const form = useForm<z.infer<typeof couponFormSchema>>({
@@ -63,7 +60,7 @@ export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
     defaultValues: {
       code: coupon.code,
       discount: String(coupon.discount),
-      type :coupon.type,
+      type: coupon.type,
       useLimit: String(coupon.useLimit),
       startDate: new Date(coupon.startDate),
       expireDate: new Date(coupon.expireDate),
@@ -75,12 +72,12 @@ export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
   });
 
   const selectedCouponType = form.watch("discountType");
- const type = form.watch("type");
-  React.useEffect(() => {
+  const type = form.watch("type");
+  useEffect(() => {
     getAllCategory().then((data) => setCategories(data.data));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllSubCategory().then((data) => setSubCategories(data.data));
   }, []);
 
@@ -165,45 +162,45 @@ export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
                 </FormItem>
               )}
             />
-          <FormField
-  control={form.control}
-  name="discount"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Discount</FormLabel>
-      <FormControl>
-        <div className="flex items-center">
-          {/* Discount number input */}
-          <Input
-            type="number"
-            placeholder="Enter discount"
-            {...field}
-            className="rounded-r-none"
-          />
-          {/* Inline select for percent/fixed */}
-          <Select
-            value={type}
-            onValueChange={(value) => form.setValue("type", value as "percent" | "flat")}
-          >
-            <SelectTrigger className="h-10 rounded-l-none">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {couponTypes.map((type) => (
-                <SelectItem key={type.key} value={type.key}>
-                  {type.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </FormControl>
-      <FormDescription className="text-red-400 text-xs min-h-4">
-        {form.formState.errors.discount?.message}
-      </FormDescription>
-    </FormItem>
-  )}
-/>
+            <FormField
+              control={form.control}
+              name="discount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center">
+                      {/* Discount number input */}
+                      <Input
+                        type="number"
+                        placeholder="Enter discount"
+                        {...field}
+                        className="rounded-r-none"
+                      />
+                      {/* Inline select for percent/fixed */}
+                      <Select
+                        value={type}
+                        onValueChange={(value) => form.setValue("type", value as "percent" | "flat")}
+                      >
+                        <SelectTrigger className="h-10 rounded-l-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {couponTypes.map((type) => (
+                            <SelectItem key={type.key} value={type.key}>
+                              {type.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </FormControl>
+                  <FormDescription className="text-red-400 text-xs min-h-4">
+                    {form.formState.errors.discount?.message}
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

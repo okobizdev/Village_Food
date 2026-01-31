@@ -3,7 +3,7 @@ import React from "react";
 import { ProductTable } from "./table";
 import { fileUrlGenerator } from "@/utils/helpers";
 import { CreateProductForm } from "./form";
-import { getProductWithPagination } from "@/services/product";
+import { getProductWithPagination } from "@/app/(admin-panel)/products/service";
 
 export const revalidate = 0;
 

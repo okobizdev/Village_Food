@@ -20,21 +20,19 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { any, z } from "zod";
+import { z } from "zod";
 import { couponFormSchema } from "./form-schema";
-import { FileUp, Paperclip } from "lucide-react";
-import { humanFileSize, makeFormData } from "@/utils/helpers";
+import { makeFormData } from "@/utils/helpers";
 import { createFormAction } from "./actions";
-import { Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 import { Label } from "@/components/ui/label";
-import { TCategory, TSubCategory, TypesOfDiscountCoupon } from "@/types/shared";
+import { TSubCategory, TypesOfDiscountCoupon } from "@/types/shared";
 import { DatePicker } from "@/components/ui/date-picker";
-import { getAllSubCategory } from "@/services/sub-category";
-import { getAllCategory } from "@/services/category";
-import { useRouter } from "next/navigation";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllCategory } from "../category/category/service";
+import { TCategory } from "../category/category/types";
+
 
 const defaultValues: z.infer<typeof couponFormSchema> = {
   code: "",
@@ -58,9 +56,9 @@ export const couponTypes = [
 
 export const CreateCouponForm: React.FC = () => {
   const { toast } = useToast();
-  const [categories, setCategories] = React.useState<TCategory[]>([]);
-  const [subCategories, setSubCategories] = React.useState<TSubCategory[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [categories, setCategories] = useState<TCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<TSubCategory[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof couponFormSchema>>({
     resolver: zodResolver(couponFormSchema),
@@ -69,12 +67,12 @@ export const CreateCouponForm: React.FC = () => {
 
   const selectedCouponType = form.watch("discountType");
   const selectedCategoryId = form.watch("categoryRef");
-   const type = form.watch("type");
-  React.useEffect(() => {
+  const type = form.watch("type");
+  useEffect(() => {
     getAllCategory().then((data) => setCategories(data.data));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllSubCategory().then((data) => setSubCategories(data.data));
   }, []);
 
@@ -140,49 +138,49 @@ export const CreateCouponForm: React.FC = () => {
               </FormItem>
             )}
           />
-   <FormField
-  control={form.control}
-  name="discount"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Discount</FormLabel>
-      <FormControl>
-        <div className="flex">
-          {/* Discount number input */}
-          <Input
-            type="number"
-            placeholder="Enter discount"
-            {...field}
-            className="rounded-r-none"
+          <FormField
+            control={form.control}
+            name="discount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Discount</FormLabel>
+                <FormControl>
+                  <div className="flex">
+                    {/* Discount number input */}
+                    <Input
+                      type="number"
+                      placeholder="Enter discount"
+                      {...field}
+                      className="rounded-r-none"
+                    />
+                    {/* Inline select for percent/fixed */}
+                    <Select
+                      value={form.getValues("type")}
+                      onValueChange={(value) =>
+                        form.setValue("type", value as "percent" | "flat")
+                      }
+                    >
+                      <SelectTrigger className="h-10 rounded-l-none w-24">
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TypesOfDiscountCoupon.map((option) => (
+                          <SelectItem key={option.key} value={option.key}>
+                            {option.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </FormControl>
+                <FormDescription className="text-red-400 text-xs min-h-4">
+                  {form.formState.errors.discount?.message}
+                </FormDescription>
+              </FormItem>
+            )}
           />
-          {/* Inline select for percent/fixed */}
-          <Select
-            value={form.getValues("type")}
-            onValueChange={(value) =>
-              form.setValue("type", value as "percent" | "flat")
-            }
-          >
-            <SelectTrigger className="h-10 rounded-l-none w-24">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              {TypesOfDiscountCoupon.map((option) => (
-                <SelectItem key={option.key} value={option.key}>
-                  {option.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </FormControl>
-      <FormDescription className="text-red-400 text-xs min-h-4">
-        {form.formState.errors.discount?.message}
-      </FormDescription>
-    </FormItem>
-  )}
-/>
 
-    
+
           <FormField
             control={form.control}
             name="useLimit"

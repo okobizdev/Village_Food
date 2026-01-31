@@ -3,9 +3,8 @@
 import {
   createProduct,
   deleteProduct,
-  getProductById,
   updateProduct,
-} from "@/services/product";
+} from "@/app/(admin-panel)/products/service";
 import { revalidatePath } from "next/cache";
 
 export async function createFormAction(data: FormData) {
@@ -21,9 +20,12 @@ export async function createFormAction(data: FormData) {
     if (inventoryType === "colorLevelInventory") {
       // Group by level for color-level inventory
       const grouped: Record<string, any[]> = {};
+
       parsed.forEach((item) => {
         const level = item.size;
+
         if (!grouped[level]) grouped[level] = [];
+
         grouped[level].push({
           color: item.colorName,
           colorCode: item.color,
@@ -36,6 +38,7 @@ export async function createFormAction(data: FormData) {
         level,
         colorLevel,
       }));
+      
     } else if (inventoryType === "colorInventory") {
       // Direct color-based entries
       inventoryArray = parsed.map((item) => ({
@@ -63,7 +66,6 @@ export async function createFormAction(data: FormData) {
 
     data.delete("inventories");
     data.set("inventoryArray", JSON.stringify(inventoryArray));
-
 
     await createProduct(data);
     revalidatePath("/");

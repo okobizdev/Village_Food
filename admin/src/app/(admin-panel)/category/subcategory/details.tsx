@@ -20,11 +20,11 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileUp, MoreHorizontal, Paperclip, Plus, Trash } from "lucide-react";
-import React from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteSubCategoryAction, updateFormAction } from "./actions";
-import { TCategory, TChildCategory, TSubCategory } from "@/types/shared";
+import { TSubCategory } from "@/types/shared";
 import { confirmation } from "@/components/modals/confirm-modal";
 import { subCategoryFormSchema } from "./form-schema";
 import {
@@ -34,86 +34,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ColorPicker, Upload, UploadFile } from "antd";
+import { Upload, UploadFile } from "antd";
 import { fileUrlGenerator, humanFileSize, makeFormData } from "@/utils/helpers";
 import { UploadOutlined } from "@ant-design/icons";
-import Image from "next/image";
-import { getAllCategory } from "@/services/category";
-import { getAllSubCategory } from "@/services/sub-category";
-import { getAllChildCategory } from "@/services/child-category";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Label } from "@/components/ui/label";
-import { upperCase, upperFirst } from "lodash";
-import { viewTypes } from "./form";
+import { TCategory } from "../category/types";
+import { getAllCategory } from "../category/service";
 
 interface Props {
   subCategory: TSubCategory;
 }
 
 export const SubCategoryDetailsSheet: React.FC<Props> = ({ subCategory }) => {
-  console.log("subCategory from props:", subCategory);
+
   const { toast } = useToast();
 
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [updating, setUpdating] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
-  const [imageFileList, setImageFileList] = React.useState<UploadFile<any>[]>([
-    {
-      uid: "-1",
-      name: String(subCategory.image).split("/").pop() || "",
-      status: "done",
-      url: fileUrlGenerator(subCategory.image || ""),
-    },
-  ]);
 
-  const [bannerFileList, setBannerFileList] = React.useState<UploadFile<any>[]>(
-    [
-      {
-        uid: "-1",
-        name: String(subCategory.bannerImage).split("/").pop() || "",
-        status: "done",
-        url: fileUrlGenerator(subCategory.bannerImage || ""),
-      },
-    ]
-  );
   const [categories, setCategories] = React.useState<TCategory[]>([]);
   const form = useForm<z.infer<typeof subCategoryFormSchema>>({
     resolver: zodResolver(subCategoryFormSchema),
     defaultValues: {
       name: subCategory.name,
-      viewType: subCategory.viewType || "",
       categoryRef: subCategory.categoryRef?._id,
-      image: [],
-      bannerImage: [],
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllCategory().then((data) => setCategories(data.data));
   }, []);
-
-  const handleImageFileChange = ({ fileList }: any) => {
-    setImageFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("image", rawFiles);
-  };
-
-  const handleBannerFileChange = ({ fileList }: any) => {
-    setBannerFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("bannerImage", rawFiles);
-  };
 
   const onSubmitUpdate = async (
     values: z.infer<typeof subCategoryFormSchema>
@@ -126,8 +78,6 @@ export const SubCategoryDetailsSheet: React.FC<Props> = ({ subCategory }) => {
         title: "SubCategory updated successfully",
       });
       setSheetOpen(false);
-      setImageFileList([]);
-      setBannerFileList([]);
     } catch (error: any) {
       toast({
         title: "Failed to update subCategory",
@@ -159,13 +109,13 @@ export const SubCategoryDetailsSheet: React.FC<Props> = ({ subCategory }) => {
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </SheetTrigger>
       <SheetContent
-        className="sm:max-w-[1050px] overflow-y-auto"
+        className="sm:max-w-[750px] overflow-y-auto bg-white"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <SheetHeader>
@@ -230,43 +180,8 @@ export const SubCategoryDetailsSheet: React.FC<Props> = ({ subCategory }) => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="viewType"
-                render={({ field }) => (
-                  <div className="flex items-end gap-2 w-full">
-                    <FormItem className="flex-1">
-                      <FormLabel>View Type</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select view type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {viewTypes.map((type) => (
-                              <SelectItem
-                                key={type.key}
-                                value={String(type.key)}
-                              >
-                                {type.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription className="text-red-400 text-xs min-h-4">
-                        {form.formState.errors.viewType?.message}
-                      </FormDescription>
-                    </FormItem>
-                  </div>
-                )}
-              />
-
               <div className="m-4 flex gap-2">
-                <Button type="submit" variant="default" loading={updating}>
+                <Button type="submit" variant="default" loading={updating} className="cursor-pointer text-white">
                   Update
                 </Button>
                 <Button
@@ -274,116 +189,13 @@ export const SubCategoryDetailsSheet: React.FC<Props> = ({ subCategory }) => {
                   variant="destructive"
                   onClick={handleDeleteClick}
                   loading={deleting}
+                  className="cursor-pointer bg-red-500 text-white"
                 >
                   Delete
                 </Button>
               </div>
             </div>
 
-            {/* Image */}
-            <div className="col-span-1 grid grid-cols-2">
-              <div className="">
-                <Label>
-                  Image <b className="text-red-500">*</b>
-                </Label>
-                <FormField
-                  control={form.control}
-                  name="image"
-                  render={({ field }) => (
-                    <div>
-                      <Upload
-                        listType="picture-card"
-                        beforeUpload={() => false}
-                        fileList={imageFileList}
-                        onChange={handleImageFileChange}
-                      >
-                        <div>
-                          <UploadOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
-                      </Upload>
-                    </div>
-                  )}
-                />
-
-                <div className="mt-4">
-                  {form.getValues("image") &&
-                    form.getValues("image").length > 0 &&
-                    form.getValues("image").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                <div className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.image?.message}
-                </div>
-              </div>
-
-              <div className="">
-                <Label>
-                  Banner Image <b className="text-red-500">*</b>
-                </Label>
-                <FormField
-                  control={form.control}
-                  name="bannerImage"
-                  render={({ field }) => (
-                    <div>
-                      <Upload
-                        listType="picture-card"
-                        beforeUpload={() => false}
-                        fileList={bannerFileList}
-                        onChange={handleBannerFileChange}
-                      >
-                        <div>
-                          <UploadOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
-                      </Upload>
-                    </div>
-                  )}
-                />
-
-                <div className="mt-4">
-                  {form.getValues("bannerImage") &&
-                    form.getValues("bannerImage").length > 0 &&
-                    form.getValues("bannerImage").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                <div className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.bannerImage?.message}
-                </div>
-              </div>
-            </div>
           </form>
         </Form>
       </SheetContent>

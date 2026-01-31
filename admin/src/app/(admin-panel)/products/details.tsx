@@ -20,16 +20,10 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileUp, MoreHorizontal, Paperclip, Plus, Trash } from "lucide-react";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteProductAction, updateFormAction } from "./actions";
-import {
-  TCategory,
-  TChildCategory,
-  TProduct,
-  TSubCategory,
-} from "@/types/shared";
 import { confirmation } from "@/components/modals/confirm-modal";
 import { productFormSchema } from "./form-schema";
 import {
@@ -39,23 +33,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ColorPicker, Upload, UploadFile } from "antd";
-import {
-  fileUrlGenerator,
-  humanFileSize,
-  makeFormData,
-  urlToFile,
-} from "@/utils/helpers";
+import { Upload, UploadFile } from "antd";
+import { fileUrlGenerator, humanFileSize } from "@/utils/helpers";
 import { UploadOutlined } from "@ant-design/icons";
-import Image from "next/image";
-import { getAllCategory } from "@/services/category";
-import { getAllSubCategory } from "@/services/sub-category";
-import { getAllChildCategory } from "@/services/child-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllChildCategory } from "@/app/(admin-panel)/category/childcategory/child-category";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { discountTypes, inventoryTypes } from "./form";
 import { Label } from "@/components/ui/label";
 import { upperCase, upperFirst } from "lodash";
+import { TCategory } from "../category/category/types";
+import { TSubCategory } from "../category/subcategory/types";
+import { getAllCategory } from "../category/category/service";
+import { TProduct } from "./types";
+import { TChildCategory } from "../category/childcategory/types";
+import { uploadImageToCloudinary } from "@/utils/cloudinary";
 
 interface Props {
   product: TProduct;
@@ -65,61 +58,33 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
 
   const { toast } = useToast();
 
-  const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [updating, setUpdating] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
-  const [imageFileList, setImageFileList] = React.useState<UploadFile<any>[]>(
-    product.images?.map((item, index) => ({
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const [optionalFileList, setOptionalFileList] = useState<UploadFile<any>[]>(
+    product.optionalImages?.map((item, index) => ({
       uid: `-${index + 1}`,
       name: String(item).split("/").pop() || `image-${index + 1}`,
       status: "done",
-      url: fileUrlGenerator(item),
+      url: item,
     })) || []
   );
 
-  const imagesDemo = product.images?.map((data) => {});
-  
-
-  const [thumbnailFileList, setThumbnailFileList] = React.useState<
+  const [thumbnailFileList, setThumbnailFileList] = useState<
     UploadFile<any>[]
   >([
     {
       uid: "-1",
       name: String(product.thumbnailImage).split("/").pop() || "",
       status: "done",
-      url: fileUrlGenerator(product.thumbnailImage || ""),
-    },
-  ]);
-  console.log(
-    thumbnailFileList,
-    "thumbnail file list from details 44444444444444444444444"
-  );
-
-  const [backViewFileList, setBackViewFileList] = React.useState<
-    UploadFile<any>[]
-  >([
-    {
-      uid: "-1",
-      name: String(product.backViewImage).split("/").pop() || "",
-      status: "done",
-      url: fileUrlGenerator(product.backViewImage || ""),
+      url: product.thumbnailImage || "",
     },
   ]);
 
-  const [sizeChartFileList, setSizeChartFileList] = React.useState<
-    UploadFile<any>[]
-  >([
-    {
-      uid: "-1",
-      name: String(product.sizeChartImage).split("/").pop() || "",
-      status: "done",
-      url: fileUrlGenerator(product.sizeChartImage || ""),
-    },
-  ]);
-
-  const [categories, setCategories] = React.useState<TCategory[]>([]);
-  const [subCategories, setSubCategories] = React.useState<TSubCategory[]>([]);
-  const [childCategories, setChildCategories] = React.useState<
+  const [categories, setCategories] = useState<TCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<TSubCategory[]>([]);
+  const [childCategories, setChildCategories] = useState<
     TChildCategory[]
   >([]);
 
@@ -137,17 +102,13 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
       subCategoryRef: product.subCategoryRef?._id,
       childCategoryRef: product.childCategoryRef?._id,
       inventoryType: product.inventoryType,
-      images: [],
-      thumbnailImage: [],
-      backViewImage: [],
-      sizeChartImage: [],
+      thumbnailImage: product.thumbnailImage ? [product.thumbnailImage] : [],
+      optionalImages: product.optionalImages || [],
       inventories: product.inventoryRef?.length
         ? product.inventoryRef.map((item: any) => ({
-            quantity: String(item.quantity),
-            ...(item.color && { color: item.color }),
-            ...(item.name && { colorName: upperFirst(item.name) }),
-            ...(item.level && { size: upperCase(item.level) }),
-          }))
+          quantity: String(item.quantity),
+          ...(item.level && { size: upperCase(item.level) }),
+        }))
         : [{ quantity: product.mainInventory }],
     },
   });
@@ -165,67 +126,40 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
 
   const getDefaultInventory = () => {
     const base = { quantity: "" };
-    if (selectedInventoryType === "colorInventory")
-      return { ...base, color: "#1677ff", colorName: "" };
     if (selectedInventoryType === "levelInventory")
       return { ...base, size: "" };
-    if (selectedInventoryType === "colorLevelInventory")
-      return { ...base, color: "#1677ff", colorName: "", size: "" };
     return base;
   };
 
-  const selectedColor = form.watch("color");
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllCategory().then((data) => setCategories(data.data));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllSubCategory().then((data) => setSubCategories(data.data));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllChildCategory().then((data) => setChildCategories(data.data));
   }, []);
 
-  const filteredSubCategories = React.useMemo(() => {
+  const filteredSubCategories = useMemo(() => {
     return subCategories.filter(
       (subCat) => subCat?.categoryRef?._id === selectedCategoryId
     );
   }, [subCategories, selectedCategoryId]);
 
-  const filteredChildCategories = React.useMemo(() => {
+  const filteredChildCategories = useMemo(() => {
     return childCategories.filter(
       (childCat) => childCat?.subCategoryRef?._id === selectedSubCategoryId
     );
-  }, [subCategories, selectedSubCategoryId]);
+  }, [childCategories, selectedSubCategoryId]);
 
-  React.useEffect(() => {
-    if (product.thumbnailImage) {
-      const fetchExistingThumbnail = async () => {
-        const response = await fetch(fileUrlGenerator(product.thumbnailImage));
-        const blob = await response.blob();
-        const file = new File([blob], product.thumbnailImage, {
-          type: blob.type,
-        });
 
-        // Set it to form field value and upload preview
-        form.setValue("thumbnailImage", [file]); // This is key!
-        setThumbnailFileList([
-          {
-            uid: "-1",
-            name: product.thumbnailImage,
-            url: fileUrlGenerator(product.thumbnailImage),
-          },
-        ]);
-      };
 
-      fetchExistingThumbnail();
-    }
-  }, [product.thumbnailImage]);
-
-  const handleImageFileChange = ({ fileList }: any) => {
-    setImageFileList(fileList);
+  const handleOptionalFileChange = ({ fileList }: any) => {
+    setOptionalFileList(fileList);
 
     const rawFiles = fileList
       .map((file: any) => {
@@ -237,7 +171,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
       .filter(Boolean);
 
     // Sync with react-hook-form
-    form.setValue("images", rawFiles);
+    form.setValue("optionalImages", rawFiles);
   };
 
   const handleThumbnailFileChange = ({ fileList }: any) => {
@@ -251,56 +185,75 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
         return file.url;
       })
       .filter(Boolean);
-
     // Sync with react-hook-form
     form.setValue("thumbnailImage", rawFiles);
   };
 
-  const handleBackViewFileChange = ({ fileList }: any) => {
-    setBackViewFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => {
-        if (file.originFileObj) {
-          return file.originFileObj;
-        }
-        return file.url;
-      })
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("backViewImage", rawFiles);
-  };
-
-  const handleSizeChartFileChange = ({ fileList }: any) => {
-    setSizeChartFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => {
-        if (file.originFileObj) {
-          return file.originFileObj;
-        }
-        return file.url;
-      })
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("sizeChartImage", rawFiles);
-  };
-
   const onSubmitUpdate = async (values: z.infer<typeof productFormSchema>) => {
     setUpdating(true);
-    const data = makeFormData(values);
+
     try {
-      await updateFormAction(String(product._id), data);
+
+      const formData = new FormData();
+      // Upload Thumbnail (Required
+      let thumbnailUrl = product.thumbnailImage;
+
+      if (values.thumbnailImage?.[0] instanceof File) {
+        const upload = await uploadImageToCloudinary(
+          values.thumbnailImage[0],
+          "products/thumbnails"
+        );
+        thumbnailUrl = upload.secure_url;
+      }
+
+      // Upload Optional Images
+      let optionalUrls: string[] = [];
+
+      if (values.optionalImages?.length) {
+        optionalUrls = await Promise.all(
+          values.optionalImages.map(async (file: any) => {
+            if (file instanceof File) {
+              const upload = await uploadImageToCloudinary(
+                file,
+                "products/optional"
+              );
+              return upload.secure_url;
+            }
+            return file; // existing url
+          })
+        );
+      }
+
+      // Append Text Fields
+      formData.append("name", values.name);
+      formData.append("description", values.description || "");
+      formData.append("videoUrl", values.videoUrl || "");
+      formData.append("discountType", values.discountType || "");
+      formData.append("discount", values.discount || "0");
+      formData.append("mrpPrice", values.mrpPrice);
+      formData.append("freeShipping", values.freeShipping || "false");
+      formData.append("categoryRef", values.categoryRef);
+      formData.append("subCategoryRef", values.subCategoryRef || "");
+      formData.append("childCategoryRef", values.childCategoryRef || "");
+      formData.append("inventoryType", values.inventoryType);
+      // Inventories
+      values.inventories.forEach((inv) => {
+        formData.append("inventories", JSON.stringify(inv));
+      });
+      // Append Images URL
+      if (thumbnailUrl) formData.append("thumbnailImage", thumbnailUrl);
+      optionalUrls.forEach((url, i) => {
+        formData.append(`optionalImages[[${i}]]`, url);
+      });
+
+
+      await updateFormAction(String(product._id), formData);
       toast({
         title: "Product updated successfully",
       });
       setSheetOpen(false);
-      setImageFileList([]);
+      setOptionalFileList([]);
       setThumbnailFileList([]);
-      setBackViewFileList([]);
-      setSizeChartFileList([]);
     } catch (error: any) {
       toast({
         title: "Failed to update product",
@@ -315,7 +268,6 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
   const handleDeleteClick = async () => {
     if (await confirmation("Are you sure you want to delete this product?")) {
       setDeleting(true);
-      console.log(product._id, "product id from han dle delete......");
       const deleted = await deleteProductAction(String(product._id));
       if (deleted) {
         toast({
@@ -330,13 +282,13 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer ">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </SheetTrigger>
       <SheetContent
-        className="sm:max-w-[1050px] overflow-y-auto"
+        className="sm:max-w-[1050px] overflow-y-auto bg-white "
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <SheetHeader>
@@ -367,7 +319,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                   </FormItem>
                 )}
               />
-              {/* <FormField
+              <FormField
                 control={form.control}
                 name="videoUrl"
                 render={({ field }) => (
@@ -381,7 +333,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                     </FormDescription>
                   </FormItem>
                 )}
-              /> */}
+              />
               <FormField
                 control={form.control}
                 name="description"
@@ -565,7 +517,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                     </div>
                   )}
                 />
-                {/* <FormField
+                <FormField
                   control={form.control}
                   name="childCategoryRef"
                   render={({ field }) => (
@@ -598,7 +550,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                       </FormItem>
                     </div>
                   )}
-                /> */}
+                />
                 <FormField
                   control={form.control}
                   name="inventoryType"
@@ -643,56 +595,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                     key={field.id}
                     className="grid grid-cols-4 gap-1 border p-2 mb-2 rounded-md space-y-2 relative justify-center items-center"
                   >
-                    {(selectedInventoryType === "colorInventory" ||
-                      selectedInventoryType === "colorLevelInventory") && (
-                      <Controller
-                        control={control}
-                        name={`inventories.${index}.color`}
-                        render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel>Color</FormLabel>
-                            <FormControl>
-                              <ColorPicker
-                                value={field.value || "#1677ff"}
-                                showText
-                                allowClear
-                                onChange={(color) =>
-                                  field.onChange(color.toHexString())
-                                }
-                              />
-                            </FormControl>
-                            <FormDescription className="text-red-400 text-xs min-h-4">
-                              {
-                                formState.errors?.inventories?.[index]?.color
-                                  ?.message
-                              }
-                            </FormDescription>
-                          </FormItem>
-                        )}
-                      />
-                    )}
-
-                    {(selectedInventoryType === "colorInventory" ||
-                      selectedInventoryType === "colorLevelInventory") && (
-                      <FormItem>
-                        <FormLabel>Color Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter color name"
-                            {...register(`inventories.${index}.colorName`)}
-                          />
-                        </FormControl>
-                        <FormDescription className="text-red-400 text-xs min-h-4">
-                          {
-                            formState.errors?.inventories?.[index]?.colorName
-                              ?.message
-                          }
-                        </FormDescription>
-                      </FormItem>
-                    )}
-
-                    {(selectedInventoryType === "levelInventory" ||
-                      selectedInventoryType === "colorLevelInventory") && (
+                    {selectedInventoryType === "levelInventory" && (
                       <FormItem>
                         <FormLabel>Size</FormLabel>
                         <FormControl>
@@ -762,6 +665,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                   type="submit"
                   variant="default"
                   loading={updating}
+                  className="text-white cursor-pointer"
                 >
                   Update
                 </Button>
@@ -770,6 +674,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                   variant="destructive"
                   onClick={handleDeleteClick}
                   loading={deleting}
+                  className="text-white cursor-pointer bg-red-500"
                 >
                   Delete
                 </Button>
@@ -831,70 +736,17 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
               </div>
 
               <div className="">
-                <Label>Backview Image (Max 1 File) </Label>
-                <FormField
-                  control={form.control}
-                  name="backViewImage"
-                  render={({ field }) => (
-                    <div>
-                      <Upload
-                        listType="picture-card"
-                        beforeUpload={() => false}
-                        fileList={backViewFileList}
-                        onChange={handleBackViewFileChange}
-                        multiple={false}
-                      >
-                        <div>
-                          <UploadOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
-                      </Upload>
-                    </div>
-                  )}
-                />
-
-                <div className="mt-4">
-                  {form.getValues("backViewImage") &&
-                    form.getValues("backViewImage").length > 0 &&
-                    form.getValues("backViewImage").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                <div className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.backViewImage?.message}
-                </div>
-              </div>
-
-              <div className="">
                 <Label>Optional Images</Label>
                 <FormField
                   control={form.control}
-                  name="images"
+                  name="optionalImages"
                   render={({ field }) => (
                     <div>
                       <Upload
                         listType="picture-card"
                         beforeUpload={() => false}
-                        fileList={imageFileList}
-                        onChange={({ fileList }) => {
-                          setImageFileList(fileList);
-                          form.setValue("images", fileList);
-                        }}
+                        fileList={optionalFileList}
+                        onChange={handleOptionalFileChange}
                       >
                         <div>
                           <UploadOutlined />
@@ -906,9 +758,9 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                 />
 
                 <div className="mt-4">
-                  {form.getValues("images") &&
-                    form.getValues("images").length > 0 &&
-                    form.getValues("images").map((file, i) => (
+                  {form.getValues("optionalImages") &&
+                    form.getValues("optionalImages").length > 0 &&
+                    form.getValues("optionalImages").map((file, i) => (
                       <div className="border-dashed border-2 rounded-lg p-2 px-3">
                         <div
                           key={i}
@@ -928,59 +780,10 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                 </div>
 
                 <div className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.images?.message}
+                  {form.formState.errors.optionalImages?.message}
                 </div>
               </div>
 
-              <div className="">
-                <Label>Size Chart Image (Max 1 File) </Label>
-                <FormField
-                  control={form.control}
-                  name="sizeChartImage"
-                  render={({ field }) => (
-                    <div>
-                      <Upload
-                        listType="picture-card"
-                        beforeUpload={() => false}
-                        fileList={sizeChartFileList}
-                        onChange={handleSizeChartFileChange}
-                        multiple={false}
-                      >
-                        <div>
-                          <UploadOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
-                      </Upload>
-                    </div>
-                  )}
-                />
-
-                <div className="mt-4">
-                  {form.getValues("sizeChartImage") &&
-                    form.getValues("sizeChartImage").length > 0 &&
-                    form.getValues("sizeChartImage").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                <div className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.sizeChartImage?.message}
-                </div>
-              </div>
             </div>
           </form>
         </Form>

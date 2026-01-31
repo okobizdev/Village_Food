@@ -212,24 +212,42 @@ class ProductService extends BaseService {
     } else {
       payload.price = mrpPrice;
     }
-    if (!files?.length) {
-      throw new Error("Thumbnail Image is required");
-    }
-    const hasThumbnailImage = files.some(
-      (file) => file.fieldname === "thumbnailImage"
-    );
+    // Handle both file uploads (multer) and Cloudinary URLs
+    if (files?.length > 0) {
+      // Traditional file upload via multer
+      const hasThumbnailImage = files.some(
+        (file) => file.fieldname === "thumbnailImage"
+      );
 
-    if (!hasThumbnailImage) {
-      throw new Error("Thumbnail Image is required");
-    }
-    let images = await ImgUploader(files);
+      if (!hasThumbnailImage) {
+        throw new Error("Thumbnail Image is required");
+      }
+      let images = await ImgUploader(files);
 
-    // images.images = Object.keys(images)
-    //   .filter((key) => key.startsWith("images["))
-    //   .map((key) => images[key]),
+      for (const key in images) {
+        payload[key] = images[key];
+      }
+    } else {
+      // Cloudinary URLs sent directly
+      if (!payload.thumbnailImage) {
+        throw new Error("Thumbnail Image is required");
+      }
 
-    for (const key in images) {
-      payload[key] = images[key];
+      // Handle optionalImages array from FormData
+      if (payload.optionalImages) {
+        const optionalImagesArray = [];
+        // Check for array-like keys in FormData (e.g., optionalImages[[0]], optionalImages[[1]])
+        for (const key in payload.optionalImages) {
+          if (key.startsWith('optionalImages[[') && key.endsWith(']]')) {
+            optionalImagesArray.push(payload.optionalImages[key]);
+          }
+        }
+        if (optionalImagesArray.length > 0) {
+          payload.optionalImages = optionalImagesArray;
+        } else {
+          delete payload.optionalImages;
+        }
+      }
     }
 
     payload.productId = await idGenerate("PRO-", "productId", this.#repository);
@@ -303,103 +321,13 @@ class ProductService extends BaseService {
       "categoryRef",
       "subCategoryRef",
       "childCategoryRef",
-      "subChildCategoryRef",
       "inventoryRef",
     ]);
     if (!productData) throw new NotFoundError("Product Not Find");
     return productData;
   }
 
-  // async updateProduct(id, payloadFiles, payload, session) {
-  //   try {
-  //     console.log("update service hit=============", payload);
-  //     const { files } = payloadFiles;
-  //     console.log(files, "files from update product service++++++++++++++");
-  //     const {
-  //       // name,
-  //       // description,
-  //       mrpPrice,
-  //       discountType,
-  //       discount,
-  //       // videoUrl,
-  //       // freeShipping,
-  //       // brandRef,
-  //       // categoryRef,
-  //       // subCategoryRef,
-  //       warehouseRef,
-  //     } = payload;
-  //     const existingProduct = await this.#repository.findById(id);
-  //     if (!existingProduct) throw new Error("Product not found");
 
-  //     if ((discountType, discount)) {
-  //       const { price, discountAmount } = calculateDiscountAmount(
-  //         mrpPrice,
-  //         discountType,
-  //         discount
-  //       );
-  //       payload.price = price;
-  //       payload.discountAmount = discountAmount;
-  //     } else {
-  //       payload.price = mrpPrice;
-  //     }
-
-  //     if (files?.length) {
-  //       let images = await ImgUploader(files);
-  //       images.images = Object.keys(images)
-  //         .filter((key) => key.startsWith("images["))
-  //         .map((key) => images[key]);
-  //       for (const key in images) {
-  //         payload[key] = images[key];
-  //       }
-  //     }
-  //     payload.productId = await idGenerate(
-  //       "PRO-",
-  //       "productId",
-  //       this.#repository
-  //     );
-  //     payload.warehouseRef = warehouseRef;
-  //     console.log(payload, "final payload to repo???????????????");
-  //     const productData = await this.#repository.updateProduct(
-  //       id,
-  //       payload,
-  //       session
-  //     );
-  //     if (files.length && productData) {
-  //       console.log("Checking for image deletions...");
-
-  //       // Compare old and new images to find differences
-  //       const oldImages = existingProduct.images || [];
-  //       const newImages = productData.images || [];
-
-  //       const oldThumbnail = existingProduct.thumbnailImage;
-  //       const newThumbnail = productData.thumbnailImage;
-
-  //       const oldBackView = existingProduct.backViewImage;
-  //       const newBackView = productData.backViewImage;
-
-  //       // Find removed images
-  //       const imagesToRemove = oldImages.filter(
-  //         (img) => !newImages.includes(img)
-  //       );
-
-  //       if (oldThumbnail && oldThumbnail !== newThumbnail) {
-  //         imagesToRemove.push(oldThumbnail);
-  //       }
-  //       if (oldBackView && oldBackView !== newBackView) {
-  //         imagesToRemove.push(oldBackView);
-  //       }
-
-  //       // Remove only the images that were replaced
-  //       if (imagesToRemove.length) {
-  //         await removeUploadFile(imagesToRemove);
-  //         console.log("Removed images:", imagesToRemove);
-  //       }
-  //     }
-  //     return productData;
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // }
 
   async updateProduct(id, payloadFiles, payload, session) {
     try {
@@ -580,6 +508,26 @@ class ProductService extends BaseService {
         for (const key in images) {
           payload[key] = images[key];
         }
+      } else {
+        // Cloudinary URLs sent directly
+        if (payload.thumbnailImage) {
+          payload.thumbnailImage = payload.thumbnailImage;
+        }
+
+        // Handle optionalImages array from FormData
+        if (payload.optionalImages) {
+          const optionalImagesArray = [];
+          for (const key in payload.optionalImages) {
+            if (key.startsWith("optionalImages[[") && key.endsWith("]]")) {
+              optionalImagesArray.push(payload.optionalImages[key]);
+            }
+          }
+          if (optionalImagesArray.length > 0) {
+            payload.optionalImages = optionalImagesArray;
+          } else {
+            delete payload.optionalImages;
+          }
+        }
       }
 
       const productData = await this.#repository.updateProduct(
@@ -620,7 +568,6 @@ class ProductService extends BaseService {
 
   async updateProductStatus(id, status) {
     if (!status) throw new NotFoundError("Status is required");
-    status = status === "true";
     const product = await this.#repository.updateProductStatus(id, {
       status: status,
     });
@@ -647,11 +594,8 @@ class ProductService extends BaseService {
       if (deletedProduct?.thumbnailImage) {
         await removeUploadFile(product?.thumbnailImage);
       }
-      if (deletedProduct?.backViewImage) {
-        await removeUploadFile(product?.backViewImage);
-      }
-      if (Array.isArray(deletedProduct?.images)) {
-        deletedProduct?.images.forEach(async (image) => {
+      if (Array.isArray(deletedProduct?.optionalImages)) {
+        deletedProduct?.optionalImages.forEach(async (image) => {
           await removeUploadFile(image);
         });
       }

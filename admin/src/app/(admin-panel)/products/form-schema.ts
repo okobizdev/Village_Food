@@ -8,7 +8,6 @@ export const productFormSchema = z.object({
   discount: z.string().optional(),
   mrpPrice: z.string().min(1, "MRP is required"),
   // status: z.string().optional(),
-  color: z.string().optional(),
   size: z.string().optional(),
   quantity: z.string().optional(),
   freeShipping: z.string().optional(),
@@ -19,56 +18,34 @@ export const productFormSchema = z.object({
   // inventoryArray: z.array(z.object(z.string())).optional(),
   inventories: z.array(
     z.object({
-      color: z.string().optional(),
-      colorName: z.string().optional(),
       size: z.string().optional(),
       quantity: z.string().nonempty("Quantity is required"),
     })
   ),
 
-  images: z
-    .array(
-      // z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-      //   message: "File size must be less than 8 MB",
-      // })
-      z.any()
-    )
-    // .max(1, {
-    //   message: "Maximum 1 files are allowed",
-    // })
-    .optional()
-    .default([]),
   thumbnailImage: z
     .array(
-      z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-        message: "File size must be less than 8 MB",
-      })
+      z.union([
+        z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
+          message: "File size must be less than 8 MB",
+        }),
+        z.string(),
+      ])
     )
     .min(1, {
       message: "Minimum 1 files are allowed",
     }),
   // .optional()
   // .default([]),
-  backViewImage: z
+  optionalImages: z
     .array(
-      z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-        message: "File size must be less than 8 MB",
-      })
+      z.union([
+        z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
+          message: "File size must be less than 8 MB",
+        }),
+        z.string(),
+      ])
     )
-    // .max(1, {
-    //   message: "Maximum 1 files are allowed",
-    // })
-    .optional()
-    .default([]),
-  sizeChartImage: z
-    .array(
-      z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-        message: "File size must be less than 8 MB",
-      })
-    )
-    // .max(1, {
-    //   message: "Maximum 1 files are allowed",
-    // })
     .optional()
     .default([]),
 });

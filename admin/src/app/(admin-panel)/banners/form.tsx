@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { bannerFormSchema, dropZoneConfig } from "./form-schema";
@@ -30,30 +30,16 @@ import { createFormAction } from "./actions";
 import { Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Label } from "@/components/ui/label";
+import { uploadImageToCloudinary } from "@/utils/cloudinary";
 
 const defaultValues = {
-  // title: "",
-  // details: "",
-  // bannerCategory: "",
-  type: "MAIN BANNER",
-  // status: "",
   image: [],
 };
 
-export const bannerTypes = [
-  { name: "MAIN BANNER", key: "main_banner" },
-  { name: "UPCOMING BANNER", key: "upcoming_banner" },
-  // { name: "CATEGORY BANNER", key: "category_banner" },
-  // { name: "BEST SALE BANNER", key: "best_sale_banner" },
-  // { name: "NEWSLETTER BANNER", key: "newsletter_banner" },
-  // { name: "SHOP BANNER", key: "shop_banner" },
-  // { name: "PROMO BANNER", key: "promo_banner" },
-];
-
 export const CreateBannerForm: React.FC = () => {
   const { toast } = useToast();
-  const [fileList, setFileList] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
+  const [fileList, setFileList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = ({ fileList }: any) => {
     setFileList(fileList);
@@ -65,7 +51,7 @@ export const CreateBannerForm: React.FC = () => {
     // Sync with react-hook-form
     form.setValue("image", rawFiles);
   };
-  // console.log(fileList, "fileList................................");
+
 
   const form = useForm<z.infer<typeof bannerFormSchema>>({
     resolver: zodResolver(bannerFormSchema),
@@ -74,9 +60,17 @@ export const CreateBannerForm: React.FC = () => {
 
   const onSubmit = async (values: z.infer<typeof bannerFormSchema>) => {
     setLoading(true);
-    const formData = makeFormData(values);
-    // console.log(values, "values from form++++++++++++++++++++++++++");
+
     try {
+
+      // Image upload to Cloudinary
+      const imageFile = values.image[0];
+      const imageUploadResult = await uploadImageToCloudinary(imageFile, "banners");
+
+      const formData = new FormData();
+      formData.append("image", imageUploadResult.secure_url);
+      formData.append("imagePublicId", imageUploadResult.public_id);
+
       await createFormAction(formData);
       form.reset();
       toast({
@@ -103,84 +97,6 @@ export const CreateBannerForm: React.FC = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid grid-cols-4 gap-2 items-end py-2"
         >
-          {/* <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Banner Title <b className="text-red-500">*</b>
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter banner title" {...field} />
-                </FormControl>
-                <FormDescription className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.title?.message}
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="details"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Banner Details</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter banner details" {...field} />
-                </FormControl>
-                <FormDescription className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.details?.message}
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="bannerCategory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Banner Category</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter bannerCategory number" {...field} />
-                </FormControl>
-                <FormDescription className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.bannerCategory?.message}
-                </FormDescription>
-              </FormItem>
-            )}
-          /> */}
-
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <div className="flex items-end gap-2 w-full">
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    Banner Type <b className="text-red-500">*</b>
-                  </FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select banner type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bannerTypes.map((type) => (
-                          <SelectItem key={type.key} value={String(type.name)}>
-                            {type.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormDescription className="text-red-400 text-xs min-h-4">
-                    {form.formState.errors.type?.message}
-                  </FormDescription>
-                </FormItem>
-              </div>
-            )}
-          />
 
           <div className="">
             <FormField
@@ -230,7 +146,7 @@ export const CreateBannerForm: React.FC = () => {
             </div>
           </div>
 
-          <Button type="submit" loading={loading} className="mb-6">
+          <Button type="submit" loading={loading} className="mb-6 cursor-pointer text-white">
             Create
           </Button>
         </form>

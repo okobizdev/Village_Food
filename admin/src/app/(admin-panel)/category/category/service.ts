@@ -1,12 +1,8 @@
 "use server";
 
 import { BASE_URL } from "@/config/config";
-import {
-  AllCategoryResponse,
-  AllCategoryWithPaginationResponse,
-  SingleCategoryResponse,
-  TCategory,
-} from "@/types/shared";
+import { AllCategoryResponse, AllCategoryWithPaginationResponse, SingleCategoryResponse } from "./types";
+
 
 export async function createCategory(data: any) {
   const response = await fetch(`${BASE_URL}/category`, {

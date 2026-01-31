@@ -46,9 +46,9 @@ const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
           </p>
           <div className="flex items-center justify-start text-[10px]">
             <span>Hotline:</span>{" "}
-            <span className="">Phone: +880 01623-726069</span>
+            <span className="">Phone: +880 +88 01714-028-279</span>
           </div>
-          <p className="text-[10px]">Email :silkthread.bd@gmail.com</p>
+          <p className="text-[10px]">Email :yousufengineering2024@gmail.com</p>
           <p className="text-[10px]">Website : www.silkthread.bd.com</p>
         </div>
 

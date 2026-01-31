@@ -13,16 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./form-schema";
 import { Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Label } from "@/components/ui/label";
-import { makeFormData } from "@/utils/helpers";
 import { createFormAction } from "./actions";
-import { useRouter } from "next/navigation";
 import { uploadImageToCloudinary } from "@/utils/cloudinary";
 
 const defaultValues = {
@@ -33,12 +31,11 @@ const defaultValues = {
 
 export const CreateForm: React.FC = () => {
   const { toast } = useToast();
-  const [fileList, setFileList] = React.useState([]);
-  const [vectorFileList, setVectorFileList] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
+  const [fileList, setFileList] = useState([]);
+  const [vectorFileList, setVectorFileList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    // resolver: zodResolver(formSchema(false)),
     resolver: zodResolver(formSchema),
     defaultValues,
   });
@@ -184,7 +181,7 @@ export const CreateForm: React.FC = () => {
             />
           </div>
 
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="text-white">
             {loading ? "Creating..." : "Create"}
           </Button>
         </form>

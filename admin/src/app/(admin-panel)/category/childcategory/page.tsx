@@ -1,9 +1,8 @@
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import React from "react";
 import { ChildCategoryTable } from "./table";
-import { fileUrlGenerator } from "@/utils/helpers";
 import { CreateChildCategoryForm } from "./form";
-import { getChildCategoryWithPagination } from "@/services/child-category";
+import { getChildCategoryWithPagination } from "@/app/(admin-panel)/category/childcategory/child-category";
 
 export const revalidate = 0;
 
@@ -29,8 +28,6 @@ export default async function ChildCategorysPage({ searchParams }: Props) {
       <ChildCategoryTable
         data={data.result.map((item) => ({
           ...item,
-          // image: fileUrlGenerator(String(item.image)),
-          // bannerImage: fileUrlGenerator(String(item.bannerImage)),
         }))}
         pagination={{
           page: parseInt(page),

@@ -1,9 +1,8 @@
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { getBannerWithPagination } from "@/services/banner";
 import React from "react";
 import { BannerTable } from "./table";
-import { fileUrlGenerator } from "@/utils/helpers";
 import { CreateBannerForm } from "./form";
+import { getBannerWithPagination } from "./service";
 
 export const revalidate = 0;
 
@@ -29,7 +28,6 @@ export default async function BannersPage({ searchParams }: Props) {
       <BannerTable
         data={data.result.map((item) => ({
           ...item,
-          // image: fileUrlGenerator(String(item.image)),
         }))}
         pagination={{
           page: parseInt(page),

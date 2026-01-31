@@ -28,6 +28,6 @@ ProductRoute.route("/:id")
 
 ProductRoute.patch("/:id/priority", controller.togglePriority);
 
-// ProductRoute.put("/status/:id", controller.updateProductStatus);
+ProductRoute.patch("/status/:id", controller.updateProductStatus);
 
 module.exports = ProductRoute;

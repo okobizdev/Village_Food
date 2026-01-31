@@ -1,13 +1,7 @@
 "use server";
 
-import {
-  createBanner,
-  deleteBanner,
-  getBannerById,
-  updateBanner,
-} from "@/services/banner";
-import { TBanner } from "@/types/shared";
 import { revalidatePath } from "next/cache";
+import { createBanner, deleteBanner, updateBanner } from "./service";
 
 export async function createFormAction(data: FormData) {
   try {

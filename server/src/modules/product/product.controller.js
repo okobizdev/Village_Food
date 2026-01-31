@@ -15,10 +15,6 @@ class ProductController {
         name: req.body.name,
         description: req.body.description,
 
-        warehousePrice: req.body.warehousePrice,
-        warehouseProfit: req.body.warehouseProfit,
-        wholesalePrice: req.body.wholesalePrice,
-        wholesaleProfit: req.body.wholesaleProfit,
         mrpPrice: req.body.mrpPrice,
 
         discountType: ensureNullIfUndefined(req.body.discountType),
@@ -29,9 +25,6 @@ class ProductController {
         categoryRef: ensureNullIfUndefined(req.body.categoryRef),
         subCategoryRef: ensureNullIfUndefined(req.body.subCategoryRef),
         childCategoryRef: ensureNullIfUndefined(req.body.childCategoryRef),
-        subChildCategoryRef: ensureNullIfUndefined(
-          req.body.subChildCategoryRef
-        ),
         inventoryType: req.body.inventoryType,
         inventory: req?.body?.inventory,
         inventoryArray: req?.body?.inventoryArray
@@ -39,6 +32,9 @@ class ProductController {
           : [],
         slug: req.body.slug,
         barcode: req.body.barcode,
+        // Cloudinary image URLs
+        thumbnailImage: req.body.thumbnailImage,
+        optionalImages: req.body,
       };
 
       const productResult = await ProductService.createProduct(
@@ -187,10 +183,6 @@ class ProductController {
         name: req.body.name,
         description: req.body.description,
 
-        warehousePrice: req.body.warehousePrice,
-        warehouseProfit: req.body.warehouseProfit,
-        wholesalePrice: req.body.wholesalePrice,
-        wholesaleProfit: req.body.wholesaleProfit,
         mrpPrice: req.body.mrpPrice,
 
         discountType: ensureNullIfUndefined(req.body.discountType),
@@ -201,9 +193,6 @@ class ProductController {
         categoryRef: ensureNullIfUndefined(req.body.categoryRef),
         subCategoryRef: ensureNullIfUndefined(req.body.subCategoryRef),
         childCategoryRef: ensureNullIfUndefined(req.body.childCategoryRef),
-        subChildCategoryRef: ensureNullIfUndefined(
-          req.body.subChildCategoryRef
-        ),
         inventoryType: req.body.inventoryType,
         inventory: req?.body?.inventory,
         inventoryArray: req?.body?.inventoryArray
@@ -211,6 +200,9 @@ class ProductController {
           : [],
         slug: req.body.slug,
         barcode: req.body.barcode,
+        // Cloudinary image URLs
+        thumbnailImage: req.body.thumbnailImage,
+        optionalImages: req.body,
       };
 
       console.log(
@@ -244,7 +236,8 @@ class ProductController {
 
   updateProductStatus = catchError(async (req, res) => {
     const id = req.params.id;
-    const status = req.query.status;
+    const { status } = req.body;
+
     await ProductService.updateProductStatus(id, status);
     const resDoc = responseHandler(201, "Product Status Update successfully");
     res.status(resDoc.statusCode).json(resDoc);

@@ -32,13 +32,13 @@ const Contact = async () => {
               <div>Miprur 2, Oposite of Stadium Gate no. 1. Dhaka</div>
             </div>
             <div className="mt-2">
-              <span className="font-bold">Hotline: </span>  01623-726069
+              <span className="font-bold">Hotline: </span>  +88 01714-028-279
             </div>
             <div className="mt-2">
-              <span className="font-bold">WhatsApp: </span> 01623-726069
+              <span className="font-bold">WhatsApp: </span> +88 01714-028-279
             </div>
             <div className="mt-2">
-              <span className="font-bold">Email: </span>  silkthread.bd@gmail.com
+              <span className="font-bold">Email: </span>  yousufengineering2024@gmail.com
             </div>
           </div>
         </div>

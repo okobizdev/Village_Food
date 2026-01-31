@@ -1,7 +1,6 @@
 
 "use client";
 import { useState } from "react";
-import userImage from "@/assets/loader/userScleton.webp";
 import {
   Popover,
   PopoverContent,
@@ -13,18 +12,16 @@ import Link from "next/link";
 import { RiProfileLine } from "react-icons/ri";
 import { TbLogout } from "react-icons/tb";
 import { toast } from "react-toastify";
-// import {  useRouter } from "next/navigation";
+
 
 const UserPopover = () => {
   const [open, setOpen] = useState(false);
-  // const router = useRouter(); // Assuming you're using Next.js router
   const handleLogout = async () => {
     try {
       await logout();
 
       toast.success("Logout successful");
-      setOpen(false); // Close the popover after logout
-      // router.push('/');
+      setOpen(false);
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -34,7 +31,7 @@ const UserPopover = () => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Image
-          src={userImage}
+          src="/assets/loader/userScleton.webp"
           alt="User"
           width={20}
           height={20}

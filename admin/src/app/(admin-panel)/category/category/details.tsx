@@ -21,23 +21,21 @@ import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   MoreHorizontal,
-  Upload as LucideUpload,
   Paperclip,
   FileUp,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteAction, updateFormAction } from "./actions";
-import { TCategory, TCoupon } from "@/types/shared";
 import { confirmation } from "@/components/modals/confirm-modal";
 import { formSchema } from "./form-schema";
-import { BASE_URL } from "@/config/config";
 import { Upload, UploadFile } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import { fileUrlGenerator, humanFileSize, makeFormData } from "@/utils/helpers";
-import Image from "next/image";
+import { humanFileSize } from "@/utils/helpers";
 import { Label } from "@/components/ui/label";
+import { deleteImageFromCloudinary, uploadImageToCloudinary } from "@/utils/cloudinary";
+import { TCategory } from "./types";
 
 interface Props {
   item: TCategory;
@@ -45,35 +43,30 @@ interface Props {
 
 export const DetailsSheet: React.FC<Props> = ({ item }) => {
   const { toast } = useToast();
-  const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [updating, setUpdating] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const [imageFileList, setImageFileList] = React.useState<UploadFile<any>[]>([
+  const [imageFileList, setImageFileList] = useState<UploadFile<any>[]>([
     {
       uid: "-1",
       name: String(item.image).split("/").pop() || "",
       status: "done",
-      url: fileUrlGenerator(item.image),
+      url: item.image,
     },
   ]);
-  const [vectorFileList, setVectorFileList] = React.useState<UploadFile<any>[]>(
+
+  const [vectorFileList, setVectorFileList] = useState<UploadFile<any>[]>(
     [
       {
         uid: "-1",
         name: String(item.vectorImage).split("/").pop() || "",
         status: "done",
-        url: fileUrlGenerator(item.vectorImage),
+        url: item.vectorImage,
       },
     ]
   );
 
-  const [selectedImageUrl, setSelectedImageUrl] = React.useState(
-    fileUrlGenerator(item.image)
-  );
-  const [selectedVectorImageUrl, setSelectedVectorImageUrl] = React.useState(
-    item.vectorImage ? fileUrlGenerator(item.vectorImage) : ""
-  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -95,7 +88,7 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
     form.setValue("image", rawFiles);
   };
 
-  const handleBannerFileChange = ({ fileList }: any) => {
+  const handleVectorFileChange = ({ fileList }: any) => {
     setVectorFileList(fileList);
 
     const rawFiles = fileList
@@ -108,11 +101,57 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
 
   const onSubmitUpdate = async (values: z.infer<typeof formSchema>) => {
     setUpdating(true);
-    const data = await makeFormData(values);
+
     try {
-      await updateFormAction(String(item._id), data);
+
+      let imageUrl = item.image;
+      let imagePublicId = item.imagePublicId || "";
+      let vectorImageUrl = item.vectorImage;
+      let vectorImagePublicId = item.vectorImagePublicId || "";
+
+      // new image upload
+      if (values.image && values.image.length > 0) {
+        // old image delete
+        if (item.imagePublicId) {
+          await deleteImageFromCloudinary(item.imagePublicId);
+        }
+
+        // new image upload
+        const uploadResult = await uploadImageToCloudinary(
+          values.image[0],
+          "categories"
+        );
+        imageUrl = uploadResult.secure_url;
+        imagePublicId = uploadResult.public_id;
+      }
+
+      // new vector image upload
+      if (values.vectorImage && values.vectorImage.length > 0) {
+        // old vector image delete
+        if (item.vectorImagePublicId) {
+          await deleteImageFromCloudinary(item.vectorImagePublicId);
+        }
+
+        // new vector image upload
+        const vectorUploadResult = await uploadImageToCloudinary(
+          values.vectorImage[0],
+          "categories/vectors"
+        );
+        vectorImageUrl = vectorUploadResult.secure_url;
+        vectorImagePublicId = vectorUploadResult.public_id;
+      }
+
+      // FormData
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("image", imageUrl);
+      formData.append("imagePublicId", imagePublicId);
+      formData.append("vectorImage", vectorImageUrl);
+      formData.append("vectorImagePublicId", vectorImagePublicId);
+
+      await updateFormAction(String(item._id), formData);
       toast({
-        title: "Coupon updated successfully",
+        title: "Category updated successfully",
       });
       setSheetOpen(false);
     } catch (error: any) {
@@ -129,13 +168,35 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
   const handleDeleteClick = async () => {
     if (await confirmation("Are you sure you want to delete this item?")) {
       setDeleting(true);
-      const deleted = await deleteAction(String(item._id));
-      if (deleted) {
+
+      try {
+
+        if (item.imagePublicId) {
+          await deleteImageFromCloudinary(item.imagePublicId);
+        }
+
+        if (item.vectorImagePublicId) {
+          await deleteImageFromCloudinary(item.vectorImagePublicId);
+        }
+
+        const deleted = await deleteAction(String(item._id));
+        if (deleted) {
+          toast({
+            title: "Category deleted successfully",
+          });
+          setSheetOpen(false);
+        }
+
+      } catch (error: any) {
         toast({
-          title: "Coupon deleted successfully",
+          title: "Failed to delete item",
+          description: error.message,
+          variant: "destructive",
         });
-        setSheetOpen(false);
+      } finally {
+        setDeleting(false);
       }
+
     }
     setDeleting(false);
   };
@@ -143,13 +204,13 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </SheetTrigger>
       <SheetContent
-        className="sm:max-w-[750px] overflow-y-auto"
+        className="sm:max-w-[750px] overflow-y-auto bg-white"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <SheetHeader>
@@ -248,7 +309,7 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
                         listType="picture-card"
                         beforeUpload={() => false}
                         fileList={vectorFileList}
-                        onChange={handleBannerFileChange}
+                        onChange={handleVectorFileChange}
                       >
                         <div>
                           <UploadOutlined />
@@ -289,7 +350,7 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
 
             {/* Action Buttons */}
             <div className="col-span-2 flex gap-3 mt-4">
-              <Button type="submit" variant="default" loading={updating}>
+              <Button type="submit" variant="default" loading={updating} className="cursor-pointer text-white">
                 Update
               </Button>
               <Button
@@ -297,6 +358,7 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
                 variant="destructive"
                 onClick={handleDeleteClick}
                 loading={deleting}
+                className="cursor-pointer bg-red-600 text-white"
               >
                 Delete
               </Button>

@@ -48,13 +48,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: ShoppingCart,
           submenus: [],
         },
-        // {
-        //   href: "/bulk-order-list",
-        //   label: "Bulk Orders",
-        //   active: pathname.includes("/bulk-order-list"),
-        //   icon: ShoppingBasket,
-        //   submenus: [],
-        // },
+
         {
           href: "/category",
           label: "Category",
@@ -71,11 +65,11 @@ export function getMenuList(pathname: string): Group[] {
               label: "Subcategory",
               active: pathname === "/category/subcategory",
             },
-            // {
-            //   href: "/category/childcategory",
-            //   label: "Childcategory",
-            //   active: pathname === "/category/childcategory",
-            // },
+            {
+              href: "/category/childcategory",
+              label: "Childcategory",
+              active: pathname === "/category/childcategory",
+            },
           ],
         },
         {

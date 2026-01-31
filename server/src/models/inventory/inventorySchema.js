@@ -15,8 +15,6 @@ const Inventoryschema = new Schema(
     quantity: { type: Number },
     barcode: { type: String },
     availableQuantity: { type: Number },
-    soldQuantity: { type: Number, default: 0 },
-    holdQuantity: { type: Number, default: 0 },
     inventoryType: { type: String },
     color: { type: String },
     name: { type: String }, // this is color name

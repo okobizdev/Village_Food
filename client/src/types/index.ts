@@ -97,10 +97,6 @@ export type TProduct = {
   price: number;
   mrpPrice: number;
   totalPrice?: number | undefined;
-  warehousePrice: number;
-  warehouseProfit: number;
-  wholesalePrice: number;
-  wholesaleProfit: number;
   thumbnailImage: string;
   backViewImage: string;
   sizeChartImage: string;
@@ -111,11 +107,11 @@ export type TProduct = {
   brandRef: string | null;
   mainInventory: number;
   inventoryType:
-  "inventory"  
-    | "colorInventory"
-    | "levelInventory"
-    | "colorLevelInventory"
-    | string;
+  "inventory"
+  | "colorInventory"
+  | "levelInventory"
+  | "colorLevelInventory"
+  | string;
   inventoryRef: TInventoryRef[];
   categoryRef: TCategory;
   subCategoryRef: TSubCategory;

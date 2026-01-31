@@ -108,9 +108,9 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
               Contact Info
             </div>
             <div className="text-black text-md lg:text-lg flex flex-col space-y-1">
-              <div>WhatsApp: 01623-726069</div>
-              <div>Phone: 01623-726069</div>
-              <div>email: silkthread.bd@gmail.com</div>
+              <div>WhatsApp: +88 01714-028-279</div>
+              <div>Phone: +88 01714-028-279</div>
+              <div>email: yousufengineering2024@gmail.com</div>
               <div>Address: Miprur 2, Oposite of Stadium Gate no. 1. Dhaka</div>
             </div>
           </div>
@@ -151,7 +151,7 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
             </ul>
           </div>
           <div>
-            <div className="text-black font-semibold mb-5 text-xl">
+            {/* <div className="text-black font-semibold mb-5 text-xl">
               Social Media
             </div>
             <div className="">
@@ -206,12 +206,12 @@ const Footer: React.FC<FooterProps> = ({ userCartProducts }) => {
                   </svg>
                 </a>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
       <div className="bg-[#37383F] text-white text-center py-4 md:pb-4 pb-[80px]">
-        Copyright © 2025 Silk Thread. All Right Reserved. Developed by{" "}
+        Copyright © 2025 Village Food. All Right Reserved. Developed by{" "}
         <a target="_blank" href="https://okobiz.com/">
           Okobiz
         </a>

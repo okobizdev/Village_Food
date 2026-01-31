@@ -100,18 +100,6 @@ class ProductRepository extends BaseRepository {
         });
       }
 
-      if (subChildCategoryId) {
-        const subChildCategoryArray = Array.isArray(subChildCategoryId)
-          ? subChildCategoryId
-          : [subChildCategoryId];
-        orCategoryIds.push({
-          subChildCategoryRef: {
-            $in: subChildCategoryArray.map(
-              (id) => new mongoose.Types.ObjectId(id)
-            ),
-          },
-        });
-      }
 
       if (orCategoryIds.length > 0) {
         filter.$or = [...(filter.$or || []), ...orCategoryIds];
@@ -163,10 +151,7 @@ class ProductRepository extends BaseRepository {
         const subChildCategories = await SubChildCategorySchema.find({
           slug: { $in: slugs },
         });
-        const ids = subChildCategories.map((s) => s._id);
-        if (ids.length) {
-          orCategoryFilters.push({ subChildCategoryRef: { $in: ids } });
-        }
+
       }
 
       if (orCategoryFilters.length > 0) {
@@ -263,7 +248,6 @@ class ProductRepository extends BaseRepository {
               { path: "categoryRef" },
               { path: "subCategoryRef" },
               { path: "childCategoryRef" },
-              { path: "subChildCategoryRef" },
               { path: "brandRef" },
               { path: "inventoryRef" },
             ]);
@@ -336,7 +320,6 @@ class ProductRepository extends BaseRepository {
               { path: "categoryRef", select: "" },
               { path: "subCategoryRef", select: "" },
               { path: "childCategoryRef", select: "" },
-              { path: "subChildCategoryRef", select: "" },
               { path: "brandRef", select: "" },
             ]);
 
@@ -388,40 +371,6 @@ class ProductRepository extends BaseRepository {
           },
         },
 
-        // Lookup sub-child categories linked to the child category
-        {
-          $lookup: {
-            from: "subchildcategories",
-            localField: "childCategoryDetails._id",
-            foreignField: "childCategoryRef",
-            as: "subChildCategoryDetails",
-          },
-        },
-        {
-          $unwind: {
-            path: "$subChildCategoryDetails",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-
-        // Lookup product counts for each sub-child category
-        {
-          $lookup: {
-            from: "products",
-            let: { subChildCategoryId: "$subChildCategoryDetails._id" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $eq: ["$subChildCategoryRef", "$$subChildCategoryId"],
-                  },
-                },
-              },
-              { $count: "productCount" },
-            ],
-            as: "productCounts",
-          },
-        },
         {
           $addFields: {
             productCount: {
@@ -563,7 +512,7 @@ class ProductRepository extends BaseRepository {
 
   async getRelatedProduct(payload) {
     const { id } = payload;
-  
+
     const product = await this.#model.findById(id).populate("categoryRef");
     const relatedProducts = await this.#model
       .find({
@@ -594,8 +543,16 @@ class ProductRepository extends BaseRepository {
     return product;
   }
 
+    async updateProductStatus(id, payload) {
+    return await this.#model.findByIdAndUpdate(
+      id,
+      { $set: payload },
+      { new: true }
+    );
+  }
+
   async togglePriority(id) {
-    const product = await this.#model.findById(id);    
+    const product = await this.#model.findById(id);
     if (!product) throw new Error("Product not found");
 
     const updatedProduct = await this.#model.findByIdAndUpdate(

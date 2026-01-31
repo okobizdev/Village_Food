@@ -24,8 +24,6 @@ class BannerRepository extends BaseRepository {
             .sort({ createdAt: sortOrder })
             .skip(offset)
             .limit(limit);
-          // .populate('')
-          // .populate('')
           const totalBanner = await this.#model.countDocuments();
 
           return { doc: banners, totalDoc: totalBanner };

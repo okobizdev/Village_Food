@@ -45,7 +45,6 @@ class WarehouseRepository extends BaseRepository {
               // { path: "categoryRef", select: "" },
               // { path: "subCategoryRef", select: "" },
               // { path: "childCategoryRef", select: "" },
-              // { path: "subChildCategoryRef", select: "" },
               // { path: "brandRef", select: "" },
             ]);
 

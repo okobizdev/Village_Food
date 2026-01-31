@@ -23,16 +23,8 @@ const Categoryschema = new Schema(
     vectorImagePublicId: {
       type: String,
     },
-    orderBy: {
-      type: Number,
-      default: null,
-    },
     slug: {
       type: String,
-    },
-    landingPageStatus: {
-      type: Boolean,
-      default: false,
     },
     status: {
       type: Boolean,

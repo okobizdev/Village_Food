@@ -3,7 +3,7 @@ import React from "react";
 import { SubCategoryTable } from "./table";
 import { fileUrlGenerator } from "@/utils/helpers";
 import { CreateSubCategoryForm } from "./form";
-import { getSubCategoryWithPagination } from "@/services/sub-category";
+import { getSubCategoryWithPagination } from "@/app/(admin-panel)/category/subcategory/sub-category";
 
 export const revalidate = 0;
 

@@ -10,6 +10,7 @@ import { upperCase, upperFirst } from "lodash";
 import TruncatedHtml from "@/components/utils/truncated-html";
 import Barcode from "react-barcode";
 import { BASE_URL } from "@/config/config";
+import { ProductStatusDropdown } from "@/components/utils/product-status-dropdown";
 
 export const columns: ColumnDef<TProduct>[] = [
   {
@@ -24,45 +25,7 @@ export const columns: ColumnDef<TProduct>[] = [
         <div>
           {row.original.thumbnailImage && (
             <Image
-              src={fileUrlGenerator(row.original.thumbnailImage)}
-              alt={row.original.name || ""}
-              width={600}
-              height={200}
-              className="w-32 object-cover"
-            />
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    header: "Backview Image",
-    accessorKey: "backViewImage",
-    cell: ({ row }) => {
-      return (
-        <div>
-          {row.original.backViewImage && (
-            <Image
-              src={fileUrlGenerator(row.original.backViewImage)}
-              alt={row.original.name || ""}
-              width={600}
-              height={200}
-              className="w-32 object-cover"
-            />
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    header: "Size Chart Image",
-    accessorKey: "sizeChartImage",
-    cell: ({ row }) => {
-      return (
-        <div>
-          {row.original.sizeChartImage && (
-            <Image
-              src={fileUrlGenerator(row.original.sizeChartImage)}
+              src={row.original.thumbnailImage}
               alt={row.original.name || ""}
               width={600}
               height={200}
@@ -79,14 +42,14 @@ export const columns: ColumnDef<TProduct>[] = [
     cell: ({ row }) => {
       return (
         <div>
-          {row.original.images &&
-            row.original.images.map((img) => (
+          {row.original.optionalImages &&
+            row.original.optionalImages.map((img: string) => (
               <Image
-                src={fileUrlGenerator(img)}
+                src={img}
                 alt={row.original.name || ""}
                 width={600}
                 height={200}
-                className="w-32 object-cover"
+                className="w-32 object-cover mt-1"
               />
             ))}
         </div>
@@ -187,9 +150,8 @@ export const columns: ColumnDef<TProduct>[] = [
     cell: ({ row }) => (
       <div className="">
         {row.original.inventoryType === "colorLevelInventory" && (
-          <p>Color - Size</p>
+          <p> Size</p>
         )}
-        {row.original.inventoryType === "colorInventory" && <p>Color</p>}
         {row.original.inventoryType === "levelInventory" && <p>Size</p>}
         {row.original.inventoryType === "inventory" && <p>-</p>}
       </div>
@@ -201,31 +163,18 @@ export const columns: ColumnDef<TProduct>[] = [
     size: 600,
     cell: ({ row }) => {
       return (
-        <div className="w-[600px] overflow-x-auto grid grid-cols-3 gap-1">
+        <div className="w-[120px] overflow-x-auto  border p-2 rounded-md">
           {row.original.inventoryRef?.map((item) => (
             <div
               key={item._id}
-              className="border p-2 rounded-md shadow hover:shadow-xl transition-all duration-500"
+              className=""
             >
-              <div className="flex items-center justify-start gap-2">
-                <div className="flex items-center justify-start gap-1">
-                  Color: {item.name ? upperCase(item.name) : "N/A"}
-                  {item.color ? (
-                    <div
-                      style={{ backgroundColor: item.color }}
-                      className="w-5 aspect-square rounded-full border border-black"
-                    ></div>
-                  ) : (
-                    "-"
-                  )}
-                </div>
-                <p>Level: {item.level ? upperCase(item.level) : "N/A"}</p>
+              <div className="flex items-center  gap-2">
+                <p>Size: {item.level ? upperCase(item.level) : "N/A"}</p>
               </div>
               <p>
                 Quantity: <span className="font-bold"> {item.quantity}</span>
               </p>
-              <p>Sold Quantity: {item.soldQuantity}</p>
-              <p>Hold Quantity: {item.holdQuantity}</p>
             </div>
           ))}
         </div>
@@ -262,6 +211,18 @@ export const columns: ColumnDef<TProduct>[] = [
         <div>
           <p>{upperFirst(row.original.childCategoryRef?.name)}</p>
         </div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      return (
+        <ProductStatusDropdown
+          productId={row.original._id}
+          currentStatus={row.original.status ?? null}
+        />
       );
     },
   },

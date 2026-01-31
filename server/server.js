@@ -33,8 +33,21 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // Input sanitization (after body parsing)
 app.use(sanitizeInput);
 
+const allowedOrigins = [
+  config.clientBaseURL,
+  config.adminBaseURL,
+  "http://localhost:3000",
+  "http://localhost:3001"
+].filter(Boolean);
+
 app.use(cors({
-  origin: config.clientBaseURL || "*",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 

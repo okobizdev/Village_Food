@@ -1,21 +1,12 @@
 "use server";
 
 import { BASE_URL } from "@/config/config";
-import {
-  AllChildCategoryResponse,
-  AllChildCategoryWithPaginationResponse,
-  SingleChildCategoryResponse,
-  TChildCategory,
-} from "@/types/shared";
+import { AllChildCategoryResponse, AllChildCategoryWithPaginationResponse, SingleChildCategoryResponse } from "./types";
 
 export async function createChildCategory(data: any) {
   const response = await fetch(`${BASE_URL}/child-category`, {
-    // headers: {
-    //   "Content-Type": "application/json",
-    // },
     method: "POST",
     body: data,
-    // body: JSON.stringify(data),
   });
   if (!response.ok) {
     throw new Error(`Error: ${response.status} - ${response.statusText}`);

@@ -61,15 +61,14 @@ export default function Layout({
       {/* Mobile Sidebar */}
       {isMobile && (
         <aside
-          className={`w-64 bg-gray-100 p-4 shadow-md fixed h-full transition-transform duration-300 z-40 ${
-            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`w-64 bg-gray-100 p-4 shadow-md fixed h-full transition-transform duration-300 z-40 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           <h2 className="text-xl font-bold mb-6">
             <Link href="/">
               <Image
                 src={logo}
-                alt="Silk Thread  | Best E-commerce platform in BD"
+                alt="Village Food  | Best E-commerce platform in BD"
                 width={120}
                 height={60}
                 className="w-full h-full"
@@ -80,11 +79,10 @@ export default function Layout({
             <li>
               <Link
                 href="/dashboard/profile"
-                className={`block px-4 py-2 rounded-lg ${
-                  pathname === "/dashboard/profile"
+                className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/profile"
                     ? "bg-blue-600 text-white"
                     : "text-blue-600 hover:bg-blue-100"
-                }`}
+                  }`}
                 onClick={() => setIsSidebarOpen(false)}
               >
                 Profile
@@ -93,11 +91,10 @@ export default function Layout({
             <li>
               <Link
                 href="/dashboard/orderHistory"
-                className={`block px-4 py-2 rounded-lg ${
-                  pathname === "/dashboard/orderHistory"
+                className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/orderHistory"
                     ? "bg-blue-600 text-white"
                     : "text-blue-600 hover:bg-blue-100"
-                }`}
+                  }`}
                 onClick={() => setIsSidebarOpen(false)}
               >
                 Order History
@@ -124,11 +121,10 @@ export default function Layout({
           <li>
             <Link
               href="/dashboard/profile"
-              className={`block px-4 py-2 rounded-lg ${
-                pathname === "/dashboard/profile"
+              className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/profile"
                   ? "bg-blue-600 text-white"
                   : "text-blue-600 hover:bg-blue-100"
-              }`}
+                }`}
             >
               Profile
             </Link>
@@ -136,11 +132,10 @@ export default function Layout({
           <li>
             <Link
               href="/dashboard/orderHistory"
-              className={`block px-4 py-2 rounded-lg ${
-                pathname === "/dashboard/orderHistory"
+              className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/orderHistory"
                   ? "bg-blue-600 text-white"
                   : "text-blue-600 hover:bg-blue-100"
-              }`}
+                }`}
             >
               Order History
             </Link>

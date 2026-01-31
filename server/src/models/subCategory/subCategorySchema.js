@@ -11,9 +11,6 @@ const SubCategoryschema = new Schema(
       required: true,
       trim: true,
     },
-    image: {
-      type: String,
-    },
     slug: {
       type: String,
     },
@@ -21,20 +18,9 @@ const SubCategoryschema = new Schema(
       type: Boolean,
       default: true,
     },
-    landingPageStatus: {
-      type: Boolean,
-      default: false,
-    },
-    orderBy: {
-      type: Number,
-    },
     categoryRef: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "category",
-    },
-    viewType: {
-      type: String,
-      enum: ["top", "middle", "lowerMiddle", "buttom"],
     },
   },
   { timestamps: true }

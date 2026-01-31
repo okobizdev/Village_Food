@@ -1,10 +1,6 @@
 import { z } from "zod";
 
 export const bannerFormSchema = z.object({
-  // title: z.string().min(1),
-  // details: z.string().optional(),
-  // bannerCategory: z.string().optional(),
-  type: z.string().min(1),
   image: z
     .array(
       z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {

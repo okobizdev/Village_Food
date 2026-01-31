@@ -1,21 +1,13 @@
 const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 const bannerRepository = require("./banner.repository.js");
-const {
-  convertFileNameWithPdfExt,
-} = require("../../middleware/upload/convertFileNameWithPdfExt.js");
-const {
-  convertFileNameWithWebpExt,
-} = require("../../middleware/upload/convertFileNameWithWebpExt.js");
-const { uploadWorker } = require("../../middleware/upload/uploadWorker.js");
-const {
-  convertImgArrayToObject,
-} = require("../../middleware/upload/convertImgArrayToObject.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
-const { isMainThread } = require("worker_threads");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 class BannerService extends BaseService {
   #repository;
@@ -25,30 +17,14 @@ class BannerService extends BaseService {
   }
 
   async createBanner(payload, payloadFiles, session) {
-    const { files } = payloadFiles;
-    const { title, details, type, status } = payload;
-    if (!files) throw new Error("image is required");
-
-    const images = await ImgUploader(files);
-    for (const key in images) {
-      payload[key] = images[key];
-      // console.log(payload, ":payload ", key, ":key");
-    }
+    if (!payload.image) throw new Error("image is required");
 
     const bannerData = await this.#repository.createBanner(payload);
     return bannerData;
   }
 
   async getAllBanner(payload) {
-    const { type } = payload;
-
-    const filter = {
-      status: true,
-    };
-
-    if (type) filter.type = type;
-
-    return await this.#repository.findAll(filter);
+    return await this.#repository.findAll({});
   }
 
   async getBannerWithPagination(payload) {
@@ -63,32 +39,37 @@ class BannerService extends BaseService {
   }
 
   async updateBanner(id, payload, payloadFiles, session) {
-    const { files } = payloadFiles;
-    const { title, details, type, status } = payload;
+    const oldBanner = await this.#repository.findById(id);
+    if (!oldBanner) throw new NotFoundError("Banner Not Find");
 
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
+    const bannerData = await this.#repository.updateById(id, payload);
+
+    // If new image is uploaded and there was an old image, delete old one from cloudinary
+    if (payload.image && oldBanner.image && payload.image !== oldBanner.image && oldBanner.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(oldBanner.imagePublicId);
+      } catch (error) {
+        console.error("Failed to delete old image from cloudinary:", error);
       }
     }
 
-    const bannerData = await this.#repository.updateById(id, payload);
-    if (!bannerData) throw new NotFoundError("Banner Not Find");
-
-    if (files?.length && bannerData) {
-      await removeUploadFile(bannerData?.image);
-    }
     return bannerData;
   }
 
   async deleteBanner(id) {
     const banner = await this.#repository.findById(id);
     if (!banner) throw new NotFoundError("Banner not found");
+
     const deletedBanner = await this.#repository.deleteById(id);
-    if (deletedBanner) {
-      await removeUploadFile(banner?.image);
+
+    if (deletedBanner && banner?.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(banner.imagePublicId);
+      } catch (error) {
+        console.error("Failed to delete image from cloudinary:", error);
+      }
     }
+
     return deletedBanner;
   }
 }

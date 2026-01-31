@@ -36,6 +36,9 @@ const config = {
   // Client
   clientBaseURL: process.env.CLIENT_BASE_URL || "http://localhost:3000",
 
+  // Admin
+  adminBaseURL: process.env.ADMIN_BASE_URL || "http://localhost:3001",
+
   // Email
   smtpService: process.env.SMTP_SERVICE || "gmail",
   smtpUser: process.env.EMAIL_USERNAME,

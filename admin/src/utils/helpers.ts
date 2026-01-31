@@ -68,7 +68,7 @@ export function humanFileSize(bytes: number, si = false, dp = 1) {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {
-    return bytes + " B";
+    return bytes + "B";
   }
 
   const units = si

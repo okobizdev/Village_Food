@@ -4,10 +4,9 @@ const pagination = require("../../utils/pagination.js");
 const BaseRepository = require("../base/base.repository.js");
 
 class SubCategoryRepository extends BaseRepository {
-  #model;
   constructor(model) {
     super(model);
-    this.#model = model;
+    this.model = model;
   }
 
   async createSubCategory(payload, session) {
@@ -17,13 +16,13 @@ class SubCategoryRepository extends BaseRepository {
       if (!validViewTypes.includes(viewType)) {
         throw new Error("Invalid viewType provided");
       }
-      await this.#model.findOneAndUpdate(
-        {  viewType: viewType },
+      await this.model.findOneAndUpdate(
+        { viewType: viewType },
         { viewType: '' },
         { new: true, session }
       );
     }
-    const newSubCategory = await this.#model.create([payload], { session });
+    const newSubCategory = await this.model.create([payload], { session });
     return newSubCategory;
   }
 
@@ -34,13 +33,13 @@ class SubCategoryRepository extends BaseRepository {
       if (!validViewTypes.includes(viewType)) {
         throw new Error("Invalid viewType provided");
       }
-      await this.#model.findOneAndUpdate(
-        {viewType: viewType },
+      await this.model.findOneAndUpdate(
+        { viewType: viewType },
         { viewType: '' },
         { new: true, session }
       );
     }
-    const updatedSubCategory = await this.#model.findByIdAndUpdate(
+    const updatedSubCategory = await this.model.findByIdAndUpdate(
       id,
       payload,
       { new: true, session }
@@ -57,14 +56,14 @@ class SubCategoryRepository extends BaseRepository {
       const subCategorys = await pagination(
         payload,
         async (limit, offset, sortOrder) => {
-          const subCategorys = await this.#model
+          const subCategorys = await this.model
             .find({})
             .sort({ createdAt: sortOrder })
             .skip(offset)
             .limit(limit)
             .populate('categoryRef')
           // .populate('')
-          const totalSubCategory = await this.#model.countDocuments();
+          const totalSubCategory = await this.model.countDocuments();
 
           return { doc: subCategorys, totalDoc: totalSubCategory };
         }
@@ -75,6 +74,10 @@ class SubCategoryRepository extends BaseRepository {
       console.error("Error getting subCategorys with pagination:", error);
       throw error;
     }
+  }
+
+  async updateSubCategoryStatus(id, payload) {
+    return await this.model.findByIdAndUpdate(id, payload, { new: true });
   }
 }
 

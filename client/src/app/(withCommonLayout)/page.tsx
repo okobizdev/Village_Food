@@ -46,9 +46,9 @@ const page = async () => {
       <div className="">
         <Banner banners={[]} />
         {/* <Category /> */}
-        <SubCategory />
+        {/* <SubCategory /> */}
         {/* <ChildCategory />   */}
-        <TopChildCategory childCategoriesList={topChildCategoriesList?.data} />
+        {/* <TopChildCategory childCategoriesList={topChildCategoriesList?.data} />
         {topRes?.status === "success" && (
           <HomeProductSection products={topRes?.data} />
         )}
@@ -75,7 +75,7 @@ const page = async () => {
 
         {buttomRes?.status === "success" && (
           <HomeProductSection products={buttomRes?.data} />
-        )}
+        )} */}
       </div>
     </>
   );

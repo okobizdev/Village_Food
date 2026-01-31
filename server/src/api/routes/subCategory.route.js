@@ -21,6 +21,5 @@ SubCategoryRoute.route("/:id")
   .put(upload.any(), controller.updateSubCategory)
   .delete(controller.deleteSubCategory);
 
-SubCategoryRoute.put("/status/:id", controller.updateSubCategoryStatus);
 
 module.exports = SubCategoryRoute;

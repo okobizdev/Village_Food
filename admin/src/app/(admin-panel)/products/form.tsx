@@ -20,24 +20,26 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import { productFormSchema, dropZoneConfig } from "./form-schema";
+import { productFormSchema } from "./form-schema";
 import { FileUp, Paperclip, Plus, Trash } from "lucide-react";
-import { humanFileSize, makeFormData } from "@/utils/helpers";
+import { humanFileSize } from "@/utils/helpers";
 import { createFormAction } from "./actions";
 import { Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Label } from "@/components/ui/label";
-import { TCategory, TChildCategory, TSubCategory } from "@/types/shared";
-import { ColorPicker } from "antd";
-import { getAllCategory } from "@/services/category";
-import { getAllSubCategory } from "@/services/sub-category";
-import { getAllChildCategory } from "@/services/child-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllChildCategory } from "@/app/(admin-panel)/category/childcategory/child-category";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useRouter } from "next/navigation";
+import { TCategory } from "../category/category/types";
+import { TSubCategory } from "../category/subcategory/types";
+import { getAllCategory } from "../category/category/service";
+import { uploadImageToCloudinary } from "@/utils/cloudinary";
+import { TChildCategory } from "../category/childcategory/types";
+
 
 const defaultValues = {
   name: "",
@@ -51,10 +53,8 @@ const defaultValues = {
   subCategoryRef: "",
   childCategoryRef: "",
   inventoryType: "",
-  images: [],
   thumbnailImage: [],
-  backViewImage: [],
-  sizeChartImage: [],
+  optionalImages: [],
   inventories: [{ quantity: "" }], // initial entry
 };
 
@@ -64,22 +64,18 @@ export const discountTypes = [
 ];
 
 export const inventoryTypes = [
-  { name: "Color", key: "colorInventory" },
   { name: "Size", key: "levelInventory" },
-  { name: "Color - Size", key: "colorLevelInventory" },
   { name: "Without Any", key: "inventory" },
 ];
 
 export const CreateProductForm: React.FC = () => {
   const { toast } = useToast();
-  const [imageFileList, setImageFileList] = React.useState([]);
-  const [thumbnailFileList, setThumbnailFileList] = React.useState([]);
-  const [backViewFileList, setBackViewFileList] = React.useState([]);
-  const [sizeChartFileList, setSizeChartFileList] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const [categories, setCategories] = React.useState<TCategory[]>([]);
-  const [subCategories, setSubCategories] = React.useState<TSubCategory[]>([]);
-  const [childCategories, setChildCategories] = React.useState<
+  const [thumbnailFileList, setThumbnailFileList] = useState([]);
+  const [optionalFileList, setOptionalFileList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<TCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<TSubCategory[]>([]);
+  const [childCategories, setChildCategories] = useState<
     TChildCategory[]
   >([]);
 
@@ -101,52 +97,36 @@ export const CreateProductForm: React.FC = () => {
 
   const getDefaultInventory = () => {
     const base = { quantity: "" };
-    if (selectedInventoryType === "colorInventory")
-      return { ...base, color: "#1677ff", colorName: "" };
     if (selectedInventoryType === "levelInventory")
       return { ...base, size: "" };
-    if (selectedInventoryType === "colorLevelInventory")
-      return { ...base, color: "#1677ff", colorName: "", size: "" };
     return base;
   };
 
-  const selectedColor = form.watch("color");
 
-
-  React.useEffect(() => {
+  useEffect(() => {
     getAllCategory().then((data) => setCategories(data.data));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllSubCategory().then((data) => setSubCategories(data.data));
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllChildCategory().then((data) => setChildCategories(data.data));
   }, []);
 
-  const filteredSubCategories = React.useMemo(() => {
+  const filteredSubCategories = useMemo(() => {
     return subCategories.filter(
       (subCat) => subCat?.categoryRef?._id === selectedCategoryId
     );
   }, [subCategories, selectedCategoryId]);
 
-  const filteredChildCategories = React.useMemo(() => {
+  const filteredChildCategories = useMemo(() => {
     return childCategories.filter(
       (childCat) => childCat?.subCategoryRef?._id === selectedSubCategoryId
     );
-  }, [subCategories, selectedSubCategoryId]);
+  }, [childCategories, selectedSubCategoryId]);
 
-  const handleImageFileChange = ({ fileList }: any) => {
-    setImageFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("images", rawFiles);
-  };
 
   const handleThumbnailFileChange = ({ fileList }: any) => {
     setThumbnailFileList(fileList);
@@ -154,49 +134,76 @@ export const CreateProductForm: React.FC = () => {
     const rawFiles = fileList
       .map((file: any) => file.originFileObj)
       .filter(Boolean);
-
     // Sync with react-hook-form
     form.setValue("thumbnailImage", rawFiles);
   };
 
-  const handleBackViewFileChange = ({ fileList }: any) => {
-    setBackViewFileList(fileList);
+  const handleOptionalFileChange = ({ fileList }: any) => {
+    setOptionalFileList(fileList);
 
     const rawFiles = fileList
       .map((file: any) => file.originFileObj)
       .filter(Boolean);
 
     // Sync with react-hook-form
-    form.setValue("backViewImage", rawFiles);
+    form.setValue("optionalImages", rawFiles);
   };
 
-  const handleSizeChartFileChange = ({ fileList }: any) => {
-    setSizeChartFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("sizeChartImage", rawFiles);
-  };
-  // console.log(fileList, "fileList................................");
 
   const onSubmit = async (values: z.infer<typeof productFormSchema>) => {
     setLoading(true);
-    const formData = makeFormData(values);
- 
+
     try {
+      // Validate thumbnail image (required)
+      if (!values.thumbnailImage || values.thumbnailImage.length === 0) {
+        throw new Error("Thumbnail image is required");
+      }
+
+      // Upload thumbnail image to Cloudinary (required)
+      const thumbnailsImageFile = values.thumbnailImage[0];
+      const thumbnailsUploadResult = await uploadImageToCloudinary(
+        thumbnailsImageFile,
+        "products/thumbnails"
+      );
+
+      const optionalImagesFiles = values.optionalImages || [];
+      const optionalImagesUploadResults = await Promise.all(
+        optionalImagesFiles.map((file) => uploadImageToCloudinary(file, "products/optional"))
+      );
+
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("description", values.description || "");
+      formData.append("videoUrl", values.videoUrl || "");
+      formData.append("discountType", values.discountType || "");
+      formData.append("discount", values.discount || "0");
+      formData.append("mrpPrice", values.mrpPrice);
+      formData.append("freeShipping", values.freeShipping || "false");
+      formData.append("categoryRef", values.categoryRef);
+      formData.append("subCategoryRef", values.subCategoryRef || "");
+      formData.append("childCategoryRef", values.childCategoryRef || "");
+      formData.append("inventoryType", values.inventoryType);
+      values.inventories.forEach((inv) => {
+        formData.append("inventories", JSON.stringify(inv));
+      });
+
+      // Append images
+      formData.append("thumbnailImage", thumbnailsUploadResult.secure_url);
+
+      optionalImagesUploadResults.forEach((result, index) => {
+        formData.append(`optionalImages[[${index}]]`, result.secure_url);
+      });
+
       await createFormAction(formData);
+
       form.reset();
       toast({
         title: "Success",
         description: "Product created successfully",
       });
-      setImageFileList([]);
+
       setThumbnailFileList([]);
-      setBackViewFileList([]);
-      setSizeChartFileList([]);
+      setOptionalFileList([]);
       window.location.reload();
     } catch (error: any) {
       toast({
@@ -236,7 +243,8 @@ export const CreateProductForm: React.FC = () => {
                 </FormItem>
               )}
             />
-            {/* <FormField
+
+            <FormField
               control={form.control}
               name="videoUrl"
               render={({ field }) => (
@@ -250,7 +258,8 @@ export const CreateProductForm: React.FC = () => {
                   </FormDescription>
                 </FormItem>
               )}
-            /> */}
+            />
+
             <FormField
               control={form.control}
               name="description"
@@ -349,6 +358,7 @@ export const CreateProductForm: React.FC = () => {
                   </div>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="discount"
@@ -364,6 +374,7 @@ export const CreateProductForm: React.FC = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="categoryRef"
@@ -397,6 +408,7 @@ export const CreateProductForm: React.FC = () => {
                   </div>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="subCategoryRef"
@@ -428,7 +440,8 @@ export const CreateProductForm: React.FC = () => {
                   </div>
                 )}
               />
-              {/* <FormField
+
+              <FormField
                 control={form.control}
                 name="childCategoryRef"
                 render={({ field }) => (
@@ -458,7 +471,8 @@ export const CreateProductForm: React.FC = () => {
                     </FormItem>
                   </div>
                 )}
-              /> */}
+              />
+
               <FormField
                 control={form.control}
                 name="inventoryType"
@@ -503,56 +517,7 @@ export const CreateProductForm: React.FC = () => {
                   key={field.id}
                   className="grid grid-cols-4 gap-1 border p-2 mb-2 rounded-md space-y-2 relative justify-center items-center"
                 >
-                  {(selectedInventoryType === "colorInventory" ||
-                    selectedInventoryType === "colorLevelInventory") && (
-                    <Controller
-                      control={control}
-                      name={`inventories.${index}.color`}
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Color</FormLabel>
-                          <FormControl>
-                            <ColorPicker
-                              value={field.value || "#1677ff"}
-                              showText
-                              allowClear
-                              onChange={(color) =>
-                                field.onChange(color.toHexString())
-                              }
-                            />
-                          </FormControl>
-                          <FormDescription className="text-red-400 text-xs min-h-4">
-                            {
-                              formState.errors?.inventories?.[index]?.color
-                                ?.message
-                            }
-                          </FormDescription>
-                        </FormItem>
-                      )}
-                    />
-                  )}
-
-                  {(selectedInventoryType === "colorInventory" ||
-                    selectedInventoryType === "colorLevelInventory") && (
-                    <FormItem>
-                      <FormLabel>Color Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter color name"
-                          {...register(`inventories.${index}.colorName`)}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-red-400 text-xs min-h-4">
-                        {
-                          formState.errors?.inventories?.[index]?.colorName
-                            ?.message
-                        }
-                      </FormDescription>
-                    </FormItem>
-                  )}
-
-                  {(selectedInventoryType === "levelInventory" ||
-                    selectedInventoryType === "colorLevelInventory") && (
+                  {selectedInventoryType === "levelInventory" && (
                     <FormItem>
                       <FormLabel>Size</FormLabel>
                       <FormControl>
@@ -613,7 +578,7 @@ export const CreateProductForm: React.FC = () => {
                 </Button>
               )}
 
-            <Button type="submit" loading={loading} className="my-6">
+            <Button type="submit" loading={loading} className="my-6  text-white cursor-pointer ">
               Create
             </Button>
           </div>
@@ -672,66 +637,17 @@ export const CreateProductForm: React.FC = () => {
               </div>
             </div>
             <div className="">
-              <Label>Backview Image (Max 1 File)</Label>
-              <FormField
-                control={form.control}
-                name="backViewImage"
-                render={({ field }) => (
-                  <div>
-                    <Upload
-                      listType="picture-card"
-                      beforeUpload={() => false}
-                      fileList={backViewFileList}
-                      onChange={handleBackViewFileChange}
-                      multiple={false}
-                    >
-                      <div>
-                        <UploadOutlined />
-                        <div style={{ marginTop: 8 }}>Upload</div>
-                      </div>
-                    </Upload>
-                  </div>
-                )}
-              />
-
-              <div className="mt-4">
-                {form.getValues("backViewImage") &&
-                  form.getValues("backViewImage").length > 0 &&
-                  form.getValues("backViewImage").map((file, i) => (
-                    <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                      <div
-                        key={i}
-                        className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Paperclip className="h-4 w-4 stroke-current" />
-                          <span>{file.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <FileUp className="h-4 w-4 stroke-current" />
-                          <span>{humanFileSize(file.size)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-
-              <div className="text-red-400 text-xs min-h-4">
-                {form.formState.errors.backViewImage?.message}
-              </div>
-            </div>{" "}
-            <div className="">
               <Label>Optional Images</Label>
               <FormField
                 control={form.control}
-                name="images"
+                name="optionalImages"
                 render={({ field }) => (
                   <div>
                     <Upload
                       listType="picture-card"
                       beforeUpload={() => false}
-                      fileList={imageFileList}
-                      onChange={handleImageFileChange}
+                      fileList={optionalFileList}
+                      onChange={handleOptionalFileChange}
                     >
                       <div>
                         <UploadOutlined />
@@ -743,9 +659,9 @@ export const CreateProductForm: React.FC = () => {
               />
 
               <div className="mt-4">
-                {form.getValues("images") &&
-                  form.getValues("images").length > 0 &&
-                  form.getValues("images").map((file, i) => (
+                {form.getValues("optionalImages") &&
+                  form.getValues("optionalImages").length > 0 &&
+                  form.getValues("optionalImages").map((file, i) => (
                     <div className="border-dashed border-2 rounded-lg p-2 px-3">
                       <div
                         key={i}
@@ -765,56 +681,7 @@ export const CreateProductForm: React.FC = () => {
               </div>
 
               <div className="text-red-400 text-xs min-h-4">
-                {form.formState.errors.images?.message}
-              </div>
-            </div>
-            <div className="">
-              <Label>Size Chart Image (Max 1 File) </Label>
-              <FormField
-                control={form.control}
-                name="sizeChartImage"
-                render={({ field }) => (
-                  <div>
-                    <Upload
-                      listType="picture-card"
-                      beforeUpload={() => false}
-                      fileList={sizeChartFileList}
-                      onChange={handleSizeChartFileChange}
-                      multiple={false}
-                    >
-                      <div>
-                        <UploadOutlined />
-                        <div style={{ marginTop: 8 }}>Upload</div>
-                      </div>
-                    </Upload>
-                  </div>
-                )}
-              />
-
-              <div className="mt-4">
-                {form.getValues("sizeChartImage") &&
-                  form.getValues("sizeChartImage").length > 0 &&
-                  form.getValues("sizeChartImage").map((file, i) => (
-                    <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                      <div
-                        key={i}
-                        className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Paperclip className="h-4 w-4 stroke-current" />
-                          <span>{file.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <FileUp className="h-4 w-4 stroke-current" />
-                          <span>{humanFileSize(file.size)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-
-              <div className="text-red-400 text-xs min-h-4">
-                {form.formState.errors.sizeChartImage?.message}
+                {form.formState.errors.optionalImages?.message}
               </div>
             </div>
           </div>
