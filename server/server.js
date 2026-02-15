@@ -10,7 +10,7 @@ const config = require("./src/config/config.js");
 const rootRouter = require("./src/api/index.js");
 const globalErrorHandler = require("./src/middleware/errors/globalErrorHandler.js");
 const securityHeaders = require("./src/middleware/securityHeaders.js");
-const rateLimiter = require("./src/middleware/rateLimiter.js");
+// const rateLimiter = require("./src/middleware/rateLimiter.js");
 const sanitizeInput = require("./src/middleware/sanitizeInput.js");
 
 // Initialize Express app
@@ -23,7 +23,7 @@ moment.tz.setDefault("Asia/Dhaka");
 app.use(securityHeaders);
 
 // Rate limiting
-app.use("/api", rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
+// app.use("/api", rateLimiter());
 
 // Middleware
 app.use(morgan("dev"));

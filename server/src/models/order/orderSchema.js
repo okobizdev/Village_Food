@@ -63,9 +63,8 @@ const Orderschema = new Schema(
       default: "CashOnDelivery",
     },
 
-    // ⭐⭐⭐ Added Fields Here
     mobileBankingProvider: {
-      type: String, // e.g., bKash, Nagad, Rocket
+      type: String,
     },
     mobileNumber: {
       type: String,
@@ -73,7 +72,6 @@ const Orderschema = new Schema(
     transactionId: {
       type: String,
     },
-    // ⭐⭐⭐ End Added Fields
 
     paymentRef: [
       {
@@ -92,33 +90,24 @@ const Orderschema = new Schema(
         productRef: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "product",
-          // required: true,
         },
         inventoryRef: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "inventory",
-          // required: true,
         },
         quantity: { type: Number, required: true },
         price: { type: Number },
         mrpPrice: { type: Number },
-        // color: { type: String },
-        // level: { type: String },
-        // price: { type: Number },
-        // productDiscount: { type: Number },
       },
     ],
     status: {
       type: String,
       enum: [
-        "OrderPlaced",
-        "DeliveredPending",
+        "Pending",
         "Delivered",
         "Cancelled",
-        "Hold",
-        "InReview",
       ],
-      default: "OrderPlaced",
+      default: "Pending",
     },
     paymentStatus: {
       type: String,

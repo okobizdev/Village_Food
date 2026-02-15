@@ -9,7 +9,7 @@ import {
 import { toast, useToast } from "@/components/ui/use-toast";
 import { createSteadfastOrder } from "@/services/courier";
 import { SteadfastOrderPayload, TOrder } from "@/types/shared";
-import { makeBDPrice, makePrice } from "@/utils/helpers";
+import { makeBDPrice } from "@/utils/helpers";
 import { ColumnDef } from "@tanstack/react-table";
 import React, { useRef } from "react";
 import { deleteOrderAction, UpdateOrderStatus } from "./actions";
@@ -20,13 +20,9 @@ import { upperCase } from "lodash";
 import { confirmation } from "@/components/modals/confirm-modal";
 
 export const orderStatuses = [
-  { key: "InOrder", name: "In Order" },
-  { key: "Hold", name: "Hold" },
   { key: "Cancelled", name: "Cancelled" },
-  { key: "PartialDelivered", name: "Partial Delivered" },
   { key: "Delivered", name: "Delivered" },
-  { key: "DeliveredPending", name: "Delivered Pending" },
-  { key: "OrderPlaced", name: "Order Placed" },
+  { key: "Pending", name: "Pending" },
 ];
 
 export const columns: ColumnDef<TOrder>[] = [
@@ -43,19 +39,13 @@ export const columns: ColumnDef<TOrder>[] = [
     cell: ({ row }) => {
       const { products } = row.original;
       return (
-        <div className="w-40 flex flex-col gap-3">
+        <div className=" flex flex-col gap-3">
           {products?.map((item, index) => (
             <div key={index} className="p-3 border rounded-md">
               <p>{item?.productRef?.name} </p>
               <p>
                 <span className="font-semibold">{item?.productRef?.price}</span>{" "}
                 x <span className="font-bold">{item?.quantity}</span>
-              </p>
-              <p>
-                Color:{" "}
-                {item?.inventoryRef?.name
-                  ? upperCase(item?.inventoryRef?.name)
-                  : "N/A"}
               </p>
               <p>
                 Size:{" "}
@@ -144,28 +134,6 @@ export const columns: ColumnDef<TOrder>[] = [
       );
     },
   },
-  // {
-  //   header: "User Info",
-  //   cell: ({ row }) => {
-  //     return (
-  //       <div>
-  //         <div className="flex justify-between items-center gap-2">
-  //           <p>Name: </p>
-  //           <p>{row.original.userRef?.name}</p>
-  //         </div>
-  //         <div className="flex justify-between items-center gap-2">
-  //           <p>Phone: </p>
-  //           <p>{row.original.userRef?.phone}</p>
-  //         </div>
-  //         <div className="flex justify-between items-center gap-2">
-  //           <p>Email: </p>
-  //           <p>{row.original.userRef?.email}</p>
-  //         </div>
-  //         {row.original.userRef?.isFistOrder && <div>First Order</div>}
-  //       </div>
-  //     );
-  //   },
-  // },
   {
     header: "Customer Info",
     cell: ({ row }) => {
@@ -179,10 +147,10 @@ export const columns: ColumnDef<TOrder>[] = [
             <p>Phone: </p>
             <p>{row.original.customerPhone}</p>
           </div>
-          <div className="flex justify-between items-center gap-2">
+          {/* <div className="flex justify-between items-center gap-2">
             <p>Email: </p>
             <p>{row.original.customerEmail}</p>
-          </div>
+          </div> */}
           <div className="flex justify-between items-center gap-2">
             <p>Address: </p>
             <p>{row.original.customerCity},</p>
@@ -196,10 +164,6 @@ export const columns: ColumnDef<TOrder>[] = [
     header: "Order Status",
     accessorKey: "status",
     cell: ({ row }) => {
-      console.log(
-        row.original.status,
-        "row from order status...........54461411321321321321321"
-      );
       const rowStatus = orderStatuses.find((r) => {
         return r.key === row?.original?.status;
       });
@@ -289,7 +253,6 @@ export const columns: ColumnDef<TOrder>[] = [
             });
           }
         } catch (error: any) {
-          console.log(error.message);
           toast({
             title: "Error!",
             variant: "destructive",
@@ -302,7 +265,7 @@ export const columns: ColumnDef<TOrder>[] = [
 
       return (
         <div>
-          <Button loading={loading} onClick={handleClick}>
+          <Button className="text-white" loading={loading} onClick={handleClick}>
             Steadfast
           </Button>
         </div>
@@ -323,10 +286,10 @@ export const columns: ColumnDef<TOrder>[] = [
         <div>
           <Button onClick={handlePrinter}>
             {/* <PrinterCheck /> */}
-            <Printer />
+            <Printer className="w-4 h-4 text-white" />
           </Button>
           {/* Print Invoice */}
-          <div className="hidden">
+          <div className="hidden ">
             {orderData && (
               <PrintInvoice ref={printerRef} orderData={orderData} />
             )}

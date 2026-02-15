@@ -1,7 +1,8 @@
 "use server";
 import { apiRequest } from "@/lib/apiRequest";
 
-import { TCorrelation, TResponse, TUser } from "@/types";
+import { TCorrelation, TResponse } from "@/types";
+import { TUser } from "@/types/user";
 import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 

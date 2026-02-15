@@ -27,13 +27,13 @@
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background-color: #FF6C0C;
+  background-color: #05a845;
   border-radius: 4px;
   max-height: 50px;
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: hsl(23, 96%, 67%);
+  background: hsl(144, 94%, 34%);
   border-radius: 4px;
 }
 
@@ -202,3 +202,6 @@
     transform: scale(1) rotate(0deg);
   }
 }
+
+
+

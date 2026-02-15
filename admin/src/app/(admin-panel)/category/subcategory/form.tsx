@@ -54,8 +54,12 @@ export const CreateSubCategoryForm: React.FC = () => {
 
   const onSubmit = async (values: z.infer<typeof subCategoryFormSchema>) => {
     setLoading(true);
-    const formData = makeFormData(values);
     try {
+
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("categoryRef", selectedCategoryId);
+
       await createFormAction(formData);
       form.reset();
       toast({
@@ -63,6 +67,7 @@ export const CreateSubCategoryForm: React.FC = () => {
         description: "SubCategory created successfully",
       });
       window.location.reload();
+
     } catch (error: any) {
       toast({
         title: "Error",
@@ -120,7 +125,7 @@ export const CreateSubCategoryForm: React.FC = () => {
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map((item, index) => (
-                            <SelectItem key={index} value={String(item._id)}>
+                            <SelectItem className="cursor-pointer" key={index} value={String(item._id)}>
                               {item.name}
                             </SelectItem>
                           ))}
@@ -135,7 +140,7 @@ export const CreateSubCategoryForm: React.FC = () => {
               )}
             />
 
-            <Button type="submit" loading={loading} className="my-6">
+            <Button type="submit" loading={loading} className="my-6 text-white cursor-pointer">
               Create
             </Button>
           </div>

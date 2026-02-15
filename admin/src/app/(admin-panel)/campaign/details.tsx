@@ -20,7 +20,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileUp, MoreHorizontal, Paperclip } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteCampaignAction, updateFormAction } from "./actions";
@@ -38,7 +38,7 @@ import { Upload } from "antd";
 import { humanFileSize, makeFormData } from "@/utils/helpers";
 import { UploadOutlined } from "@ant-design/icons";
 import Image from "next/image";
-import { getAllCoupon } from "@/services/coupon";
+import { getAllCoupon } from "@/app/(admin-panel)/coupon/service";
 
 interface Props {
   campaign: TCampaign;
@@ -47,16 +47,16 @@ interface Props {
 export const CampaignDetailsSheet: React.FC<Props> = ({ campaign }) => {
   const { toast } = useToast();
 
-  const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [updating, setUpdating] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
-  const [coupons, setCoupons] = React.useState<TCoupon[]>([]);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [coupons, setCoupons] = useState<TCoupon[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAllCoupon().then((data) => setCoupons(data.data));
   }, []);
 
-  // console.log(campaign, "campaign from colum detail");
+
   const form = useForm<z.infer<typeof campaignFormSchema>>({
     resolver: zodResolver(campaignFormSchema),
     defaultValues: {

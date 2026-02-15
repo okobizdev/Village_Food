@@ -17,12 +17,6 @@ const Categoryschema = new Schema(
     imagePublicId: {
       type: String,
     },
-    vectorImage: {
-      type: String,
-    },
-    vectorImagePublicId: {
-      type: String,
-    },
     slug: {
       type: String,
     },

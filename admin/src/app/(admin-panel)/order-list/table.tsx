@@ -49,7 +49,7 @@ export const OrderTable: React.FC<Props> = ({ data, pagination }) => {
       <div className="flex justify-between items-center p-4">
         <Label className="text-xl font-semibold">Order List</Label>
       </div>
-      
+
       <div className="border rounded-lg mx-4 mb-4">
         <div className="max-h-[1000px] overflow-auto">
           <Table className="w-auto min-w-full">
@@ -63,16 +63,16 @@ export const OrderTable: React.FC<Props> = ({ data, pagination }) => {
                         className={
                           (header.column.columnDef.meta as any)?.align
                             ? "h-10 text-white bg-primary whitespace-nowrap text-" +
-                              (header.column.columnDef.meta as any)?.align
+                            (header.column.columnDef.meta as any)?.align
                             : "h-10 text-white bg-primary whitespace-nowrap"
                         }
                       >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     );
                   })}
@@ -91,7 +91,7 @@ export const OrderTable: React.FC<Props> = ({ data, pagination }) => {
                           className={
                             (cell.column.columnDef.meta as any)?.align
                               ? "py-2 whitespace-nowrap text-" +
-                                (cell.column.columnDef.meta as any)?.align
+                              (cell.column.columnDef.meta as any)?.align
                               : "py-2 whitespace-nowrap"
                           }
                         >

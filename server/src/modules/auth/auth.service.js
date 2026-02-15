@@ -5,12 +5,10 @@ const bcrypt = require("bcryptjs");
 const { isMainThread } = require("worker_threads");
 const { generateAccessToken, generateRefreshToken } = require('../../utils/jwt.js');
 const authRepository = require('./auth.repository.js');
-const isArrayElementExist = require('../../utils/isArrayElementExist.js');
 const { convertFileNameWithPdfExt } = require('../../middleware/upload/convertFileNameWithPdfExt.js');
 const { convertFileNameWithWebpExt } = require('../../middleware/upload/convertFileNameWithWebpExt.js');
 const { uploadWorker } = require('../../middleware/upload/uploadWorker.js');
 const { convertImgArrayToObject } = require('../../middleware/upload/convertImgArrayToObject.js');
-const { removeUploadFile } = require('../../middleware/upload/removeUploadFile.js');
 const Email = require('../../utils/Email.js');
 const OTPGenerate = require('../../utils/OTPGenerate.js');
 const roleRepository = require('../role/role.repository.js');
@@ -49,9 +47,7 @@ class AuthService extends BaseService {
         const hashedPassword = await bcrypt.hash(String(password), 10);
         payload.password = hashedPassword;
         payload.userId = await idGenerate('USE-', "userId", this.#repository);
-        // console.log("Payload", payload);
-        // ll
-        // role
+
         const role = await this.#roleRepository.findAndCreateRole({ role: 'User' });
         payload.roleRef = role._id;
         const authData = await this.#repository.authUserSignUp(payload, session);

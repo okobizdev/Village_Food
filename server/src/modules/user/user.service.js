@@ -1,21 +1,6 @@
 const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 const userRepository = require("./user.repository.js");
-const {
-  convertFileNameWithPdfExt,
-} = require("../../middleware/upload/convertFileNameWithPdfExt.js");
-const {
-  convertFileNameWithWebpExt,
-} = require("../../middleware/upload/convertFileNameWithWebpExt.js");
-const { uploadWorker } = require("../../middleware/upload/uploadWorker.js");
-const {
-  convertImgArrayToObject,
-} = require("../../middleware/upload/convertImgArrayToObject.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
-const { isMainThread } = require("worker_threads");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
 const { idGenerate } = require("../../utils/IdGenerator.js");
 
 class UserService extends BaseService {
@@ -25,29 +10,7 @@ class UserService extends BaseService {
     this.#repository = repository;
   }
 
-  async createUser(payload, payloadFiles, session) {
-
-    const { files } = payloadFiles;
-
-    const {
-      name,
-      email,
-      phone,
-      password,
-      address,
-      city,
-      state,
-      role,
-      isFirstOrder,
-      orderPlaced,
-    } = payload;
-    // if (!type) throw new Error("type is required");
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
+  async createUser(payload) {
     payload.userId = await idGenerate("USE-", "userId", this.#repository);
     const userData = await this.#repository.createUser(payload);
     return userData;
@@ -68,38 +31,17 @@ class UserService extends BaseService {
     return userData;
   }
 
-  async updateUser(id, payload, payloadFiles, session) {
-    const { files } = payloadFiles;
+  async updateUser(id, payload) {
+
     const { warehouseRef } = payload;
 
-    const {
-      name,
-      email,
-      phone,
-      password,
-      address,
-      city,
-      state,
-      role,
-      isFirstOrder,
-      orderPlaced,
-    } = payload;
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
     if (!warehouseRef || warehouseRef === "undefined") {
       delete payload.warehouseRef;
     }
 
     const userData = await this.#repository.updateById(id, payload);
     if (!userData) throw new NotFoundError("User Not Find");
-    if (files?.length && userData?.image) {
 
-      await removeUploadFile(userData?.image);
-    }
     return userData;
   }
 
@@ -107,9 +49,7 @@ class UserService extends BaseService {
     const user = await this.#repository.findById(id);
     if (!user) throw new NotFoundError("User not found");
     const deletedUser = await this.#repository.deleteById(id);
-    if (deletedUser) {
-      await removeUploadFile(user?.image);
-    }
+
     return deletedUser;
   }
 }

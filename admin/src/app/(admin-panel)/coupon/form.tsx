@@ -27,11 +27,12 @@ import { couponFormSchema } from "./form-schema";
 import { makeFormData } from "@/utils/helpers";
 import { createFormAction } from "./actions";
 import { Label } from "@/components/ui/label";
-import { TSubCategory, TypesOfDiscountCoupon } from "@/types/shared";
+import { TypesOfDiscountCoupon } from "@/types/shared";
 import { DatePicker } from "@/components/ui/date-picker";
-import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/service";
 import { getAllCategory } from "../category/category/service";
 import { TCategory } from "../category/category/types";
+import { TSubCategory } from "../category/subcategory/types";
 
 
 const defaultValues: z.infer<typeof couponFormSchema> = {

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/assets/logo/ChatGPT Image Nov 22, 2025, 12_55_12 PM.png";
 import { usePathname, useRouter } from "next/navigation";
 import { FaHome, FaSignOutAlt, FaBars, FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -67,7 +66,7 @@ export default function Layout({
           <h2 className="text-xl font-bold mb-6">
             <Link href="/">
               <Image
-                src={logo}
+                src="/assets/logo/logo.png"
                 alt="Village Food  | Best E-commerce platform in BD"
                 width={120}
                 height={60}
@@ -80,8 +79,8 @@ export default function Layout({
               <Link
                 href="/dashboard/profile"
                 className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/profile"
-                    ? "bg-blue-600 text-white"
-                    : "text-blue-600 hover:bg-blue-100"
+                  ? "bg-blue-600 text-white"
+                  : "text-blue-600 hover:bg-blue-100"
                   }`}
                 onClick={() => setIsSidebarOpen(false)}
               >
@@ -92,8 +91,8 @@ export default function Layout({
               <Link
                 href="/dashboard/orderHistory"
                 className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/orderHistory"
-                    ? "bg-blue-600 text-white"
-                    : "text-blue-600 hover:bg-blue-100"
+                  ? "bg-blue-600 text-white"
+                  : "text-blue-600 hover:bg-blue-100"
                   }`}
                 onClick={() => setIsSidebarOpen(false)}
               >
@@ -109,7 +108,7 @@ export default function Layout({
         <h2 className="text-xl font-bold mb-6">
           <Link href="/">
             <Image
-              src={logo}
+              src="/assets/logo/logo.png"
               alt="Unicrescent | Best E-commerce platform in BD"
               width={120}
               height={60}
@@ -122,8 +121,8 @@ export default function Layout({
             <Link
               href="/dashboard/profile"
               className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/profile"
-                  ? "bg-blue-600 text-white"
-                  : "text-blue-600 hover:bg-blue-100"
+                ? "bg-blue-600 text-white"
+                : "text-blue-600 hover:bg-blue-100"
                 }`}
             >
               Profile
@@ -133,8 +132,8 @@ export default function Layout({
             <Link
               href="/dashboard/orderHistory"
               className={`block px-4 py-2 rounded-lg ${pathname === "/dashboard/orderHistory"
-                  ? "bg-blue-600 text-white"
-                  : "text-blue-600 hover:bg-blue-100"
+                ? "bg-blue-600 text-white"
+                : "text-blue-600 hover:bg-blue-100"
                 }`}
             >
               Order History

@@ -87,11 +87,11 @@ const ForgetPassword = () => {
                             />
                             {errors.contact && <span className="text-red-500 text-sm">{errors.contact.message}</span>}
                         </div>
-                        <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">Send OTP!</button>
+                        <button type="submit" className="bg-primary text-white p-2 rounded-md">Send OTP!</button>
                     </form>
                     <div className="flex justify-center gap-2 mt-4 text-md">
-                        <Link href="/login" className="text-blue-500 hover:underline">Login</Link> |
-                        <Link href="/register" className="text-blue-500 hover:underline">Registration</Link>
+                        <Link href="/login" className="text-primary hover:underline">Login</Link> |
+                        <Link href="/register" className="text-primary hover:underline">Registration</Link>
                     </div>
                 </div>
             </div>

@@ -5,7 +5,7 @@ import {
   deleteCoupon,
   getCouponById,
   updateCoupon,
-} from "@/services/coupon";
+} from "@/app/(admin-panel)/coupon/service";
 import { TCoupon } from "@/types/shared";
 import { revalidatePath } from "next/cache";
 

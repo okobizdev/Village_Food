@@ -8,7 +8,9 @@ export const getShopSidebar = async () => {
 };
 
 export const getCategoryById = async (id: string) => {
-  const res = await fetch(`${apiBaseUrl}/category/${id}`);
+  const res = await fetch(`${apiBaseUrl}/category/${id}`, {
+    next: { revalidate: 3600 },
+  });
 
   if (!res.ok) {
     throw new Error("Failed to fetch category");

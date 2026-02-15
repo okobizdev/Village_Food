@@ -10,6 +10,7 @@ export const uploadImageToCloudinary = async (
   file: File,
   folder: string = "misc"
 ): Promise<TCloudinaryUploadResult> => {
+
   const formData = new FormData();
   formData.append("file", file);
 

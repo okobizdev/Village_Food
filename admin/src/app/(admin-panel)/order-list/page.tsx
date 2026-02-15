@@ -1,8 +1,7 @@
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { getOrderWithPagination } from "@/services/order";
+import { getOrderWithPagination } from "@/app/(admin-panel)/order-list/service";
 import React from "react";
 import { OrderTable } from "./table";
-import { fileUrlGenerator } from "@/utils/helpers";
 
 export const revalidate = 0;
 

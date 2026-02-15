@@ -26,13 +26,11 @@ import { uploadImageToCloudinary } from "@/utils/cloudinary";
 const defaultValues = {
   name: "",
   image: [],
-  vectorImage: [],
 };
 
 export const CreateForm: React.FC = () => {
   const { toast } = useToast();
   const [fileList, setFileList] = useState([]);
-  const [vectorFileList, setVectorFileList] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,23 +39,16 @@ export const CreateForm: React.FC = () => {
   });
 
   const handleImageFileChange = ({ fileList }: any) => {
-    const latestFileList = fileList.slice(-1); // only keep the last uploaded
+    const latestFileList = fileList.slice(-1);
+
     setFileList(latestFileList);
 
     const rawFiles = latestFileList
       .map((f: any) => f.originFileObj)
       .filter(Boolean);
+
     form.setValue("image", rawFiles);
-  };
 
-  const handleVectorFileChange = ({ fileList }: any) => {
-    const latestFileList = fileList.slice(-1); // only keep the last uploaded
-    setVectorFileList(latestFileList);
-
-    const rawFiles = latestFileList
-      .map((f: any) => f.originFileObj)
-      .filter(Boolean);
-    form.setValue("vectorImage", rawFiles);
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -69,22 +60,16 @@ export const CreateForm: React.FC = () => {
       const imageFile = values.image[0];
       const imageUploadResult = await uploadImageToCloudinary(imageFile, "categories");
 
-      // Vector Image upload to Cloudinary
-      const vectorImageFile = values.vectorImage[0];
-      const vectorUploadResult = await uploadImageToCloudinary(vectorImageFile, "categories/vectors");
 
       // FormData 
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("image", imageUploadResult.secure_url);
       formData.append("imagePublicId", imageUploadResult.public_id);
-      formData.append("vectorImage", vectorUploadResult.secure_url);
-      formData.append("vectorImagePublicId", vectorUploadResult.public_id);
 
       await createFormAction(formData);
       form.reset();
       setFileList([]);
-      setVectorFileList([]);
       toast({
         title: "Success",
         description: "Coupon created successfully",
@@ -112,7 +97,7 @@ export const CreateForm: React.FC = () => {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem className="flex-1">
+                <FormItem className="">
                   <FormLabel>
                     Category Name <b className="text-red-500">*</b>
                   </FormLabel>
@@ -153,35 +138,9 @@ export const CreateForm: React.FC = () => {
               )}
             />
 
-            {/* Vector Image Upload */}
-            <FormField
-              control={form.control}
-              name="vectorImage"
-              render={() => (
-                <FormItem className="flex-1">
-                  <FormLabel>
-                    Vector Image <b className="text-red-500">*</b>
-                  </FormLabel>
-                  <Upload
-                    listType="picture-card"
-                    beforeUpload={() => false}
-                    fileList={vectorFileList}
-                    onChange={handleVectorFileChange}
-                    maxCount={1}
-                  >
-                    {vectorFileList.length < 1 && (
-                      <div>
-                        <UploadOutlined />
-                        <div style={{ marginTop: 8 }}>Upload Vector</div>
-                      </div>
-                    )}
-                  </Upload>
-                </FormItem>
-              )}
-            />
           </div>
 
-          <Button type="submit" disabled={loading} className="text-white">
+          <Button type="submit" size="lg" disabled={loading} className="!text-white cursor-pointer">
             {loading ? "Creating..." : "Create"}
           </Button>
         </form>

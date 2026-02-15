@@ -16,16 +16,6 @@ const SearchCancel = () => {
   const allSubCategories = subCategorySlugs.flatMap((sub) => sub.split(","));
   const allChildCategories = childCategorySlugs.flatMap((sub) => sub.split(","));
 
-  // const handleClear = () => {
-  //   const newParams = new URLSearchParams(searchParams.toString());
-
-
-  //   // Remove all categories and subcategories
-  //   categorySlugs.forEach((cat) => newParams.delete("category"));
-  //   subCategorySlugs.forEach((sub) => newParams.delete("subCategory"));
-
-  //   router.replace(`?${newParams.toString()}`);
-  // };
 
   const handleClear = (type: "category" | "subCategory" | "childCategory", value: string) => {
     const newParams = new URLSearchParams(searchParams.toString());
@@ -46,7 +36,7 @@ const SearchCancel = () => {
     router.push(`?${newParams.toString()}`);
   };
 
-  // Don't show the component if no categories or subcategories are present
+
   if (categorySlugs.length === 0 && subCategorySlugs.length === 0 && childCategorySlugs.length === 0) return null;
 
   return (
@@ -56,7 +46,7 @@ const SearchCancel = () => {
         // <div className="flex gap-x-2">
         <>
           {allCategories.map((cat, index) => (
-            <div key={index} className="bg-[#495588] inline-flex p-1 px-2 rounded text-[#fff] text-sm items-center justify-center gap-1 capitalize">
+            <div key={index} className="bg-primary inline-flex p-1 px-2 rounded text-[#fff] text-sm items-center justify-center gap-1 capitalize">
               <p>{cat}</p>
               <HiMiniXMark className="text-lg cursor-pointer" onClick={() => handleClear("category", cat)} />
             </div>
@@ -68,7 +58,7 @@ const SearchCancel = () => {
       {allSubCategories.length > 0 && (
         <>
           {allSubCategories.map((sub, index) => (
-            <div key={index} className="bg-[#495588] inline-flex p-1 px-2 rounded text-[#fff] text-sm items-center justify-center gap-1 capitalize">
+            <div key={index} className="bg-primary inline-flex p-1 px-2 rounded text-[#fff] text-sm items-center justify-center gap-1 capitalize">
               <p>{sub}</p>
               <HiMiniXMark className="text-lg cursor-pointer" onClick={() => handleClear("subCategory", sub)} />
             </div>
@@ -79,7 +69,7 @@ const SearchCancel = () => {
       {allChildCategories.length > 0 && (
         <>
           {allChildCategories.map((child, index) => (
-            <div key={index} className="bg-[#495588] inline-flex p-1 px-2 rounded text-[#fff] text-sm items-center justify-center gap-1 capitalize">
+            <div key={index} className="bg-primary inline-flex p-1 px-2 rounded text-[#fff] text-sm items-center justify-center gap-1 capitalize">
               <p>{child}</p>
               <HiMiniXMark className="text-lg cursor-pointer" onClick={() => handleClear("childCategory", child)} />
             </div>

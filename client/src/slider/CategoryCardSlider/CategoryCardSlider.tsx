@@ -1,214 +1,161 @@
 "use client";
 
-import { TCategory } from "@/types";
 import Image from "next/image";
-import React, { useRef, useEffect, useState } from "react";
-import { apiBaseUrl } from "@/config/config";
+import React, { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { TCategory } from "@/types/category";
 
 interface CategoryProps {
   categoriesList: TCategory[];
 }
 
 const CategoryCardSlider: React.FC<CategoryProps> = ({ categoriesList }) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
+  // Sort categories by status
   const sortedCategories = [...(categoriesList || [])].sort(
     (a, b) => Number(b.status) - Number(a.status)
   );
 
-  // Generate upcoming cards if less than 6 categories
-  const minCategories = 7;
-  const displayCategories = [...sortedCategories];
-  
-  if (sortedCategories.length < minCategories) {
-    const upcomingCount = minCategories - sortedCategories.length;
-    for (let i = 0; i < upcomingCount; i++) {
-      displayCategories.push({
-        _id: `upcoming-${i}`,
-        name: "Upcoming",
-        slug: "",
-        image: "",
-        status: 0,
-        isUpcoming: true
-      } as unknown as TCategory & { isUpcoming?: boolean });
-    }
-  }
-
-  const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const scrollAmount = direction === "left" ? -300 : 300;
-      container.scrollBy({
-        left: scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  // Track scroll position for indicators
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      const scrollLeft = container.scrollLeft;
-      const cardWidth = container.scrollWidth / displayCategories.length;
-      const newIndex = Math.round(scrollLeft / cardWidth);
-      setActiveIndex(newIndex);
-    };
-
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, [displayCategories.length]);
-
-  // Auto sliding with reverse
-  useEffect(() => {
-    let direction: "left" | "right" = "right";
-    
-    const interval = setInterval(() => {
-      if (scrollContainerRef.current) {
-        const container = scrollContainerRef.current;
-        const maxScroll = container.scrollWidth - container.clientWidth;
-        
-        if (direction === "right" && container.scrollLeft >= maxScroll - 10) {
-          direction = "left";
-        } else if (direction === "left" && container.scrollLeft <= 10) {
-          direction = "right";
-        }
-        
-        scroll(direction);
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
   return (
-    <div className="w-full lg:px-2">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
-            Shop by Category
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-500 font-bold mt-1 mb-3 ">
-            Explore our wide range of products
-          </p>
-        </div>
-        <div className="hidden md:flex gap-2">
+    <div className="w-full max-w-7xl mx-auto py-12">
+      {/* Header with Navigation */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
+          Shop by <span className="text-primary">Category</span>
+        </h2>
+        {/* Navigation Buttons */}
+        <div className="flex items-center md:gap-3">
           <button
-            onClick={() => scroll("left")}
-            className="p-2 rounded-full bg-white border-2 border-gray-200 hover:border-[#FF6C0C] hover:bg-[#FF6C0C] hover:text-white transition-all duration-300 shadow-md"
-            aria-label="Scroll left"
+            onClick={() => swiperInstance?.slidePrev()}
+            className="group p-2 lg:p-3 rounded-full bg-white border-2 border-gray-200 hover:border-primary hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+            aria-label="Previous"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-700 group-hover:text-white transition-colors" />
           </button>
           <button
-            onClick={() => scroll("right")}
-            className="p-2 rounded-full bg-white border-2 border-gray-200 hover:border-[#FF6C0C] hover:bg-[#FF6C0C] hover:text-white transition-all duration-300 shadow-md"
-            aria-label="Scroll right"
+            onClick={() => swiperInstance?.slideNext()}
+            className="group p-2 lg:p-3 rounded-full bg-white border-2 border-gray-200 hover:border-primary hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+            aria-label="Next"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-700 group-hover:text-white transition-colors" />
           </button>
         </div>
       </div>
 
+      {/* Swiper Carousel */}
       <div className="relative">
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-2 sm:gap-3 lg:gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4 snap-x snap-mandatory"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]}
+          onSwiper={setSwiperInstance}
+          spaceBetween={24}
+          slidesPerView={1}
+          loop={sortedCategories.length >= 3}
+          autoplay={{
+            delay: 4000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
+          speed={800}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true,
+          }}
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 3,
+              spaceBetween: 24,
+            },
+          }}
+          className="category-hero-swiper"
         >
-          {displayCategories?.map((category, index) => {
-            const isUpcoming = 'isUpcoming' in category && category.isUpcoming;
-            
-            return (
-              <Link
-                key={category._id}
-                href={isUpcoming ? "#" : `/shop?category=${category.slug || category._id}`}
-                className="flex-shrink-0 snap-start"
-                onClick={(e) => isUpcoming && e.preventDefault()}
+          {sortedCategories.map((category, index) => (
+            <SwiperSlide key={category._id || index}>
+              <Link href={`/shop?category=${category.slug}`}
+                className="cursor-pointer"
               >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: isUpcoming ? 1 : 1.03 }}
-                  className={`group relative w-32 h-40 sm:w-40 sm:h-52 md:w-48 md:h-64 lg:w-60 lg:h-80 bg-white border-2 ${
-                    isUpcoming 
-                      ? "border-dashed border-gray-300 bg-gray-50" 
-                      : "border-gray-200 hover:border-[#FF6C0C] hover:shadow-2xl"
-                  } rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 ${
-                    isUpcoming ? "cursor-default" : "cursor-pointer"
-                  } flex flex-col`}
-                >
-                  {isUpcoming ? (
-                    <div className="relative w-full flex-1 flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200">
-                      <div className="text-center p-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 mx-auto mb-2 sm:mb-3 rounded-full bg-white/80 flex items-center justify-center">
-                          <span className="text-2xl sm:text-3xl lg:text-4xl">🎁</span>
-                        </div>
-                        <p className="text-xs sm:text-sm lg:text-base font-semibold text-gray-400">
-                          Coming Soon
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative w-full flex-1">
-                      <Image
-                        src={apiBaseUrl + category.image || ""}
-                        alt={category.name}
-                        fill
-                        sizes="(max-width: 640px) 128px, (max-width: 768px) 160px, (max-width: 1024px) 192px, 240px"
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                  )}
-
-                  <div className="p-1.5 sm:p-2 lg:p-3 text-center bg-white">
-                    <p className={`text-xs sm:text-sm lg:text-base font-semibold ${
-                      isUpcoming 
-                        ? "text-gray-400" 
-                        : "text-gray-700 group-hover:text-[#FF6C0C]"
-                    } transition-colors duration-300 capitalize line-clamp-2`}>
-                      {isUpcoming ? "Upcoming" : category.name}
-                    </p>
+                <div className="group relative overflow-hidden rounded-md aspect-[4/3] cursor-pointer">
+                  {/* Background Image with Overlay */}
+                  <div className="absolute inset-0">
+                    <Image
+                      src={category.image || "/placeholder-category.png"}
+                      alt={category.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      priority={index < 3}
+                    />
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
                   </div>
 
-                  {!isUpcoming && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      whileHover={{ opacity: 1, x: 0 }}
-                      className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-all duration-300"
-                    >
-                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF6C0C]" />
-                    </motion.div>
-                  )}
-                </motion.div>
+                  {/* Content */}
+                  <div className="relative h-full flex flex-col justify-between p-6 md:p-8">
+                    {/* Category Name - Top Left */}
+                    <div>
+                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white drop-shadow-2xl leading-tight tracking-wide">
+                        {category.name}
+                      </h3>
+                    </div>
+
+                    {/* CTA Button - Bottom Left */}
+                    <div>
+                      <button className="group/btn inline-flex items-center gap-2 px-6 py-3 bg-white rounded-full text-gray-900 font-semibold text-sm md:text-base shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 cursor-pointer ">
+                        <span className="bangla-text">Explore Collections</span>
+                        <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Decorative Corner Accent */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
               </Link>
-            );
-          })}
-        </div>
-
-        {/* Gradient overlays - hidden on mobile for better visibility */}
-        <div className="absolute top-0 left-0 h-full w-12 sm:w-16 lg:w-20 bg-linear-to-r from-white to-transparent pointer-events-none hidden sm:block" />
-        <div className="absolute top-0 right-0 h-full w-12 sm:w-16 lg:w-20 bg-linear-to-l from-white to-transparent pointer-events-none hidden sm:block" />
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
 
-      {/* Mobile scroll indicators */}
-      <div className="flex md:hidden justify-center gap-1.5 mt-3">
-        {displayCategories?.slice(0, Math.min(5, displayCategories.length)).map((_, index) => (
-          <div
-            key={index}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === activeIndex % 5
-                ? "bg-[#FF6C0C] w-6"
-                : "bg-gray-300"
-            }`}
-          />
-        ))}
-      </div>
+      {/* Custom Styles */}
+      <style jsx global>{`
+
+
+        .category-hero-swiper .swiper-slide {
+          height: auto;
+        }
+
+        .category-pagination .swiper-pagination-bullet {
+          width: 10px;
+          height: 10px;
+          background: #d1d5db;
+          opacity: 1;
+          transition: all 0.3s ease;
+        }
+
+        .category-pagination .swiper-pagination-bullet-active {
+          background: #10b981;
+          width: 32px;
+          border-radius: 5px;
+        }
+
+        /* Smooth transitions */
+        .category-hero-swiper .swiper-slide img {
+          will-change: transform;
+        }
+      `}</style>
     </div>
   );
 };

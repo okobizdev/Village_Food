@@ -120,7 +120,7 @@ class ReportService extends BaseService {
   }
 
   async getDashboardMetrics(duration) {
-  const now = new Date();
+    const now = new Date();
     let startDate = new Date();
     let endDate = new Date();
 
@@ -166,75 +166,41 @@ class ReportService extends BaseService {
         endDate.setHours(23, 59, 59, 999);
         break;
       default:
-        // If no duration, use all data
         startDate = null;
         endDate = null;
     }
 
-    // Total Orders (with duration)
+    // Date match filter
     const orderMatch = startDate && endDate
       ? { createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) } }
       : {};
+
+    // Total Orders
     const totalOrders = await OrderSchema.countDocuments(orderMatch);
-    // Total Sales
-    
-    const totalSalesResult = await OrderSchema.aggregate([
-         ...(startDate && endDate ? [{ $match: orderMatch }] : []),
-      {
-        $group: {
-          _id: null,
-          totalSales: { $sum: "$totalPrice" },
-        },
-      },
-    ]);
-    const totalSales = totalSalesResult[0]?.totalSales || 0;
 
-    // Total Stock
-const totalStockResult = await InventorySchema.aggregate([
-  {
-    $group: {
-      _id: null,
-      totalStock: { $sum: "$availableQuantity" },
-    },
-  },
-]);
+    // Pending Orders
+    const pendingOrders = await OrderSchema.countDocuments({
+      ...orderMatch,
+      status: "Pending"
+    });
 
-const totalStock = totalStockResult[0]?.totalStock || 0;
+    // Delivered Orders
+    const deliveredOrders = await OrderSchema.countDocuments({
+      ...orderMatch,
+      status: "Delivered"
+    });
 
-
-    // Total Stock Value
-    const totalStockValueResult = await InventorySchema.aggregate([
-
-      {
-        $lookup: {
-          from: "products",
-          localField: "productRef",
-          foreignField: "_id",
-          as: "product",
-        },
-      },
-      { $unwind: "$product" },
-      {
-        $project: {
-          stockValue: { $multiply: ["$availableQuantity", "$product.price"] },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalStockValue: { $sum: "$stockValue" },
-        },
-      },
-    ]);
- 
-    const totalStockValue = totalStockValueResult[0]?.totalStockValue || 0;
-
+    // Cancelled Orders
+    const cancelledOrders = await OrderSchema.countDocuments({
+      ...orderMatch,
+      status: "Cancelled"
+    });
 
     return {
       totalOrders,
-      totalSales,
-      totalStock,
-      totalStockValue,
+      pendingOrders,
+      deliveredOrders,
+      cancelledOrders,
     };
   }
 }

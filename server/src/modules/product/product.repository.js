@@ -24,6 +24,32 @@ class ProductRepository extends BaseRepository {
     return newProduct;
   }
 
+  async getProductsByStatus(status) {
+    return await this.#model
+      .find({ status },
+        {
+          name: 1,
+          thumbnailImage: 1,
+          price: 1,
+          mrpPrice: 1,
+          discount: 1,
+          discountType: 1,
+          discountAmount: 1,
+          inventoryType: 1,
+          productId: 1,
+          inventoryRef: 1,
+          slug: 1,
+        }
+      )
+      .populate({
+        path: "inventoryRef",
+        select: "_id level",
+      })
+      .sort({ createdAt: -1 })
+      .lean();
+  }
+
+
   async updateProduct(id, payload) {
     const updatedProduct = await this.#model.findByIdAndUpdate(id, payload);
     if (!updatedProduct) {
@@ -34,6 +60,7 @@ class ProductRepository extends BaseRepository {
 
   async getProductWithPagination(payload) {
     try {
+
       const {
         sortBy = "createdAt",
         minPrice,
@@ -44,8 +71,6 @@ class ProductRepository extends BaseRepository {
         subCategorySlug,
         childCategoryId,
         childCategorySlug,
-        subChildCategoryId,
-        subChildCategorySlug,
         brandId,
         brandSlug,
         isNewArrival,
@@ -57,106 +82,34 @@ class ProductRepository extends BaseRepository {
       } = payload;
 
       const filter = {};
+
       if (minPrice || maxPrice) {
         filter.price = {};
+
         if (minPrice) filter.price.$gte = parseFloat(minPrice);
         if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
       }
 
-      const orCategoryIds = [];
-
-      if (categoryId) {
-        const categoryArray = Array.isArray(categoryId)
-          ? categoryId
-          : [categoryId];
-        orCategoryIds.push({
-          categoryRef: {
-            $in: categoryArray.map((id) => new mongoose.Types.ObjectId(id)),
-          },
-        });
-      }
-
-      if (subCategoryId) {
-        const subCategoryArray = Array.isArray(subCategoryId)
-          ? subCategoryId
-          : [subCategoryId];
-        orCategoryIds.push({
-          subCategoryRef: {
-            $in: subCategoryArray.map((id) => new mongoose.Types.ObjectId(id)),
-          },
-        });
-      }
-
-      if (childCategoryId) {
-        const childCategoryArray = Array.isArray(childCategoryId)
-          ? childCategoryId
-          : [childCategoryId];
-        orCategoryIds.push({
-          childCategoryRef: {
-            $in: childCategoryArray.map(
-              (id) => new mongoose.Types.ObjectId(id)
-            ),
-          },
-        });
-      }
-
-
-      if (orCategoryIds.length > 0) {
-        filter.$or = [...(filter.$or || []), ...orCategoryIds];
-      }
-
-      const orCategoryFilters = [];
-
-      if (categorySlug) {
-        const slugs = Array.isArray(categorySlug)
-          ? categorySlug
-          : [categorySlug];
-        const categories = await CategorySchema.find({ slug: { $in: slugs } });
-        const ids = categories.map((c) => c._id);
-        if (ids.length) {
-          orCategoryFilters.push({ categoryRef: { $in: ids } });
-        }
-      }
-
-      if (subCategorySlug) {
-        const slugs = Array.isArray(subCategorySlug)
-          ? subCategorySlug
-          : [subCategorySlug];
-        const subCategories = await SubCategorySchema.find({
-          slug: { $in: slugs },
-        });
-        const ids = subCategories.map((s) => s._id);
-        if (ids.length) {
-          orCategoryFilters.push({ subCategoryRef: { $in: ids } });
-        }
-      }
-
+      // CATEGORY FILTER (PRIORITY BASED)
       if (childCategorySlug) {
-        const slugs = Array.isArray(childCategorySlug)
-          ? childCategorySlug
-          : [childCategorySlug];
-        const childCategories = await ChildCategorySchema.find({
-          slug: { $in: slugs },
-        });
-        const ids = childCategories.map((c) => c._id);
-        if (ids.length) {
-          orCategoryFilters.push({ childCategoryRef: { $in: ids } });
+        const child = await ChildCategorySchema.findOne({ slug: childCategorySlug });
+        if (child) {
+          filter.childCategoryRef = child._id;
+        }
+      }
+      else if (subCategorySlug) {
+        const sub = await SubCategorySchema.findOne({ slug: subCategorySlug });
+        if (sub) {
+          filter.subCategoryRef = sub._id;
+        }
+      }
+      else if (categorySlug) {
+        const cat = await CategorySchema.findOne({ slug: categorySlug });
+        if (cat) {
+          filter.categoryRef = cat._id;
         }
       }
 
-      if (subChildCategorySlug) {
-        const slugs = Array.isArray(subChildCategorySlug)
-          ? subChildCategorySlug
-          : [subChildCategorySlug];
-        const subChildCategories = await SubChildCategorySchema.find({
-          slug: { $in: slugs },
-        });
-
-      }
-
-      if (orCategoryFilters.length > 0) {
-        filter.$or = orCategoryFilters;
-      }
 
       if (brandId) {
         filter.brandRef = new mongoose.Types.ObjectId(String(brandId));
@@ -240,18 +193,29 @@ class ProductRepository extends BaseRepository {
         payload,
         async (limit, offset) => {
           const product = await this.#model
-            .find(filter)
+            .find(filter, {
+              name: 1,
+              thumbnailImage: 1,
+              price: 1,
+              mrpPrice: 1,
+              discount: 1,
+              discountType: 1,
+              discountAmount: 1,
+              inventoryType: 1,
+              productId: 1,
+              inventoryRef: 1,
+              slug: 1,
+            })
+            .populate({
+              path: "inventoryRef",
+              select: "_id level",
+            })
             .sort(sortCriteria)
             .skip(offset)
             .limit(limit)
-            .populate([
-              { path: "categoryRef" },
-              { path: "subCategoryRef" },
-              { path: "childCategoryRef" },
-              { path: "brandRef" },
-              { path: "inventoryRef" },
-            ]);
-          const totalProducts = await this.#model.countDocuments();
+            .lean();
+
+          const totalProducts = await this.#model.countDocuments(filter);
           return { doc: product, totalDoc: totalProducts };
         }
       );
@@ -309,7 +273,7 @@ class ProductRepository extends BaseRepository {
     try {
       const productsWithPagination = await pagination(
         payload,
-        async (limit, offset, sortOrder) => {
+        async (limit, offset) => {
           const product = await this.#model
             .find()
             .sort({ createdAt: -1 })
@@ -512,15 +476,34 @@ class ProductRepository extends BaseRepository {
 
   async getRelatedProduct(payload) {
     const { id } = payload;
-
     const product = await this.#model.findById(id).populate("categoryRef");
     const relatedProducts = await this.#model
       .find({
         categoryRef: product.categoryRef._id,
         _id: { $ne: id },
+      },
+        {
+          name: 1,
+          slug: 1,
+          thumbnailImage: 1,
+          price: 1,
+          mrpPrice: 1,
+          discount: 1,
+          discountType: 1,
+          discountAmount: 1,
+          inventoryType: 1,
+          productId: 1,
+          inventoryRef: 1,
+        }
+      )
+      .populate({
+        path: "inventoryRef",
+        select: "_id level",
       })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(10)
+      .lean();
+
     return relatedProducts;
   }
 
@@ -543,7 +526,7 @@ class ProductRepository extends BaseRepository {
     return product;
   }
 
-    async updateProductStatus(id, payload) {
+  async updateProductStatus(id, payload) {
     return await this.#model.findByIdAndUpdate(
       id,
       { $set: payload },

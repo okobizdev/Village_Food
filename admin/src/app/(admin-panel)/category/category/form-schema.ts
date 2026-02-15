@@ -14,13 +14,4 @@ export const formSchema = z.object({
     )
     .optional()
     .default([]),
-
-  vectorImage: z
-    .array(
-      z.instanceof(File).refine((file) => file.size < 8 * 1024 * 1024, {
-        message: "File size must be less than 8 MB",
-      })
-    )
-    .optional()
-    .default([]),
 });

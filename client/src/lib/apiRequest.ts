@@ -15,21 +15,20 @@ export const apiRequest = async <T = unknown>({
   body,
   headers = {},
 }: ApiRequestOptions): Promise<T> => {
-
-
-
-  const res = await fetch(`${apiBaseUrl}${endpoint}`
-    , {
+  const res = await fetch(`${apiBaseUrl}${endpoint}`, {
     method,
     headers: {
       'Content-Type': 'application/json',
       ...headers,
     },
     ...(typeof body !== 'undefined' ? { body: JSON.stringify(body) } : {}),
-  }
-);
-  const result = await res.json();
+  });
 
+  if (!res.ok) {
+    throw new Error(`API Error: ${res.status} ${res.statusText}`);
+  }
+
+  const result = await res.json();
 
   return result;
 };

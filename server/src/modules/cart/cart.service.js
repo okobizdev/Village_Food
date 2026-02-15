@@ -16,16 +16,7 @@ class CartService extends BaseService {
     if (!productRef && !inventoryRef) {
       throw new Error("Product ID & Inventory ID is required");
     }
-    // console.log("file", files);
 
-    // const existingCart = await this.#repository.findCartByUserAndProduct(
-    //   userRef,
-    //   correlationId: payload.correlationId,
-    //   productRef,
-    //   // color,
-    //   // size,
-    //   inventoryRef
-    // );
     const query = {};
     const isObjectId = /^[a-f\d]{24}$/i.test(payload?.userRef);
     if (isObjectId) {

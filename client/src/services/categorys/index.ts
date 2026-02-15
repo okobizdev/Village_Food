@@ -2,17 +2,11 @@
 import { apiBaseUrl } from "@/config/config";
 
 export const getAllCategorys = async () => {
-  const res = await fetch(`${apiBaseUrl}/category`);
+  const res = await fetch(`${apiBaseUrl}/category`, {
+    next: { revalidate: 3600 },
+  });
 
   return res.json();
 };
 
-// export const getSingleCategoryBySlug = async (slug: string) => {
-//   const res = await fetch(`${apiBaseUrl}/category/${slug}`);
 
-//   if (!res.ok) {
-//     throw new Error("Failed to fetch category");
-//   }
-
-//   return res.json();
-// };

@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { TCampaign } from "@/types";
 import Link from "next/link";
+import { TCampaign } from "@/types/campaign";
 
 interface Props {
   campaign: TCampaign;
@@ -58,9 +58,9 @@ const Campaign: React.FC<Props> = ({ campaign }) => {
   }, [campaign]);
 
   return (
-    <div className="Container pb-8 py-4">
-      <div className="grid md:grid-cols-2   rounded">
-        <div className="flex flex-col items-center justify-center bg-[#222222]/80 md:rounded-l rounded-t">
+    <div className="max-w-7xl mx-auto pb-8 py-4">
+      <div className="grid md:grid-cols-2 rounded">
+        <div className="flex flex-col items-center justify-center bg-green-700 md:rounded-l rounded-t">
           <div className="text-center lg:pb-8 pb-4 text-[#fff]">
             <p className="md:mt-0 mt-3">Special Offer</p>
             <h2 className="lg:text-2xl text-xl font-semibold mt-1">
@@ -96,19 +96,18 @@ const Campaign: React.FC<Props> = ({ campaign }) => {
 
           <div className="my-8">
             <Link href="/shop">
-              <button className="px-8 py-3 bg-[#1D4092] text-[#fff] rounded cursor-pointer border border-[#ffff]/0 hover:border-[#fff] duration-300">
+              <button className="px-8 py-3 bg-white text-gray-800 text-lg font-bold rounded cursor-pointer border border-[#fff]/0 hover:border-[#fff] duration-300">
                 Shop Now
               </button>
             </Link>
           </div>
         </div>
-        <div>
+        <div className=" relative h-[300px] md:h-[500px]">
           <Image
             src="/assets/images/timer.webp"
             alt="Countdown Timer"
-            width={800}
-            height={800}
-            className="w-full h-full object-cover md:rounded-r rounded-b"
+            fill
+            className="w-full h-full object-fill md:rounded-r rounded-b"
           />
         </div>
       </div>

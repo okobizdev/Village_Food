@@ -111,11 +111,7 @@ class OrderService extends BaseService {
 
       const availableQuantity = productInfo?.availableQuantity || 0;
       const quantityToHold = Number(order?.quantity);
-      // console.log(
-      //   "availableQuantity, quantityToHold",
-      //   availableQuantity,
-      //   quantityToHold
-      // );
+
       if (availableQuantity < quantityToHold) {
         throw new Error(
           `Insufficient stock for product ${productInfo?.productRef?.name}`

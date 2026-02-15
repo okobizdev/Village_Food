@@ -38,7 +38,7 @@ import { fileUrlGenerator, humanFileSize, makeFormData } from "@/utils/helpers";
 import { UploadOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import { Label } from "@/components/ui/label";
-import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/service";
 import { TChildCategory } from "./types";
 import { TSubCategory } from "../subcategory/types";
 
@@ -74,8 +74,12 @@ export const ChildCategoryDetailsSheet: FC<Props> = ({
     values: z.infer<typeof childCategoryFormSchema>
   ) => {
     setUpdating(true);
-    const data = makeFormData(values);
     try {
+
+      const data = new FormData();
+      data.append("name", values.name);
+      data.append("subCategoryRef", values.subCategoryRef);
+
       await updateFormAction(String(childCategory._id), data);
       toast({
         title: "ChildCategory updated successfully",

@@ -5,7 +5,6 @@ const BrandService = require("./brand.service.js");
 
 class BrandController {
   createBrand = withTransaction(async (req, res, next, session) => {
-    console.log(req.body);
     const payloadFiles = {
       files: req.files,
     };

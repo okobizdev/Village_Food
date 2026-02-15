@@ -12,7 +12,9 @@ const rateLimitStore = new Map();
  * @param {number} options.max - Maximum requests per window (default: 100)
  * @returns {Function} Express middleware
  */
+
 const rateLimiter = (options = {}) => {
+
     const {
         windowMs = 15 * 60 * 1000, // 15 minutes
         max = 10000, // 10000 requests per windowMs
@@ -36,7 +38,7 @@ const rateLimiter = (options = {}) => {
 
         // Check if limit exceeded
         if (recentRequests.length >= max) {
-            return res.status(429).json({ 
+            return res.status(429).json({
                 success: false,
                 statusCode: 429,
                 message,

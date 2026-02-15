@@ -60,7 +60,7 @@ export function CollapseMenuButton({
           variant={active ? "secondary" : "ghost"}
           className="w-full justify-start h-10"
         >
-          <div className="w-full items-center flex justify-between">
+          <div className="w-full items-center flex justify-between cursor-pointer">
             <div className="flex items-center">
               <span className="mr-4">
                 <Icon size={18} />
@@ -86,7 +86,7 @@ export function CollapseMenuButton({
             >
               <ChevronDown
                 size={18}
-                className="transition-transform duration-200"
+                className="transition-transform duration-200 cursor-pointer"
               />
             </div>
           </div>

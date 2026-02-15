@@ -2,10 +2,6 @@ const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 
 const subCategoryRepository = require("./sub.category.repository.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
 
 class SubCategoryService extends BaseService {
   constructor(repository, serviceName) {
@@ -13,15 +9,7 @@ class SubCategoryService extends BaseService {
     this.repository = repository;
   }
 
-  async createSubCategory(payloadFiles, payload, session) {
-    const { files } = payloadFiles;
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
-
+  async createSubCategory(payload, session) {
     const subCategoryData = await this.repository.createSubCategory(
       payload,
       session
@@ -56,14 +44,7 @@ class SubCategoryService extends BaseService {
     return subCategoryData;
   }
 
-  async updateSubCategory(id, payloadFiles, payload, session) {
-    const { files } = payloadFiles;
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
+  async updateSubCategory(id, payload, session) {
 
     // Update the database with the new data
     const subCategoryData = await this.repository.updateSubCategory(
@@ -71,18 +52,6 @@ class SubCategoryService extends BaseService {
       payload,
       session
     );
-
-    // Remove old files if they’re being replaced
-    const oldSubCategory = await this.repository.findById(id);
-
-    if (files?.length && oldSubCategory) {
-      if (
-        oldSubCategory.image &&
-        oldSubCategory.image !== subCategoryData.image
-      ) {
-        await removeUploadFile(oldSubCategory.image);
-      }
-    }
 
     return subCategoryData;
   }
@@ -94,9 +63,6 @@ class SubCategoryService extends BaseService {
     if (!subCategory) throw new NotFoundError("SubCategory not found");
     const deletedSubCategory = await this.repository.deleteById(id);
 
-    if (deletedSubCategory && subCategory?.image) {
-      await removeUploadFile(subCategory.image);
-    }
     return deletedSubCategory;
   }
 }

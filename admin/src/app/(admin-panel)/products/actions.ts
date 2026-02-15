@@ -71,7 +71,6 @@ export async function createFormAction(data: FormData) {
     revalidatePath("/");
     return true;
   } catch (error: any) {
-    console.error("Create product error:", error);
     throw new Error(error?.message || "Failed to create product");
   }
 }
@@ -139,7 +138,6 @@ export async function updateFormAction(id: string, data: FormData) {
     revalidatePath("/");
     return true;
   } catch (error: any) {
-    console.error("Update product error:", error);
     throw new Error(error?.message || "Failed to update product");
   }
 }
@@ -152,7 +150,6 @@ export async function deleteProductAction(id: string) {
     revalidatePath("/");
     return true;
   } catch (error: any) {
-    console.error("Delete product error:", error);
     throw new Error(error?.message || "Failed to delete product");
   }
 }

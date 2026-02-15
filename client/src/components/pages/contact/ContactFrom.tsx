@@ -4,6 +4,7 @@ import { ContactPosting } from "@/services/contact";
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Send, Loader2 } from "lucide-react";
 
 type FormFields = "name" | "email" | "phone" | "subject" | "message";
 
@@ -46,7 +47,14 @@ const ContactFrom = () => {
       const result = await ContactPosting(formData);
 
       if (result) {
-        toast.success("Your message has been sent successfully!");
+        toast.success("🎉 Your message has been sent successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         setFormData({
           name: "",
           email: "",
@@ -55,11 +63,17 @@ const ContactFrom = () => {
           message: "",
         });
       } else {
-        toast.error("Something went wrong.");
+        toast.error("❌ Something went wrong. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
       }
     } catch (error) {
       console.error("Error submitting contact form:", error);
-      toast.error("An error occurred. Please try again later.");
+      toast.error("⚠️ An error occurred. Please try again later.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setLoading(false);
     }
@@ -67,60 +81,171 @@ const ContactFrom = () => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        {(["name", "email", "phone", "subject"] as FormFields[]).map(
-          (field) => (
-            <div className="mb-4" key={field}>
-              <label
-                className="block text-gray-700 font-medium mb-2"
-                htmlFor={field}
-              >
-                {field.charAt(0).toUpperCase() + field.slice(1)}
-              </label>
-              <input
-                type={
-                  field === "email"
-                    ? "email"
-                    : field === "phone"
-                    ? "tel"
-                    : "text"
-                }
-                id={field}
-                value={formData[field]}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder={`Enter ${field}`}
-              />
-            </div>
-          )
-        )}
-
-        <div className="mb-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Name Field */}
+        <div className="form-group">
           <label
-            className="block text-gray-700 font-medium mb-2"
+            className="block text-gray-800 font-bold mb-2 text-sm"
+            htmlFor="name"
+          >
+            Full Name *
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-green-300"
+            placeholder="Enter your name"
+          />
+        </div>
+
+        {/* Email & Phone in Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="form-group">
+            <label
+              className="block text-gray-800 font-bold mb-2 text-sm"
+              htmlFor="email"
+            >
+              Email Address *
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-green-300"
+              placeholder="your@email.com"
+            />
+          </div>
+
+          <div className="form-group">
+            <label
+              className="block text-gray-800 font-bold mb-2 text-sm"
+              htmlFor="phone"
+            >
+              Phone Number *
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-green-300"
+              placeholder="+880 1XXX-XXXXXX"
+            />
+          </div>
+        </div>
+
+        {/* Subject Field */}
+        <div className="form-group">
+          <label
+            className="block text-gray-800 font-bold mb-2 text-sm"
+            htmlFor="subject"
+          >
+            Subject *
+          </label>
+          <input
+            type="text"
+            id="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-green-300"
+            placeholder="What is this about?"
+          />
+        </div>
+
+        {/* Message Field */}
+        <div className="form-group">
+          <label
+            className="block text-gray-800 font-bold mb-2 text-sm"
             htmlFor="message"
           >
-            Message
+            Message *
           </label>
           <textarea
             id="message"
-            rows={3}
+            rows={5}
             value={formData.message}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="Type your message here..."
+            required
+            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 hover:border-green-300 resize-none"
+            placeholder="Tell us how we can help you..."
           ></textarea>
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
-          className="bg-[#1E3E96] text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300 w-full lg:w-auto cursor-pointer"
+          className="group relative w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold py-4 px-6 rounded-xl hover:from-green-700 hover:to-emerald-800 transition-all duration-300 transform hover:scale-101 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none flex items-center justify-center gap-3 overflow-hidden cursor-pointer "
         >
-          {loading ? "Sending..." : "Send"}
+          {/* Animated background on hover */}
+          <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-emerald-800 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+
+          {/* Button content */}
+          <span className="relative flex items-center gap-3">
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                Send Message
+              </>
+            )}
+          </span>
         </button>
+
+        {/* Helper Text */}
+        <p className="text-sm text-gray-500 text-center">
+          We'll respond within 24 hours 💚
+        </p>
       </form>
-      <ToastContainer position="top-right" autoClose={3000} />
+
+      {/* Toast Container with Custom Styling */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ zIndex: 99999 }}
+      />
+
+      {/* Custom Toast Styles */}
+      <style jsx global>{`
+        .Toastify__toast--success {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          border-radius: 12px;
+          font-weight: 600;
+        }
+        
+        .Toastify__toast--error {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          border-radius: 12px;
+          font-weight: 600;
+        }
+        
+        .Toastify__progress-bar--success {
+          background: #ffffff;
+        }
+        
+        .Toastify__progress-bar--error {
+          background: #ffffff;
+        }
+      `}</style>
     </div>
   );
 };

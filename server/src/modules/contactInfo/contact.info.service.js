@@ -1,9 +1,6 @@
 const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 const contactInfoRepository = require("./contact.info.repository.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
 
 class ContactInfoService extends BaseService {
   #repository;
@@ -12,8 +9,7 @@ class ContactInfoService extends BaseService {
     this.#repository = repository;
   }
 
-  async createContactInfo(payload, session) {
-    const { name, message, subject, email, phone, whatsapp } = payload;
+  async createContactInfo(payload) {
     const contactInfoData = await this.#repository.createContactInfo(payload);
     return contactInfoData;
   }
@@ -35,8 +31,7 @@ class ContactInfoService extends BaseService {
     return contactInfoData;
   }
 
-  async updateContactInfo(id, payload, session) {
-    const { name, message, subject, email, phone, whatsapp } = payload;
+  async updateContactInfo(id, payload) {
     const contactInfoData = await this.#repository.updateById(id, payload);
     if (!contactInfoData) throw new NotFoundError("ContactInfo Not Find");
     return contactInfoData;
@@ -46,9 +41,6 @@ class ContactInfoService extends BaseService {
     const contactInfo = await this.#repository.findById(id);
     if (!contactInfo) throw new NotFoundError("ContactInfo not found");
     const deletedContactInfo = await this.#repository.deleteById(id);
-    if (deletedContactInfo) {
-      await removeUploadFile(contactInfo?.image);
-    }
     return deletedContactInfo;
   }
 }

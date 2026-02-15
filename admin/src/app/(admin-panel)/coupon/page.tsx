@@ -1,5 +1,5 @@
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { getAllCoupon, getCouponWithPagination } from "@/services/coupon";
+import { getAllCoupon, getCouponWithPagination } from "@/app/(admin-panel)/coupon/service";
 import React from "react";
 import { CouponTable } from "./table";
 import { Item } from "@radix-ui/react-dropdown-menu";
@@ -30,7 +30,7 @@ export default async function CouponsPage({ searchParams }: Props) {
       <CouponTable
         data={data.result.map((item) => ({
           ...item,
-               
+
           // image: fileUrlGenerator(String(item.image)),
         }))}
         pagination={{

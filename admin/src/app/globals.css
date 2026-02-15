@@ -6,7 +6,19 @@
   --color-secondary: #fffeea;
 }
 
+
 @layer base {
+  :root {
+    --destructive: 0 84.2% 60.2%;          /* red */
+    --destructive-foreground: 210 20% 98%; /* white */
+  }
+}
+
+@layer base {
+
+   html {
+    font-size: 19px;
+  }
 
    * {
     border-color: rgb(209, 213, 219);
@@ -19,7 +31,7 @@
   }
 
   button {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 cursor-pointer;
   }
 
 }
@@ -33,6 +45,19 @@
 
 /* Shadcn specific components */
 @layer components {
+    /* 🔴 Force destructive toast styles */
+  [data-variant="destructive"],
+  .destructive,
+  [class*="destructive"] {
+    background-color: #ef4444 !important;  /* Red background */
+    color: white !important;
+    border-color: #ef4444 !important;
+  }
+
+  [data-variant="destructive"] * {
+    color: white !important;
+  }
+  
   /* Card component */
   [data-radix-card],
   .card,
@@ -46,6 +71,36 @@
   [role="listbox"],
   [data-radix-popper-content-wrapper] {
     border-color: rgb(209, 213, 219) !important;
+  }
+
+    /* Select dropdown background */
+  [role="listbox"] {
+    background-color: rgb(243, 244, 246);
+  }
+
+  /* Make SelectItem full-width clickable */
+  [role="option"] > * {
+    display: block;      
+    width: 100%;        
+    padding: 10px 12px; 
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  /* Hover (mouse) */
+  [role="option"] > *:hover {
+    background-color: rgb(229, 231, 235);
+  }
+
+  /* Keyboard highlight */
+  [role="option"][data-highlighted] > * {
+    background-color: rgb(229, 231, 235);
+  }
+
+  /* Selected item */
+  [role="option"][data-state="checked"] > * {
+    background-color: rgb(209, 213, 219);
+    font-weight: 400;
   }
 
   /* Input, Textarea, Select */
@@ -62,6 +117,28 @@
     border-color: rgb(209, 213, 219) !important;
   }
 
+  table th,
+  table td {
+    padding-top: 18px;
+    padding-bottom: 14px;
+    padding-left: 12px;
+    padding-right: 12px;
+    vertical-align: middle;
+  }
+
+  table th {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  table td {
+    font-size: 18px;
+  }
+
+  table tr {
+    min-height: 56px;
+  }
+
   /* Separator */
   [data-orientation="horizontal"],
   [data-orientation="vertical"] {
@@ -70,10 +147,6 @@
 }
 
 @media print {
-  @page {
-    size: 80mm auto;
-    margin: 0;
-  }
 
   body {
     margin: 0 !important;
@@ -82,12 +155,24 @@
     print-color-adjust: exact !important;
   }
 
-  .print-area {
-    width: 80mm !important;
-    max-width: 80mm !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    font-size: 11px !important;
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  @media print {
+    @page {
+      size: 100mm auto;   
+      margin: 0;
+    }
+
+    .print-area {
+      width: 100mm !important;
+      max-width: 100mm !important;
+      padding: 4px !important;
+      margin: 0 auto !important;
+      font-size: 16px !important; 
+    }
   }
 
   img {

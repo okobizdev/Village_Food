@@ -32,23 +32,6 @@ export const columns: ColumnDef<TCategory>[] = [
     },
   },
   {
-    header: "Vector Image",
-    accessorKey: "vectorImage",
-    cell: ({ row }) => {
-      const { vectorImage } = row.original;
-      return (
-        <div className="w-20 h-20 relative">
-          <Image
-            src={vectorImage}
-            alt="category"
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "priority",
     header: "Priority",
     cell: ({ row }) => {

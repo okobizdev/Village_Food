@@ -5,26 +5,27 @@ const pagination = require("../../utils/pagination.js");
 const BaseRepository = require("../base/base.repository.js");
 
 class CategoryRepository extends BaseRepository {
+  #model;
   constructor(model) {
     super(model);
-    this.model = model;
+    this.#model = model;
   }
 
   async createCategory(payload, session) {
-    const newCategory = await this.model.create([payload], { session });
+    const newCategory = await this.#model.create([payload], { session });
     return newCategory;
   }
 
   async getAllCategory() {
     // Sort by: landingPageStatus DESC, orderBy ASC, createdAt DESC
-    const categories = await this.model
+    const categories = await this.#model
       .find()
       .sort({ landingPageStatus: -1, orderBy: 1, createdAt: -1 });
     return categories;
   }
 
   async getCategoryById(categoryId) {
-    const category = await this.model.aggregate([
+    const category = await this.#model.aggregate([
       {
         $match: { _id: new mongoose.Types.ObjectId(categoryId) }, // Match the specific category ID
       },
@@ -46,7 +47,7 @@ class CategoryRepository extends BaseRepository {
   }
 
   async getCategoryBySlug(slug) {
-    const category = await this.model.aggregate([
+    const category = await this.#model.aggregate([
       {
         $match: { slug: slug }, // Match the specific category ID
       },
@@ -68,7 +69,7 @@ class CategoryRepository extends BaseRepository {
   }
 
   async updateCategory(id, payload) {
-    const updatedCategory = await this.model.findByIdAndUpdate(id, payload);
+    const updatedCategory = await this.#model.findByIdAndUpdate(id, payload);
     if (!updatedCategory) {
       throw new Error("About Us not found");
     }
@@ -80,7 +81,7 @@ class CategoryRepository extends BaseRepository {
       const categorys = await pagination(
         payload,
         async (limit, offset) => {
-          const categorys = await this.model.aggregate([
+          const categorys = await this.#model.aggregate([
             {
               $addFields: {
                 landingPageStatusSort: { $cond: ["$landingPageStatus", 0, 1] },
@@ -158,19 +159,6 @@ class CategoryRepository extends BaseRepository {
           as: "subChildCategories",
         },
       },
-      // {
-      //   $addFields: {
-      //     "subCategories.childCategories": {
-      //       $filter: {
-      //         input: "$childCategories",
-      //         as: "child",
-      //         cond: {
-      //           $eq: ["$$child.subCategoryRef", "$$child.subCategoryRef"],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
       {
         $addFields: {
           subCategories: {

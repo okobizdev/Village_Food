@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/table";
 import { Label } from "@radix-ui/react-label";
 import { Card } from "@/components/ui/card";
-import { TSubCategory } from "@/types/shared";
 import { columns } from "./columns";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { TSubCategory } from "./types";
 
 interface Props {
   data: TSubCategory[];
@@ -65,16 +65,16 @@ export const SubCategoryTable: React.FC<Props> = ({ data, pagination }) => {
                     className={
                       (header.column.columnDef.meta as any)?.align
                         ? "h-8 text-white text-" +
-                          (header.column.columnDef.meta as any)?.align
+                        (header.column.columnDef.meta as any)?.align
                         : "h-8 text-white"
                     }
                   >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 );
               })}
@@ -97,7 +97,7 @@ export const SubCategoryTable: React.FC<Props> = ({ data, pagination }) => {
                     className={
                       (cell.column.columnDef.meta as any)?.align
                         ? "py-1 text-" +
-                          (cell.column.columnDef.meta as any)?.align
+                        (cell.column.columnDef.meta as any)?.align
                         : "py-1"
                     }
                   >

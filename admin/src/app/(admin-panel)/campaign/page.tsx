@@ -1,5 +1,5 @@
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import { getCampaignWithPagination } from "@/services/campaign";
+import { getCampaignWithPagination } from "@/app/(admin-panel)/campaign/service";
 import React from "react";
 import { CampaignTable } from "./table";
 import { fileUrlGenerator } from "@/utils/helpers";

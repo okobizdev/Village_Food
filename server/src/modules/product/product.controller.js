@@ -5,6 +5,7 @@ const ProductService = require("./product.service.js");
 const { ensureNullIfUndefined } = require("../../utils/helpers.js");
 
 class ProductController {
+  
   createProduct = withTransaction(async (req, res, next, session) => {
     try {
       const payloadFiles = {
@@ -58,6 +59,25 @@ class ProductController {
     }
   });
 
+  getBestSellerProducts = catchError(async (req, res) => {
+    const products = await ProductService.getProductsByStatus("bestSeller");
+    const resDoc = responseHandler(200, "Best Seller Products", products);
+    res.status(resDoc.statusCode).json(resDoc);
+  });
+
+  getBestDealProducts = catchError(async (req, res) => {
+    const products = await ProductService.getProductsByStatus("bestDeal");
+    const resDoc = responseHandler(200, "Best Deal Products", products);
+    res.status(resDoc.statusCode).json(resDoc);
+  });
+
+  getPopularProducts = catchError(async (req, res) => {
+    const products = await ProductService.getProductsByStatus("popular");
+    const resDoc = responseHandler(200, "Popular Products", products);
+    res.status(resDoc.statusCode).json(resDoc);
+  });
+
+
   getAllProduct = catchError(async (req, res) => {
     const payload = {
       warehouseRef: req.query.warehouseRef,
@@ -91,6 +111,7 @@ class ProductController {
     const resDoc = responseHandler(200, "Get All Products", productResult);
     res.status(resDoc.statusCode).json(resDoc);
   });
+
   getSearchProduct = catchError(async (req, res) => {
     const payload = {
       search: req.query.search,
@@ -105,8 +126,8 @@ class ProductController {
       page: req.query.page,
       limit: req.query.limit,
       order: req.query.order,
-      sortBy: req.query.sortBy, // e.g., 'name', 'mrpPrice', 'createdAt'
-      minPrice: req.query.minPrice, // Minimum price for filtering
+      sortBy: req.query.sortBy, 
+      minPrice: req.query.minPrice, 
       maxPrice: req.query.maxPrice,
       categoryId: req.query.categoryId,
       categorySlug: req.query.categorySlug,
@@ -114,8 +135,6 @@ class ProductController {
       subCategorySlug: req.query.subCategorySlug,
       childCategoryId: req.query.childCategoryId,
       childCategorySlug: req.query.childCategorySlug,
-      subChildCategoryId: req.query.subChildCategoryId,
-      subChildCategorySlug: req.query.subChildCategorySlug,
       brandId: req.query.brandId,
       brandSlug: req.query.brandSlug,
       isNewArrival: req.query.isNewArrival,
@@ -205,10 +224,7 @@ class ProductController {
         optionalImages: req.body,
       };
 
-      console.log(
-        { id: id, payloadFiles: payloadFiles, payload: payload },
-        "from update product controller....."
-      );
+
       await ProductService.updateProduct(id, payloadFiles, payload, session);
       const resDoc = responseHandler(201, "Product Update successfully");
       res.status(resDoc.statusCode).json(resDoc);
@@ -218,7 +234,7 @@ class ProductController {
           .status(400)
           .json({ message: "Product title already exists." });
       }
-      console.log(error);
+
       next(error);
     }
   });

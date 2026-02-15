@@ -2,15 +2,15 @@
 import React, { useEffect, useState } from "react";
 import CheckOutForm from "../CheckOutForm/CheckOutForm";
 import CartOverView from "../CartOverView/CartOverView";
-import { TProduct } from "@/types";
 import { getUser } from "@/services/auth";
 import { getCartProducts } from "@/services/cart";
 import { toast } from "react-toastify";
+import { TProduct } from "@/types/product";
 
 
 
 const MainCheckOut = () => {
-  
+
   const [products, setProducts] = useState<TProduct | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [coupon, setCoupon] = useState<string | null>(null);
@@ -46,10 +46,8 @@ const MainCheckOut = () => {
               userRef={String(userId)}
               shipping={shipping}
               setShipping={setShipping}
-              setCoupon={setCoupon} type={function (value: React.SetStateAction<string | null>): void {
-                console.log(value)
-                throw new Error("Function not implemented.");
-              }} />
+              setCoupon={setCoupon}
+            />
           )}
         </div>
         <div className="lg:w-2/5 w-full">

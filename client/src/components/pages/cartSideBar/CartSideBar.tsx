@@ -27,7 +27,7 @@ const CartSideBar: React.FC<Props> = ({ cartProducts }) => {
       {/* Toggle Button */}
       <div className="fixed top-[30vh]  right-0 z-20">
         <div
-          className="bg-[#FF6C0C]  p-2 text-[#fff] rounded-l cursor-pointer"
+          className="bg-primary p-2 text-[#fff] rounded-l cursor-pointer"
           onClick={menuClick}
         >
           <IoCart className="text-xl" />

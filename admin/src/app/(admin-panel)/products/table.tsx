@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/table";
 import { Label } from "@radix-ui/react-label";
 import { Card } from "@/components/ui/card";
-import { TProduct } from "@/types/shared";
 import { columns } from "./columns";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { TProduct } from "./types";
 
 interface Props {
   data: TProduct[];

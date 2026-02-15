@@ -2,7 +2,7 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import React from "react";
 import { ChildCategoryTable } from "./table";
 import { CreateChildCategoryForm } from "./form";
-import { getChildCategoryWithPagination } from "@/app/(admin-panel)/category/childcategory/child-category";
+import { getChildCategoryWithPagination } from "@/app/(admin-panel)/category/childcategory/service";
 
 export const revalidate = 0;
 

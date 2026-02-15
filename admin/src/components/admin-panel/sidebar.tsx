@@ -11,7 +11,6 @@ import { SidebarToggle } from "@/components/admin-panel/sidebar-toggle";
 import Image from "next/image";
 // import { getSetting } from "@/services/settings";
 import React from "react";
-import { fileUrlGenerator } from "@/utils/helpers";
 
 
 export function Sidebar() {

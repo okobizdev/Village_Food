@@ -1,6 +1,5 @@
 
 const { UserSchema } = require('../../models/auth/userSchema.js');
-const pagination = require('../../utils/pagination.js');
 const BaseRepository = require('../base/base.repository.js');
 const moment = require("moment-timezone");
 

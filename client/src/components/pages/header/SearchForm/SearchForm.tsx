@@ -2,7 +2,7 @@
 
 import { apiBaseUrl } from "@/config/config";
 import { getSearchProducts } from "@/services/products";
-import { TProduct } from "@/types";
+import { TProduct } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -36,7 +36,7 @@ const SearchForm: React.FC<ResponsiveSearchFormProps> = ({ onClose }) => {
       }
     };
 
-    const delayDebounce = setTimeout(() => {}, 100);
+    const delayDebounce = setTimeout(() => { }, 100);
     fetchSearchResults();
     return () => clearTimeout(delayDebounce);
   }, [query]);

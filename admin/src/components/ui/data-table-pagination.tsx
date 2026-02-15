@@ -57,7 +57,8 @@ export function DataTablePagination<TData>({
           variant={i === currentPage ? "default" : "outline"}
           size="sm"
           onClick={() => handlePageChange(i)}
-          className="px-3"
+          className={`px-3 ${i === currentPage ? "text-white" : "text-primary"
+            }`}
         >
           {i}
         </Button>
@@ -71,25 +72,25 @@ export function DataTablePagination<TData>({
     <div className="flex w-full flex-col items-center justify-between gap-4 overflow-auto px-2 py-1 sm:flex-row sm:gap-8">
       <div className="w-full flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6 lg:gap-8">
         <div className="flex items-center gap-2 text-sm font-medium">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <div className="w-[100px]">Rows per page</div>
+          <div className="flex items-center gap-2 text-sm font-medium ">
+            <div className="w-[120px]">Rows per page</div>
             <Select
               onValueChange={handleLimitChange}
               value={searchParams.get("limit") || "10"}
             >
-              <SelectTrigger className="w-[60px]">
+              <SelectTrigger className="w-[70px]">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
                 {pageSizeOptions.map((option) => (
-                  <SelectItem key={option} value={option.toString()}>
+                  <SelectItem className="bg-gray-100 cursor-pointer" key={option} value={option.toString()}>
                     {option}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div className="w-full flex  items-center justify-center text-sm font-medium">
+          <div className="w-full flex items-center justify-center text-sm font-medium cursor-pointer">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
@@ -101,9 +102,10 @@ export function DataTablePagination<TData>({
             size="sm"
             onClick={() => handlePageChange(1)}
             disabled={currentPage === 1}
+            className="cursor-pointer"
           // className={currentPage === 1 ? "cursor-not-allowed" : ""}
           >
-            <DoubleArrowLeftIcon className="h-4 w-4" />
+            <DoubleArrowLeftIcon className="h-4 w-4 " />
           </Button>
           <Button
             variant="outline"
@@ -114,8 +116,9 @@ export function DataTablePagination<TData>({
           >
             <ChevronLeftIcon className="h-4 w-4" />
           </Button>
-
-          {renderPageButtons()}
+          <div className="">
+            {renderPageButtons()}
+          </div>
 
           <Button
             variant="outline"
@@ -124,16 +127,17 @@ export function DataTablePagination<TData>({
             disabled={currentPage === totalPages}
           // className={currentPage === totalPages ? "cursor-no-drop" : ""}
           >
-            <ChevronRightIcon className="h-4 w-4" />
+            <ChevronRightIcon className="h-4 w-4 cursor-pointer" />
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages}
+            className="cursor-pointer"
           // className={currentPage === totalPages ? "cursor-not-allowed" : ""}
           >
-            <DoubleArrowRightIcon className="h-4 w-4" />
+            <DoubleArrowRightIcon className="h-4 w-4 cursor-pointer" />
           </Button>
         </div>
       </div>

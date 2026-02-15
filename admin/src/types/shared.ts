@@ -109,38 +109,12 @@ export interface TProductReview {
 }
 
 
-export type AllSubCategoryResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: TSubCategory[];
-};
-
 export type AllProductReviewWithPaginationResponse = {
   statusCode: number;
   status: string;
   message: string;
   data: {
     result: TProductReview[];
-    pagination: {
-      currentPage: number;
-      currentPageLimit: number;
-      total: number;
-      totalPage: number;
-      prevPage: number | null;
-      prevPageLimit: number;
-      nextPage: number | null;
-      nextPageLimit: number;
-    };
-  };
-};
-
-export type AllSubCategoryWithPaginationResponse = {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: {
-    result: TSubCategory[];
     pagination: {
       currentPage: number;
       currentPageLimit: number;
@@ -342,20 +316,6 @@ export interface SteadfastOrderPayload {
   recipient_address: string;
   cod_amount: string | number; // Can be numeric or string depending on usage
   note?: string; // Optional field
-}
-
-export interface DashboardMetrics {
-  totalOrders: number;
-  totalSales: number;
-  totalStock: number;
-  totalStockValue: number;
-}
-
-export interface DashboardMetricsResponse {
-  statusCode: number;
-  status: string;
-  message: string;
-  data: DashboardMetrics;
 }
 
 export interface OrderProducts {

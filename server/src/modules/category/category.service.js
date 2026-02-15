@@ -2,19 +2,17 @@ const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 
 const categoryRepository = require("./category.repository.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
 
 class CategoryService extends BaseService {
+  #repository;
+
   constructor(repository, serviceName) {
     super(repository, serviceName);
-    this.repository = repository;
+    this.#repository = repository;
   }
 
   async createCategory(payload, session) {
-    const categoryData = await this.repository.createCategory(
+    const categoryData = await this.#repository.createCategory(
       payload,
       session
     );
@@ -22,39 +20,34 @@ class CategoryService extends BaseService {
   }
 
   async getAllCategory() {
-    return await this.repository.getAllCategory();
+    return await this.#repository.getAllCategory();
   }
 
   async getCategoryWithPagination(payload) {
-    const category = await this.repository.getCategoryWithPagination(payload);
+    const category = await this.#repository.getCategoryWithPagination(payload);
     return category;
   }
 
   async getSingleCategory(id) {
-    const categoryData = await this.repository.getCategoryById(id);
+    const categoryData = await this.#repository.getCategoryById(id);
     if (!categoryData) throw new NotFoundError("Category Not Find");
     return categoryData;
   }
 
   async getSingleCategoryWithSlug(slug) {
-    const categoryData = await this.repository.getCategoryBySlug(slug);
+    const categoryData = await this.#repository.getCategoryBySlug(slug);
     if (!categoryData) throw new NotFoundError("Category Not Find");
     return categoryData;
   }
 
 
-  async updateCategory(id, payloadFiles, payload) {
-    const { files } = payloadFiles;
+  async updateCategory(id, payload) {
     const {
       name,
       slug,
       status,
       image,
       imagePublicId,
-      vectorImage,
-      vectorImagePublicId,
-      landingPageStatus,
-      orderBy,
     } = payload;
 
 
@@ -62,38 +55,22 @@ class CategoryService extends BaseService {
     const updatePayload = {
       name,
       slug,
-      orderBy,
-      landingPageStatus,
       status,
     };
 
     // Only add image fields if they're provided
     if (image) updatePayload.image = image;
     if (imagePublicId) updatePayload.imagePublicId = imagePublicId;
-    if (vectorImage) updatePayload.vectorImage = vectorImage;
-    if (vectorImagePublicId) updatePayload.vectorImagePublicId = vectorImagePublicId;
 
-    // Handle file uploads if any
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        updatePayload[key] = images[key];
-      }
-    }
 
     // Get old category data for file cleanup
-    const oldCategory = await this.repository.findById(id);
+    const oldCategory = await this.#repository.findById(id);
     if (!oldCategory) {
       throw new NotFoundError("Category not found");
     }
 
     // Update the database with the new data
-    const categoryData = await this.repository.updateCategory(id, updatePayload);
-
-    // Remove old files if they're being replaced
-    if (files?.length && oldCategory && updatePayload.image && oldCategory.image !== updatePayload.image) {
-      await removeUploadFile(oldCategory.image);
-    }
+    const categoryData = await this.#repository.updateCategory(id, updatePayload);
 
     return categoryData;
   }
@@ -103,7 +80,7 @@ class CategoryService extends BaseService {
 
     const updatedStatus = status === true || status === "true";
 
-    const category = await this.repository.updateCategoryStatus(id, {
+    const category = await this.#repository.updateCategoryStatus(id, {
       status: updatedStatus,
     });
 
@@ -114,22 +91,17 @@ class CategoryService extends BaseService {
 
 
   async deleteCategory(id) {
-    const category = await this.repository.findById(id);
+    const category = await this.#repository.findById(id);
     if (!category) throw new NotFoundError("Category not found");
-    const deletedCategory = await this.repository.deleteById(id);
-
-    if (deletedCategory) {
-      await removeUploadFile(category?.image);
-    }
+    const deletedCategory = await this.#repository.deleteById(id);
     return deletedCategory;
   }
 
   async getNavBar() {
-    const navbarData = await this.repository.getNavBar();
+    const navbarData = await this.#repository.getNavBar();
     if (!navbarData) throw new NotFoundError("Navbar Not Find");
     return navbarData;
   }
-
 
 }
 

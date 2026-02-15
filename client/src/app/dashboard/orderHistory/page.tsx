@@ -17,7 +17,8 @@ import {
   FaMoneyBillWave,
   FaTruck,
 } from "react-icons/fa";
-import { TProduct } from "@/types";
+import { TProduct } from "@/types/product";
+
 
 
 const getStatusInfo = (status: string) => {
@@ -161,7 +162,7 @@ const OrderHistory = async () => {
                       {item?.productRef?.thumbnailImage && (
                         <div>
                           <Image
-                            src={`${apiBaseUrl}${item.productRef.thumbnailImage}`}
+                            src={`${item.productRef.thumbnailImage}`}
                             width={100}
                             height={100}
                             alt={item.productRef.name || "Product Image"}

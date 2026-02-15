@@ -1,6 +1,5 @@
-import { rajdhani } from "@/app/font";
-import React from "react";
-import user from "@/assets/images/reviewUser.png";
+
+
 import Image from "next/image";
 import { IoIosStar } from "react-icons/io";
 import { IoStarHalf } from "react-icons/io5";
@@ -19,9 +18,9 @@ const ProductReview = async ({ userRef, productRef }: ProductReviewProps) => {
 
 
   return (
-    <div className="mt-12 Container">
+    <div className=" my-12 max-w-7xl mx-auto">
       <h2
-        className={`text-xl font-semibold border-b pb-3 ${rajdhani.className}`}
+        className="text-xl font-semibold border-b pb-3"
       >
         Product Review
       </h2>
@@ -34,7 +33,7 @@ const ProductReview = async ({ userRef, productRef }: ProductReviewProps) => {
                 <div className="flex items-center gap-2">
                   <div className="md:w-[40px] w-[30px] border border-[#262626]/50 p-1 rounded">
                     <Image
-                      src={user}
+                      src="/assets/images/reviewUser.png"
                       alt="user"
                       width={60}
                       height={60}

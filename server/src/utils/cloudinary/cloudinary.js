@@ -36,8 +36,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       secure_url: result.secure_url,
       public_id: result.public_id,
     });
-  } catch (err) {
-    console.error(err);
+  } catch {
     res.status(500).json({ error: "Upload failed" });
   }
 });

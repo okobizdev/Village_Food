@@ -2,10 +2,6 @@ const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 
 const childCategoryRepository = require("./child.category.repository.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
 
 class ChildCategoryService extends BaseService {
   #repository;

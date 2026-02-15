@@ -5,7 +5,7 @@ import {
   deleteCampaign,
   getCampaignById,
   updateCampaign,
-} from "@/services/campaign";
+} from "@/app/(admin-panel)/campaign/service";
 import { revalidatePath } from "next/cache";
 
 export async function createFormAction(data: FormData) {

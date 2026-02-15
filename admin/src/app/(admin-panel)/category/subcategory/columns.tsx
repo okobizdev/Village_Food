@@ -1,10 +1,9 @@
-import { TSubCategory } from "@/types/shared";
 import { ColumnDef } from "@tanstack/react-table";
-import Image from "next/image";
 import { SubCategoryDetailsSheet } from "./details";
-import { fileUrlGenerator, makeBDPrice, truncateText } from "@/utils/helpers";
+import { truncateText } from "@/utils/helpers";
 import React from "react";
-import { upperCase, upperFirst } from "lodash";
+import { upperFirst } from "lodash";
+import { TSubCategory } from "./types";
 
 export const columns: ColumnDef<TSubCategory>[] = [
   {

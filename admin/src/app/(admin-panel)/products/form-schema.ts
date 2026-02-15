@@ -7,19 +7,15 @@ export const productFormSchema = z.object({
   discountType: z.string().optional(),
   discount: z.string().optional(),
   mrpPrice: z.string().min(1, "MRP is required"),
-  // status: z.string().optional(),
   size: z.string().optional(),
-  quantity: z.string().optional(),
   freeShipping: z.string().optional(),
   categoryRef: z.string().nonempty("Category is required"),
   subCategoryRef: z.string().optional(),
   childCategoryRef: z.string().optional(),
   inventoryType: z.string().nonempty("Inventory Type is required"),
-  // inventoryArray: z.array(z.object(z.string())).optional(),
   inventories: z.array(
     z.object({
       size: z.string().optional(),
-      quantity: z.string().nonempty("Quantity is required"),
     })
   ),
 
@@ -35,8 +31,6 @@ export const productFormSchema = z.object({
     .min(1, {
       message: "Minimum 1 files are allowed",
     }),
-  // .optional()
-  // .default([]),
   optionalImages: z
     .array(
       z.union([

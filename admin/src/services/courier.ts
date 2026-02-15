@@ -23,6 +23,7 @@ export async function createSteadfastOrder(data: SteadfastOrderPayload) {
     }
     return response.json();
   } catch (error: any) {
-    console.log(error.message);
+    console.error("Courier service error:", error.message);
+    throw error;
   }
 }

@@ -56,16 +56,6 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
     },
   ]);
 
-  const [vectorFileList, setVectorFileList] = useState<UploadFile<any>[]>(
-    [
-      {
-        uid: "-1",
-        name: String(item.vectorImage).split("/").pop() || "",
-        status: "done",
-        url: item.vectorImage,
-      },
-    ]
-  );
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -73,7 +63,6 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
     defaultValues: {
       name: item.name,
       image: [],
-      vectorImage: [],
     },
   });
 
@@ -88,16 +77,7 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
     form.setValue("image", rawFiles);
   };
 
-  const handleVectorFileChange = ({ fileList }: any) => {
-    setVectorFileList(fileList);
 
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("vectorImage", rawFiles);
-  };
 
   const onSubmitUpdate = async (values: z.infer<typeof formSchema>) => {
     setUpdating(true);
@@ -106,8 +86,6 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
 
       let imageUrl = item.image;
       let imagePublicId = item.imagePublicId || "";
-      let vectorImageUrl = item.vectorImage;
-      let vectorImagePublicId = item.vectorImagePublicId || "";
 
       // new image upload
       if (values.image && values.image.length > 0) {
@@ -125,29 +103,12 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
         imagePublicId = uploadResult.public_id;
       }
 
-      // new vector image upload
-      if (values.vectorImage && values.vectorImage.length > 0) {
-        // old vector image delete
-        if (item.vectorImagePublicId) {
-          await deleteImageFromCloudinary(item.vectorImagePublicId);
-        }
-
-        // new vector image upload
-        const vectorUploadResult = await uploadImageToCloudinary(
-          values.vectorImage[0],
-          "categories/vectors"
-        );
-        vectorImageUrl = vectorUploadResult.secure_url;
-        vectorImagePublicId = vectorUploadResult.public_id;
-      }
 
       // FormData
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("image", imageUrl);
       formData.append("imagePublicId", imagePublicId);
-      formData.append("vectorImage", vectorImageUrl);
-      formData.append("vectorImagePublicId", vectorImagePublicId);
 
       await updateFormAction(String(item._id), formData);
       toast({
@@ -293,57 +254,6 @@ export const DetailsSheet: React.FC<Props> = ({ item }) => {
 
                 <div className="text-red-400 text-xs min-h-4">
                   {form.formState.errors.image?.message}
-                </div>
-              </div>
-
-              <div className="">
-                <Label>
-                  Vector Image <b className="text-red-500">*</b>
-                </Label>
-                <FormField
-                  control={form.control}
-                  name="vectorImage"
-                  render={({ field }) => (
-                    <div>
-                      <Upload
-                        listType="picture-card"
-                        beforeUpload={() => false}
-                        fileList={vectorFileList}
-                        onChange={handleVectorFileChange}
-                      >
-                        <div>
-                          <UploadOutlined />
-                          <div style={{ marginTop: 8 }}>Upload</div>
-                        </div>
-                      </Upload>
-                    </div>
-                  )}
-                />
-
-                <div className="mt-4">
-                  {form.getValues("vectorImage") &&
-                    form.getValues("vectorImage").length > 0 &&
-                    form.getValues("vectorImage").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                <div className="text-red-400 text-xs min-h-4">
-                  {form.formState.errors.vectorImage?.message}
                 </div>
               </div>
             </div>

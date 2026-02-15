@@ -41,6 +41,3 @@
 .menuTitle:not(:hover)::before {
     transform-origin: right;
 }
-/* .navBtn {
-  @apply px-3 py-2 bg-[#FF6C0C] text-white font-bold rounded;
-} */

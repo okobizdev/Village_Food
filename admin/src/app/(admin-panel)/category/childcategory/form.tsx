@@ -24,14 +24,11 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { childCategoryFormSchema } from "./form-schema";
-import { FileUp, Paperclip } from "lucide-react";
-import { humanFileSize, makeFormData } from "@/utils/helpers";
+import { makeFormData } from "@/utils/helpers";
 import { createFormAction } from "./actions";
-import { Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 import { Label } from "@/components/ui/label";
 import "react-quill/dist/quill.snow.css";
-import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/service";
 import { TSubCategory } from "../subcategory/types";
 
 
@@ -44,8 +41,6 @@ const defaultValues = {
 
 export const CreateChildCategoryForm: React.FC = () => {
   const { toast } = useToast();
-  const [imageFileList, setImageFileList] = useState([]);
-  const [bannerFileList, setBannerFileList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [subCategories, setSubCategories] = useState<TSubCategory[]>([]);
   const form = useForm<z.infer<typeof childCategoryFormSchema>>({
@@ -57,41 +52,23 @@ export const CreateChildCategoryForm: React.FC = () => {
     getAllSubCategory().then((data) => setSubCategories(data.data));
   }, []);
 
-  const handleImageFileChange = ({ fileList }: any) => {
-    setImageFileList(fileList);
 
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("image", rawFiles);
-  };
-
-  const handleBannerFileChange = ({ fileList }: any) => {
-    setBannerFileList(fileList);
-
-    const rawFiles = fileList
-      .map((file: any) => file.originFileObj)
-      .filter(Boolean);
-
-    // Sync with react-hook-form
-    form.setValue("bannerImage", rawFiles);
-  };
 
   const onSubmit = async (values: z.infer<typeof childCategoryFormSchema>) => {
     setLoading(true);
-    const formData = makeFormData(values);
 
     try {
+
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("subCategoryRef", values.subCategoryRef);
+
       await createFormAction(formData);
       form.reset();
       toast({
         title: "Success",
         description: "ChildCategory created successfully",
       });
-      setImageFileList([]);
-      setBannerFileList([]);
       window.location.reload();
     } catch (error: any) {
       toast({

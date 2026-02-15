@@ -1,7 +1,7 @@
 "use client";
 
 import { apiBaseUrl } from "@/config/config";
-import { TProduct } from "@/types";
+import { TProduct } from "@/types/product";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,10 +17,10 @@ const CartOverView: React.FC<Props> = ({ products, shipping }) => {
 
   const [showCartOverview, setShowCartOverview] = useState(false);
 
-// const productDiscount = products?.productDiscount;
+  // const productDiscount = products?.productDiscount;
 
 
- 
+
   return (
     <div className="top-20 sticky">
       <div
@@ -69,7 +69,7 @@ const CartOverView: React.FC<Props> = ({ products, shipping }) => {
                             <Image
                               height={100}
                               width={100}
-                              src={apiBaseUrl + product?.product?.thumbnailImage}
+                              src={product?.product?.thumbnailImage}
                               alt={product?.product?.name}
                               className="w-16 h-16 object-cover"
                             />
@@ -103,7 +103,7 @@ const CartOverView: React.FC<Props> = ({ products, shipping }) => {
               </div>
             </motion.div>
           )}
-          
+
       </AnimatePresence>
     </div>
   );

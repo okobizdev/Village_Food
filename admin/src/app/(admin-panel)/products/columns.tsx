@@ -1,16 +1,16 @@
 "use client";
 
-import { TProduct } from "@/types/shared";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { ProductDetailsSheet } from "./details";
-import { fileUrlGenerator, makeBDPrice, truncateText } from "@/utils/helpers";
+import { makeBDPrice, truncateText } from "@/utils/helpers";
 import React, { useState } from "react";
 import { upperCase, upperFirst } from "lodash";
 import TruncatedHtml from "@/components/utils/truncated-html";
 import Barcode from "react-barcode";
 import { BASE_URL } from "@/config/config";
 import { ProductStatusDropdown } from "@/components/utils/product-status-dropdown";
+import { TProduct } from "./types";
 
 export const columns: ColumnDef<TProduct>[] = [
   {
@@ -38,7 +38,7 @@ export const columns: ColumnDef<TProduct>[] = [
   },
   {
     header: "Additional Images",
-    accessorKey: "images",
+    accessorKey: "optionalImages",
     cell: ({ row }) => {
       return (
         <div>
@@ -149,9 +149,6 @@ export const columns: ColumnDef<TProduct>[] = [
     accessorKey: "inventoryType",
     cell: ({ row }) => (
       <div className="">
-        {row.original.inventoryType === "colorLevelInventory" && (
-          <p> Size</p>
-        )}
         {row.original.inventoryType === "levelInventory" && <p>Size</p>}
         {row.original.inventoryType === "inventory" && <p>-</p>}
       </div>
@@ -172,9 +169,6 @@ export const columns: ColumnDef<TProduct>[] = [
               <div className="flex items-center  gap-2">
                 <p>Size: {item.level ? upperCase(item.level) : "N/A"}</p>
               </div>
-              <p>
-                Quantity: <span className="font-bold"> {item.quantity}</span>
-              </p>
             </div>
           ))}
         </div>

@@ -5,7 +5,7 @@ import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
-import { SessionProvider } from "next-auth/react";
+import RoutePrefetcher from "@/components/RoutePrefetcher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +23,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NextTopLoader showSpinner={false} color="#1D4092" />
-          <AdminPanelLayout>{children}</AdminPanelLayout>
+          <AdminPanelLayout>
+            <RoutePrefetcher />
+            {children}
+          </AdminPanelLayout>
           <Toaster />
         </ThemeProvider>
       </body>

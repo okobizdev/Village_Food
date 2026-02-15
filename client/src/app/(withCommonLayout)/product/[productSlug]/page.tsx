@@ -1,6 +1,3 @@
-// import NavBar from "@/components/pages/header/NavBar/NavBar";
-// import { getCartProducts } from "@/services/cart";
-
 import ProductDetails from "@/components/pages/products/ProductDetails/ProductDetails";
 import ProductReview from "@/components/pages/products/ProductReview/ProductReview";
 import ReletiveProducts from "@/components/pages/products/ReletiveProducts/ReletiveProducts";
@@ -11,10 +8,10 @@ import {
   getSingleProductBySlug,
 } from "@/services/products";
 import { Metadata } from "next";
-import React from "react";
+
 
 export const metadata: Metadata = {
-  title: "SilkThread | Single Product",
+  title: "Village food | Single Product",
   description: "Best E-commerce platform in BD",
 };
 
@@ -29,8 +26,7 @@ const Page = async ({ params }: PageProps) => {
   const { data: product } = await getSingleProductBySlug(
     resolvedParams.productSlug
   );
-console.log("product===========>",product);
-console.log("resolvedParams===========>",resolvedParams);
+
 
   const user = await getUser();
   const userRef = user?.id;
@@ -39,16 +35,12 @@ console.log("resolvedParams===========>",resolvedParams);
 
   const { data: relativeProducts } = await getRelativeProducts(productId);
 
-  // ==================== Product Details ====================
-  // const coupon = "";
-  // const userCartProducts = await getCartProducts(userRef, coupon);
 
   return (
     <div className="">
-      {/* <NavBar userCartProducts={userCartProducts?.data} /> */}
       <ProductDetails product={product} />
+      <ReletiveProducts relativeProducts={relativeProducts} userRef={userRef} />
       <ProductReview userRef={userRef} productRef={productId} />
-      <ReletiveProducts relativeProducts={relativeProducts} />
     </div>
   );
 };

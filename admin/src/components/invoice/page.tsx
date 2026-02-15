@@ -21,35 +21,35 @@ const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
       (acc, item) => acc + Number(item?.quantity || 0),
       0
     );
-    // DISCOUNT (from backend field)
-    // const totalDiscount = Number(orderData.discount || 0);
 
-    // SAFE SHIPPING COST CALCULATION
     const totalDiscount =
       Number(orderData.subTotalPrice || 0) +
       Number(orderData.shippingCost || 0) -
       Number(orderData.totalPrice || 0);
-    // console.log(calculatedShipping)
+
     return (
       <div
         ref={ref}
-        className="print-area w-[60mm] mx-auto px-2 py-4 text-[11px] font-medium"
+        className="print-area w-[90mm] mx-auto px-2 py-4 text-[16px] font-medium "
       >
-        <div className="w-full flex flex-col justify-center items-center text-center py-2">
-          <Image
-            src="./logo/sidebar-logo.png" alt={""}
-            className="h-[0.8cm] object-cover"
-          />
+        <div className="w-full flex flex-col justify-center items-center text-center py-2 mt-10">
+          <div className=" relative w-20 h-20">
+            <Image
+              src="/logo/sidebar-logo.png" alt={""}
+              fill
+              className="h-[0.8cm] object-cover"
+            />
+          </div>
           <p className="mt-2">{BRAND_NAME}</p>
-          <p className="text-[10px]">
-            Address: Miprur 2, Oposite of Stadium Gate no. 1. Dhaka.
+          <p className="text-[16px]">
+            Address: 62/B North Pirerbag 60ft Mirpur Dhaka-1216. Bangladesh
           </p>
-          <div className="flex items-center justify-start text-[10px]">
+          <div className="flex items-center justify-start text-[16px]">
             <span>Hotline:</span>{" "}
             <span className="">Phone: +880 +88 01714-028-279</span>
           </div>
-          <p className="text-[10px]">Email :yousufengineering2024@gmail.com</p>
-          <p className="text-[10px]">Website : www.silkthread.bd.com</p>
+          <p className="text-[16px]">Email: yousufengineering2024@gmail.com</p>
+          {/* <p className="text-[14px]">Website : www.silkthread.bd.com</p> */}
         </div>
 
         <div className="w-full border-b border-[#000000] py-2">

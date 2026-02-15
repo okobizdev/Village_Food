@@ -1,6 +1,6 @@
 "use client";
 
-import { TShopSideBar } from "@/types";
+import { TShopSideBar } from "@/types/shopSideBar";
 import Link from "next/link";
 import React, { useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
@@ -37,9 +37,8 @@ const AllPageSidebar: React.FC<AllPageSidebarProps> = ({ shopSideBar }) => {
             <li key={cat._id}>
               <div
                 onClick={() => hasSubCategories && toggleCategory(cat._id)}
-                className={`flex items-center justify-between cursor-pointer text-md font-bold text-gray-700 transition ${
-                  hasSubCategories ? "hover:text-[#495588]" : "cursor-default"
-                }`}
+                className={`flex items-center justify-between cursor-pointer text-md font-bold text-gray-700 transition ${hasSubCategories ? "hover:text-[#495588]" : "cursor-default"
+                  }`}
               >
                 <Link href={`/shop?category=${cat.slug}`}>{cat.name}</Link>
                 {hasSubCategories &&
@@ -51,14 +50,13 @@ const AllPageSidebar: React.FC<AllPageSidebarProps> = ({ shopSideBar }) => {
               </div>
 
               <div
-                className={`transition-all duration-300 overflow-hidden ${
-                  isExpandedCategory
-                    ? "max-h-[500px] opacity-100 mt-2"
-                    : "max-h-0 opacity-0"
-                }`}
+                className={`transition-all duration-300 overflow-hidden ${isExpandedCategory
+                  ? "max-h-[500px] opacity-100 mt-2"
+                  : "max-h-0 opacity-0"
+                  }`}
               >
                 <ul className="space-y-1 pl-4">
-                  {Array.isArray(cat.subCategories) &&  cat.subCategories.map((subCat) => {
+                  {Array.isArray(cat.subCategories) && cat.subCategories.map((subCat) => {
                     const hasChildCategories =
                       (subCat.childCategories?.length ?? 0) > 0;
                     const isExpandedSubCat = expandedSubCategory === subCat._id;
@@ -69,13 +67,12 @@ const AllPageSidebar: React.FC<AllPageSidebarProps> = ({ shopSideBar }) => {
                           onClick={() =>
                             hasChildCategories && toggleSubCategory(subCat._id)
                           }
-                          className={`flex items-center justify-between text-md text-gray-600 transition ${
-                            hasChildCategories
-                              ? "hover:text-[#495588]"
-                              : "cursor-default"
-                          }`}
+                          className={`flex items-center justify-between text-md text-gray-600 transition ${hasChildCategories
+                            ? "hover:text-[#495588]"
+                            : "cursor-default"
+                            }`}
                         >
-                          <Link href={`/shop?subCategory=${subCat.slug}`}>
+                          <Link href={`/shop?category=${cat.slug}&subCategory=${subCat.slug}`}>
                             {subCat.name}
                           </Link>
                           {hasChildCategories &&
@@ -87,11 +84,10 @@ const AllPageSidebar: React.FC<AllPageSidebarProps> = ({ shopSideBar }) => {
                         </div>
 
                         <div
-                          className={`transition-all duration-300 overflow-hidden ${
-                            isExpandedSubCat
-                              ? "max-h-[300px] opacity-100 mt-1"
-                              : "max-h-0 opacity-0"
-                          }`}
+                          className={`transition-all duration-300 overflow-hidden ${isExpandedSubCat
+                            ? "max-h-[300px] opacity-100 mt-1"
+                            : "max-h-0 opacity-0"
+                            }`}
                         >
                           <ul className="space-y-1 pl-4">
                             {subCat.childCategories?.map((childCat) => (
@@ -100,7 +96,7 @@ const AllPageSidebar: React.FC<AllPageSidebarProps> = ({ shopSideBar }) => {
                                 className="text-sm text-gray-500"
                               >
                                 <Link
-                                  href={`/shop?childCategory=${childCat.slug}`}
+                                  href={`/shop?category=${cat.slug}&subCategory=${subCat.slug}&childCategory=${childCat.slug}`}
                                 >
                                   {childCat.name}
                                 </Link>

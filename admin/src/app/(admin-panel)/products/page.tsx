@@ -1,9 +1,8 @@
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import React from "react";
 import { ProductTable } from "./table";
-import { fileUrlGenerator } from "@/utils/helpers";
 import { CreateProductForm } from "./form";
-import { getProductWithPagination } from "@/app/(admin-panel)/products/service";
+import { getProductWithPaginationForAdmin } from "@/app/(admin-panel)/products/service";
 
 export const revalidate = 0;
 
@@ -21,7 +20,7 @@ export default async function ProductsPage({ searchParams }: Props) {
     ? searchParams.limit[0]
     : searchParams.limit || "10";
 
-  const { data } = await getProductWithPagination(page, limit);
+  const { data } = await getProductWithPaginationForAdmin(page, limit);
 
   return (
     <ContentLayout title="Product">
@@ -29,9 +28,6 @@ export default async function ProductsPage({ searchParams }: Props) {
       <ProductTable
         data={data.result.map((item) => ({
           ...item,
-          // thumbnailImage: fileUrlGenerator(String(item.thumbnailImage)),
-          // backViewImage: fileUrlGenerator(String(item.backViewImage)),
-          // sizeChartImage: fileUrlGenerator(String(item.sizeChartImage)),
         }))}
         pagination={{
           page: parseInt(page),

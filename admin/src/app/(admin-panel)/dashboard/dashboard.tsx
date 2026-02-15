@@ -1,132 +1,133 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@radix-ui/react-label";
 import {
-  Boxes,
-  ClipboardCheck,
-  Download,
-  ScrollText,
   ShoppingBag,
-  Users,
-  UsersRound,
+  Clock,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { useReactToPrint } from "react-to-print";
-import { useStore } from "zustand";
-import { Menubar, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 import { useRouter } from "next/navigation";
-import { makeBDPrice } from "@/utils/helpers";
-import { DashboardMetrics } from "@/types/shared";
-// import RadialsChart from "@/components/widget/chart/radials";
-// import { getOrderReportsByDuration } from "@/services/reports";
-
 import SelectDuration from "@/components/selectDuration/SelectDuration";
-import { getDashboardMetrics } from "@/services/dashboard";
 import BarChart from "@/components/widget/chart/barchart";
+import { getDashboardMetrics } from "./service";
 
-interface AdminDashboardProps {
-  counts: DashboardMetrics;
+interface DashboardCounts {
+  totalOrders: number;
+  pendingOrders: number;
+  deliveredOrders: number;
+  cancelledOrders: number;
 }
+
 
 export default function AdminDashboard() {
   const [selectRadialsChart, setSelectRadialsChart] = useState("this-month");
   const [selectChartLabel, setSelectChartLabel] = useState("This Month");
-  const [counts, setCounts] = useState({
+  const [counts, setCounts] = useState<DashboardCounts>({
     totalOrders: 0,
-    totalSales: 0,
-    totalStock: 0,
-    totalStockValue: 0,
+    pendingOrders: 0,
+    deliveredOrders: 0,
+    cancelledOrders: 0,
   });
   const router = useRouter();
 
   useEffect(() => {
     getDashboardMetrics(selectRadialsChart).then((data) => {
-      setCounts(data.data);
+      setCounts({
+        totalOrders: data.data.totalOrders ?? 0,
+        pendingOrders: data.data.pendingOrders ?? 0,
+        deliveredOrders: data.data.deliveredOrders ?? 0,
+        cancelledOrders: data.data.cancelledOrders ?? 0,
+      });
     });
   }, [selectRadialsChart]);
 
-
-
   return (
     <div>
-      <div className="flex flex-col   mb-4">
+      <div className="flex flex-col mb-4">
         <div className="flex items-center justify-between">
           <Label className="text-lg font-semibold text-gray-600">
             {selectChartLabel}
           </Label>
           <div className="">
-            <SelectDuration setSelectChartFilter={setSelectRadialsChart} setSelectChartFilterLabel={setSelectChartLabel} />
+            <SelectDuration
+              setSelectChartFilter={setSelectRadialsChart}
+              setSelectChartFilterLabel={setSelectChartLabel}
+            />
           </div>
-
         </div>
-        <div className="p-4 flex flex-col lg:flex-row items-center justify-between gap-5">
-          <div className="flex items-center justify-between w-full gap-3">
-            <Card className="group hover:bg-primary hover:text-white flex justify-between w-full h-36 ">
-              <div className="flex items-center justify-start pl-6  rounded-sm">
-                <div className=" rounded-sm h-8 w-8 flex justify-center items-center">
-                  <ScrollText size={20} />
-                </div>
-                <CardHeader className="">
-                  <CardDescription className="group-hover:text-white">
-                    Total Sales
-                  </CardDescription>
-                  <CardTitle className="">
-                    {makeBDPrice(counts.totalSales)}
-                  </CardTitle>
-                </CardHeader>
-              </div>
-            </Card>
 
-            <Card className="flex justify-between w-full h-36 group hover:bg-primary hover:text-white">
-              <div className="flex items-center justify-start pl-6 ">
-                <div className=" rounded-sm h-8 w-8 flex justify-center items-center">
-                  <ShoppingBag size={20} color="#29CC6A" />
-                </div>
-                <CardHeader className="">
-                  <CardDescription className="group-hover:text-white">Total Orders</CardDescription>
-                  <CardTitle className="">{counts.totalOrders}</CardTitle>
-                </CardHeader>
-              </div>
-            </Card>
-          </div>
-          <div className="flex items-center justify-between w-full gap-3">
-            <Card className="flex i justify-between w-full h-36 group hover:bg-primary hover:text-white">
-              <div className="flex items-center justify-start pl-6 ">
-                <div className="bg-[#FFF3DBEE] rounded-sm h-8 w-8 flex justify-center items-center">
-                  <ClipboardCheck size={20} color="#FFAA00" />
-                </div>
-                <CardHeader className="">
-                  <CardDescription className="group-hover:text-white">Total Stock</CardDescription>
-                  <CardTitle className="">{counts.totalStock}</CardTitle>
-                </CardHeader>
-              </div>
-            </Card>
-
-            <Card className="flex items-center justify-start pl-6 w-full h-36 group hover:bg-primary hover:text-white">
-              <div className="bg-[#FFDCF7] rounded-sm h-8 w-8 flex justify-center items-center">
-                <Boxes size={20} color="#FF1BCD" />
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Orders */}
+          <Card className="group hover:bg-primary hover:text-white">
+            <div className="flex items-center justify-start pl-6 h-36">
+              <div className="rounded-sm h-8 w-8 flex justify-center items-center">
+                <ShoppingBag size={20} />
               </div>
               <CardHeader>
-                <CardDescription className="group-hover:text-white">Stock Value</CardDescription>
-                <CardTitle>{makeBDPrice(counts.totalStockValue)}</CardTitle>
+                <CardDescription className="group-hover:text-white">
+                  Total Orders
+                </CardDescription>
+                <CardTitle>{counts.totalOrders}</CardTitle>
               </CardHeader>
-            </Card>
-          </div>
+            </div>
+          </Card>
+
+          {/* Pending Orders */}
+          <Card className="group hover:bg-yellow-500 hover:text-white">
+            <div className="flex items-center justify-start pl-6 h-36">
+              <div className="rounded-sm h-8 w-8 flex justify-center items-center">
+                <Clock size={20} />
+              </div>
+              <CardHeader>
+                <CardDescription className="group-hover:text-white">
+                  Pending Orders
+                </CardDescription>
+                <CardTitle>{counts.pendingOrders}</CardTitle>
+              </CardHeader>
+            </div>
+          </Card>
+
+          {/* Delivered Orders */}
+          <Card className="group hover:bg-green-500 hover:text-white">
+            <div className="flex items-center justify-start pl-6 h-36">
+              <div className="rounded-sm h-8 w-8 flex justify-center items-center">
+                <CheckCircle size={20} />
+              </div>
+              <CardHeader>
+                <CardDescription className="group-hover:text-white">
+                  Delivered Orders
+                </CardDescription>
+                <CardTitle>{counts.deliveredOrders}</CardTitle>
+              </CardHeader>
+            </div>
+          </Card>
+
+          {/* Cancelled Orders */}
+          <Card className="group hover:bg-red-500 hover:text-white">
+            <div className="flex items-center justify-start pl-6 h-36">
+              <div className="rounded-sm h-8 w-8 flex justify-center items-center">
+                <XCircle size={20} />
+              </div>
+              <CardHeader>
+                <CardDescription className="group-hover:text-white">
+                  Cancelled Orders
+                </CardDescription>
+                <CardTitle>{counts.cancelledOrders}</CardTitle>
+              </CardHeader>
+            </div>
+          </Card>
         </div>
+
         <div>
-
-          {/* <BarChart SelectDuration={selectRadialsChart} />  */}
           <BarChart selectChartDuration={selectRadialsChart} />
-          {/* <RadialsChart  selectChartDuration={selectRadialsChart}/>  */}
         </div>
-
       </div>
     </div>
   );

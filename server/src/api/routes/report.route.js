@@ -1,7 +1,6 @@
 const { Router } = require("express");
 const controller = require("../../modules/reports/report.controller.js");
 // const jwtAuth = require("../../middleware/auth/jwtAuth.js");
-const { upload } = require("../../middleware/upload/upload.js");
 
 const ReportRoute = Router();
 

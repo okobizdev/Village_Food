@@ -1,7 +1,7 @@
 
 import type { Metadata } from "next";
 import "./globals.css";
-import { lato } from "./font";
+import { nunito } from "./font";
 import NextTopLoader from "nextjs-toploader";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -17,12 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${lato.className} antialiased `}>
-        <NextTopLoader showSpinner={false} color="#FF6C0C" />
+      <body className={`${nunito.className} antialiased `}>
+        <NextTopLoader showSpinner={false} color="#05a845" />
         <LanguageProvider>
           {children}
         </LanguageProvider>
-
       </body>
     </html>
   );

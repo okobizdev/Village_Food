@@ -3,7 +3,7 @@
 import {
   deleteProductReview,
   updateProductReviewStatus,
-} from "@/services/productReview";
+} from "@/app/(admin-panel)/product-review/service";
 import { revalidatePath } from "next/cache";
 
 export async function UpdateFormStatus(id: string, status: boolean) {
@@ -15,7 +15,6 @@ export async function UpdateFormStatus(id: string, status: boolean) {
       return { success: true, data: res };
     }
   } catch (error: any) {
-    console.log(error.message);
     throw new Error(error.message);
   }
 }

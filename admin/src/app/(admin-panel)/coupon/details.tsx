@@ -19,12 +19,12 @@ import {
 } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileUp, MoreHorizontal, Paperclip } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteCouponAction, updateFormAction } from "./actions";
-import { TCoupon, TSubCategory } from "@/types/shared";
+import { TCoupon } from "@/types/shared";
 import { confirmation } from "@/components/modals/confirm-modal";
 import { couponFormSchema } from "./form-schema";
 import {
@@ -37,9 +37,10 @@ import {
 import { couponTypes } from "./form";
 import { makeFormData } from "@/utils/helpers";
 import { DatePicker } from "@/components/ui/date-picker";
-import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/service";
 import { TCategory } from "../category/category/types";
 import { getAllCategory } from "../category/category/service";
+import { TSubCategory } from "../category/subcategory/types";
 
 interface Props {
   coupon: TCoupon;
@@ -54,7 +55,7 @@ export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
   const [categories, setCategories] = useState<TCategory[]>([]);
   const [subCategories, setSubCategories] = useState<TSubCategory[]>([]);
 
-  // console.log(coupon, "coupon from colum detail");
+
   const form = useForm<z.infer<typeof couponFormSchema>>({
     resolver: zodResolver(couponFormSchema),
     defaultValues: {
@@ -66,7 +67,6 @@ export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
       expireDate: new Date(coupon.expireDate),
       discountType: coupon.discountType,
       categoryRef: coupon.categoryRef?._id,
-      // brandRef: coupon.brandRef,
       subCategoryRef: coupon.subCategoryRef?._id,
     },
   });
@@ -127,13 +127,13 @@ export const CouponDetailsSheet: React.FC<Props> = ({ coupon }) => {
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0 curser-pointer">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </SheetTrigger>
       <SheetContent
-        className="sm:max-w-[750px] overflow-y-auto"
+        className="sm:max-w-[850px] overflow-y-auto bg-white "
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <SheetHeader>

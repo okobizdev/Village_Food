@@ -7,9 +7,6 @@ class SubCategoryController {
   constructor() {
     this.createSubCategory = withTransaction(async (req, res, next, session) => {
       try {
-        const payloadFiles = {
-          files: req.files,
-        };
         const payload = {
           name: req.body.name,
           status: req.body.status === true || req.body.status === "true",
@@ -17,7 +14,6 @@ class SubCategoryController {
           categoryRef: req.body.categoryRef,
         };
         const subCategoryResult = await SubCategoryService.createSubCategory(
-          payloadFiles,
           payload,
           session
         );
@@ -90,9 +86,6 @@ class SubCategoryController {
     this.updateSubCategory = catchError(async (req, res, _next, session) => {
       try {
         const id = req.params.id;
-        const payloadFiles = {
-          files: req?.files,
-        };
         const payload = {
           name: req.body.name,
           status: req.body.status === true || req.body.status === "true",
@@ -101,7 +94,6 @@ class SubCategoryController {
         };
         await SubCategoryService.updateSubCategory(
           id,
-          payloadFiles,
           payload,
           session
         );

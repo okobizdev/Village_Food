@@ -1,20 +1,11 @@
 "use client";
 import { loginUser } from "@/services/auth";
-// import NavBar from "@/components/pages/header/NavBar/NavBar";
-// import { getUser, loginUser } from "@/services/auth";
-// import { getCartProducts } from "@/services/cart";
 import { TResponse } from "@/types";
-// import { Metadata } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-// export const metadata: Metadata = {
-//   title: "Unicrescent | Login",
-//   description: "Best E-commerce platform in BD",
-// };
 
 const SignIn = () => {
   const {
@@ -23,7 +14,7 @@ const SignIn = () => {
     formState: { errors },
   } = useForm<FormData>();
   const router = useRouter();
-  // const pathname = usePathname();
+
 
   interface FormData {
     email: string;
@@ -35,40 +26,16 @@ const SignIn = () => {
   const onSubmit = async (data: FormData) => {
     const response = (await loginUser(data)) as TResponse;
     if (response?.statusCode === 201) {
-      // /forgotpassword/verifyOTP?contact=nasim.okobiz%40gmail.com check if path has forgotpassword than redirect to login page
-      // if (pathname.includes("forgotpassword")) {
-
-      //   router.push("/shop");
-      //   return;
-      // }
       toast.success(response.message || "Login successful");
-      // Check if the user is coming from a specific page and redirect accordingly
       router.back();
     }
-    toast.error(response.message || "Login successful");
+    toast.success(response.message || "Login successful");
+    router.back();
   };
-
-  // const [productsByUser, setProductsByUser] = useState<TResponse | null>(null);
-  // const coupon = "";
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const user = await getUser();
-  //       const userId = user?.id;
-  //       const data = await getCartProducts(userId, coupon);
-  //       setProductsByUser(data || []);
-  //     } catch (error) {
-  //       console.error("Error fetching user or cart:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
 
   return (
     <div>
-      {/* <NavBar userCartProducts={productsByUser?.data} /> */}
-      <div className="flex flex-col justify-center items-center py-20">
+      <div className="flex flex-col justify-center items-center py-20 mt-6">
         <div className="w-[350px] lg:w-[600px]">
           <div className="border-b border-black/20 text-center pb-3 mb-5">
             <h2 className="text-3xl font-bold">Sign In</h2>
@@ -77,24 +44,6 @@ const SignIn = () => {
             className="flex flex-col gap-4"
             onSubmit={handleSubmit(onSubmit)}
           >
-            {/* Email Field */}
-            {/* <div className="flex flex-col">
-              <label htmlFor="email" className="pb-2">
-                E-Mail Address/Phone Number
-              </label>
-              <input
-                type="text"
-                placeholder="Email/Number"
-                className="border border-black/20 p-1.5 rounded"
-                {...register("email", { required: "Email/Phone is required" })}
-              />
-              {errors.email && (
-                <span className="text-red-500">
-                  {String(errors.email.message)}
-                </span>
-              )}
-            </div> */}
-
             <input
               type="text"
               placeholder="Email/Number"
@@ -103,7 +52,7 @@ const SignIn = () => {
                 required: "Email/Phone is required",
                 validate: (value) => {
                   const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-                  const isPhone = /^\d{10,15}$/.test(value); // basic phone check (adjust as needed)
+                  const isPhone = /^\d{10,15}$/.test(value);
                   if (!isEmail && !isPhone) {
                     return "Enter a valid email or phone number";
                   }
@@ -140,8 +89,8 @@ const SignIn = () => {
               </label>
             </div>
 
-            {/* Submit Button */} 
-            <button type="submit" className=" button-primary bg-orange-400" >
+            {/* Submit Button */}
+            <button type="submit" className=" button-primary bg-primary py-2 px-4 rounded-md cursor-pointer hover:bg-primary/90 transition-colors text-white" >
               Login
             </button>
           </form>
@@ -149,14 +98,14 @@ const SignIn = () => {
             <div className="mt-2 text-center  ">
               <Link
                 href="/forgotpassword"
-                className="text-orange-400 pr-1 hover:underline"
+                className="text-primary pr-1 hover:underline"
               >
                 Forgot Your Password?
               </Link>{" "}
               |
             </div>
             <div className="mt-2 text-center">
-              <Link href="/register" className="text-orange-400  hover:underline">
+              <Link href="/register" className="text-primary  hover:underline">
                 Registration
               </Link>
             </div>

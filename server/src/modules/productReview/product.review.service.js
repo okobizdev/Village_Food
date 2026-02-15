@@ -1,7 +1,6 @@
 const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 const productReviewRepository = require("./product.review.repository.js");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
 const orderRepository = require("../order/order.repository.js");
 
 class ProductReviewService extends BaseService {
@@ -13,8 +12,7 @@ class ProductReviewService extends BaseService {
     this.#orderRepository = orderRepository;
   }
 
-  async createProductReview(payload, payloadFiles, session) {
-    const { files } = payloadFiles;
+  async createProductReview(payload, session) {
     const { name, rating, comment, userRef, productRef } = payload;
     // if (!files) throw new Error("image is required");
     const requiredFields = { name, rating, comment, userRef, productRef };
@@ -28,13 +26,6 @@ class ProductReviewService extends BaseService {
 
     if (!productPurchase) {
       throw new NotFoundError("Product not purchased by user");
-    }
-
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
     }
 
     const productReviewData = await this.#repository.createProductReview(
@@ -66,29 +57,17 @@ class ProductReviewService extends BaseService {
     return productReviewData;
   }
 
-  async updateProductReview(id, payload, payloadFiles, session) {
-    const { files } = payloadFiles;
-    const { rating, comment, userRef, productRef, status } = payload;
-
-    if (files?.length) {
-      const images = await ImgUploader(files);
-      for (const key in images) {
-        payload[key] = images[key];
-      }
-    }
+  async updateProductReview(id, payload) {
 
     const productReviewData = await this.#repository.updateById(id, payload);
     if (!productReviewData) throw new NotFoundError("ProductReview Not Find");
 
-    if (files.length && productReviewData) {
-      await removeUploadFile(productReviewData?.image);
-    }
     return productReviewData;
   }
 
   async updateProductReviewStatus(id, status) {
     try {
-     
+
       const updatedProductReview = await this.#repository.updateById(id, {
         status,
       });
@@ -96,7 +75,7 @@ class ProductReviewService extends BaseService {
         throw new NotFoundError("Product Review Not Found");
       }
     } catch (error) {
-      console.log(error.message);
+
       throw new Error(error.message);
     }
   }
@@ -105,9 +84,6 @@ class ProductReviewService extends BaseService {
     const productReview = await this.#repository.findById(id);
     if (!productReview) throw new NotFoundError("ProductReview not found");
     const deletedProductReview = await this.#repository.deleteById(id);
-    // if (deletedProductReview) {
-    //   await removeUploadFile(productReview?.image);
-    // }
     return deletedProductReview;
   }
 }

@@ -1,24 +1,6 @@
 const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
-
-const isArrayElementExist = require("../../utils/isArrayElementExist.js");
 const inventoryRepository = require("./inventory.repository.js");
-const { isMainThread } = require("worker_threads");
-const { log } = require("console");
-const {
-  convertFileNameWithPdfExt,
-} = require("../../middleware/upload/convertFileNameWithPdfExt.js");
-const {
-  convertFileNameWithWebpExt,
-} = require("../../middleware/upload/convertFileNameWithWebpExt.js");
-const { uploadWorker } = require("../../middleware/upload/uploadWorker.js");
-const {
-  convertImgArrayToObject,
-} = require("../../middleware/upload/convertImgArrayToObject.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
 const productRepository = require("../product/product.repository.js");
 const { idGenerate } = require("../../utils/IdGenerator.js");
 
@@ -58,7 +40,7 @@ class InventoryService extends BaseService {
       payload,
       session
     );
- 
+
     if (inventoryData) {
       await this.#productRepository.addProductInventory(
         inventoryData[0]._id,
@@ -113,7 +95,7 @@ class InventoryService extends BaseService {
     const inventory = await this.#repository.updateInventoryStatus(id, {
       status: status,
     });
-   
+
     if (!inventory) throw new NotFoundError("Inventory not found");
     return inventory;
   }

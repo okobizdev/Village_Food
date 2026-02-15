@@ -2,7 +2,7 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import React from "react";
 import { ProductReviewTable } from "./table";
 import { fileUrlGenerator } from "@/utils/helpers";
-import { getProductReviewWithPagination } from "@/services/productReview";
+import { getProductReviewWithPagination } from "@/app/(admin-panel)/product-review/service";
 
 export const revalidate = 0;
 

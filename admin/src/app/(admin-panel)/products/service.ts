@@ -23,7 +23,7 @@ export async function getAllProduct(): Promise<AllProductResponse> {
   return response.json();
 }
 
-export async function getProductWithPagination(
+export async function getProductWithPaginationForAdmin(
   page?: string,
   limit?: string
 ): Promise<AllProductWithPaginationResponse> {
@@ -32,7 +32,7 @@ export async function getProductWithPagination(
   if (limit) queryParams.set("limit", limit);
 
   const response = await fetch(
-    `${BASE_URL}/product/pagination?${queryParams.toString()}`,
+    `${BASE_URL}/product/pagination/admin?${queryParams.toString()}`,
     { cache: "no-store" }
   );
 

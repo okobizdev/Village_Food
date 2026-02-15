@@ -3,7 +3,7 @@ import React from "react";
 import { SubCategoryTable } from "./table";
 import { fileUrlGenerator } from "@/utils/helpers";
 import { CreateSubCategoryForm } from "./form";
-import { getSubCategoryWithPagination } from "@/app/(admin-panel)/category/subcategory/sub-category";
+import { getSubCategoryWithPagination } from "@/app/(admin-panel)/category/subcategory/service";
 
 export const revalidate = 0;
 
@@ -29,8 +29,6 @@ export default async function SubCategorysPage({ searchParams }: Props) {
       <SubCategoryTable
         data={data.result.map((item) => ({
           ...item,
-          // image: fileUrlGenerator(String(item.image)),
-          // bannerImage: fileUrlGenerator(String(item.bannerImage)),
         }))}
         pagination={{
           page: parseInt(page),

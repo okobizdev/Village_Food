@@ -1,11 +1,8 @@
 
 "use client";
 
-// import NavBar from "@/components/pages/header/NavBar/NavBar";
 import {  registrationUser } from "@/services/auth";
-// import { getCartProducts } from "@/services/cart";
 import { TResponse } from "@/types";
-// import { Metadata } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, {  useState } from "react";
@@ -13,11 +10,6 @@ import { useForm } from "react-hook-form";
 import { VscEyeClosed, VscEye } from "react-icons/vsc";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// export const metadata: Metadata = {
-//   title: "Unicrescent | Register",
-//   description: "Best E-commerce platform in BD",
-// };
 
 interface FormData {
   name: string;
@@ -74,28 +66,8 @@ const Registration = () => {
     }
   };
 
-  // const [productsByUser, setProductsByUser] = useState<TResponse | null>(null);
-
-  // const coupon = "";
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const user = await getUser();
-  //       const userId = user?.id;
-  //       const data = await getCartProducts(userId, coupon);
-  //       setProductsByUser(data || []);
-  //     } catch (error) {
-  //       console.error("Error fetching user or cart:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
   return (
     <>
-      {/* <NavBar userCartProducts={productsByUser?.data} /> */}
       <div className="flex flex-col justify-center items-center py-20 mt-2.5">
         <div className="w-[350px] lg:w-[600px]">
           <div className="border-b-1 border-black/20 text-center pb-3 mb-5">
@@ -220,20 +192,11 @@ const Registration = () => {
               )}
             </div>
 
-            {/* Submit Button */}
-            {/* <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`bg-blue-500 text-white p-2 rounded-md cursor-pointer ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-            >
-              {isSubmitting ? "Registering..." : "Register"}
-            </button> */}
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`bg-orange-500 text-white p-2 rounded-md flex items-center justify-center gap-2 ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-orange-600"
+              className={`bg-primary text-white p-2 rounded-md flex items-center justify-center gap-2 ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90 cursor-pointer"
                 }`}
             >
               {isSubmitting && (

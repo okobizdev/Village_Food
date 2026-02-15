@@ -1,19 +1,15 @@
 "use client";
-import cashOnDelivery from "@/assets/payment/cash-on-delivery.png";
 // import sslPay from "@/assets/payment/ssl-pay.png";
-import bikashNagad from "@/assets/payment/bikash-nagad.jpg";
 import { addOrder } from "@/services/order";
-import { TProduct } from "@/types";
 import { cities } from "@/utilits/cities";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import orderGift from "@/assets/gift/animation.gif";
 import { useRef, useState } from "react";
+import { TProduct } from "@/types/product";
 
 interface FormData {
   customerName: string;
@@ -40,7 +36,6 @@ interface Props {
   shipping: number;
   setShipping: React.Dispatch<React.SetStateAction<number>>;
   setCoupon: React.Dispatch<React.SetStateAction<string | null>>;
-  type: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const CheckOutForm: React.FC<Props> = ({
@@ -75,49 +70,20 @@ const CheckOutForm: React.FC<Props> = ({
   const Subtotal = products?.data?.subTotalPrice || 0;
   const discountValue = Number(products?.data?.couponDiscount) || 0;
   const payableAmount = Subtotal + (shipping || 0) - discountValue;
-  console.log("payableAmount", payableAmount)
+
   // ----------------- Submit Handler -----------------
   const onSubmit = async (data: FormData) => {
     // No need to check for product discounts, coupon always applies on MRP
     await confirmOrder(data);
   };
 
-  // ----------------- Apply Coupon -----------------
-  // const handleAddCoupon = () => {
-  //   const coupon = getValues("coupon");
 
-  // if(products.discount !== null){
-  //     if (coupon && coupon.trim() !== "") {
-  //     setCoupon(coupon.trim());
-  //     toast.success("Coupon applied on MRP Price", {
-  //       theme: "colored",
-  //       autoClose: 5000,
-  //     });
-  //   } else {
-  //     setCoupon(null);
-  //     toast.info("No coupon applied.", { theme: "colored", autoClose: 5000 });
-  //   }
-  // }else{
-  //  if (coupon && coupon.trim() !== "") {
-  //     setCoupon(coupon.trim());
-  //     toast.success("Coupon applied ", {
-  //       theme: "colored",
-  //       autoClose: 5000,
-  //     });
-  //   } else {
-  //     setCoupon(null);
-  //     toast.info("No coupon applied.", { theme: "colored", autoClose: 5000 });
-  //   }
-  // }
-
-  // }
   const handleAddCoupon = () => {
     const coupon = getValues("coupon")?.trim();
 
     // Check: does ANY product have discount?
     const hasProductDiscount = Number(products.data.productDiscount > 0);
 
-    console.log(hasProductDiscount)
 
     if (coupon) {
       setCoupon(coupon);
@@ -153,7 +119,7 @@ const CheckOutForm: React.FC<Props> = ({
         shippingCost: shipping || 0,
         ...data,
       };
-      console.log(order.totalPrice);
+
 
       setIsSubmitting(true);
       const result = (await addOrder(order)) as {
@@ -197,15 +163,15 @@ const CheckOutForm: React.FC<Props> = ({
     <div className="lg:mt-8 mt-4">
       <h1 className="text-center font-extrabold text-2xl lg:text-3xl mb-6">Checkout Info</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-  
+
         {/*Shipping Info */}
         <div className="lg:flex justify-center items-center lg:space-x-2 space-x-0">
 
           <div className="w-full">
-            <h2 className="font-semibold text-gray-700">আপনার নাম</h2>
+            <h2 className="font-semibold text-gray-700">Your Name</h2>
             <input
               type="text"
-              placeholder="আপনার নাম লিখুন *"
+              placeholder="Enter your name *"
               className="w-full my-2.5 border border-black/20 p-1.5 rounded
              focus:border-black focus:outline-none"
               {...register("customerName", { required: "Name is required" })}
@@ -217,10 +183,10 @@ const CheckOutForm: React.FC<Props> = ({
             )}
           </div>
           <div className="w-full">
-            <h2 className="font-semibold text-gray-700 ">আপনার মোবাইল </h2>
+            <h2 className="font-semibold text-gray-700 ">Your Mobile Number </h2>
             <input
               type="text"
-              placeholder="আপনার মোবাইল নাম্বার লিখুন*"
+              placeholder="Enter your mobile number *"
               className="w-full my-2.5 border border-black/20 p-1.5 rounded focus:border-black focus:outline-none"
               {...register("customerPhone", {
                 required: "Number is required",
@@ -239,10 +205,10 @@ const CheckOutForm: React.FC<Props> = ({
         </div>
 
         <div>
-          <h2 className="font-semibold text-gray-700 ">আপনার ঠিকানা</h2>
+          <h2 className="font-semibold text-gray-700 ">Your Address</h2>
           <input
             type="text"
-            placeholder="আপনার বিস্তারিত ঠিকানা লিখুন *"
+            placeholder="Enter your full address *"
             className="w-full my-2.5 border border-black/20 p-1.5 rounded focus:border-black focus:outline-none"
             {...register("customerAddress", {
               required: "Address is required",
@@ -258,7 +224,7 @@ const CheckOutForm: React.FC<Props> = ({
 
         <div className="flex md:flex-row flex-col items-center md:gap-3 gap-1  ">
           <div className="w-full ">
-            <h2 className="font-semibold text-gray-700 ">আপনার থানা </h2>
+            <h2 className="font-semibold text-gray-700 ">Police Station (Thana) </h2>
             <input
               {...register("customerThana", {
                 required: "Thana is required"
@@ -266,7 +232,7 @@ const CheckOutForm: React.FC<Props> = ({
               className="w-full  border border-black/20 p-1.5 
             rounded focus:border-black focus:outline-none "
               type="text"
-              placeholder="আপনার থানা লিখুন*"
+              placeholder="Enter your thana*"
             />
             {errors.customerThana && (
               <span className="text-red-500">
@@ -275,7 +241,7 @@ const CheckOutForm: React.FC<Props> = ({
             )}
           </div>
           <div className="w-full">
-            <h2 className="font-semibold text-gray-700 "> জেলা সিলেক্ট করুন</h2>
+            <h2 className="font-semibold text-gray-700 "> Select District</h2>
             <select
               className="w-full my-2.5 border border-black/20 p-1.5 rounded focus:border-black focus:outline-none"
               {...register("customerCity", {
@@ -355,7 +321,7 @@ const CheckOutForm: React.FC<Props> = ({
                       className="h-8 w-full"
                       height={100}
                       width={100}
-                      src={cashOnDelivery}
+                      src="/assets/payment/cash-on-delivery.png"
                       alt="COD"
                     />
                   </label>
@@ -380,7 +346,7 @@ const CheckOutForm: React.FC<Props> = ({
                       className="h-8 w-20"
                       height={150}
                       width={150}
-                      src={bikashNagad}
+                      src="/assets/payment/bikash-nagad.jpg"
                       alt="bKash Nagad"
                     />
                   </label>
@@ -494,13 +460,13 @@ const CheckOutForm: React.FC<Props> = ({
               <input
                 type="text"
                 placeholder="Enter Coupon Code Here"
-                className="border border-black/20 p-1.5 rounded focus:border-black focus:outline-none w-full"
+                className="border border-black/20 py-3 px-3 rounded focus:border-black focus:outline-none w-full"
                 {...register("coupon")}
               />
             </div>
             <div
               onClick={() => handleAddCoupon()}
-              className="bg-[#FF6C0C] py-2 px-10 text-white 2xl:w-[30%] xl:w-[40%] lg:w-[50%] rounded cursor-pointer text-center w-full"
+              className="bg-primary py-3 px-10 text-white 2xl:w-[30%] xl:w-[40%] lg:w-[50%] rounded cursor-pointer text-center w-full"
             >
               Add Coupon
             </div>
@@ -545,12 +511,12 @@ const CheckOutForm: React.FC<Props> = ({
             ref={buttonRef}
             type="submit"
             disabled={isSubmitting}
-            className={` text-sm font-semibold text-white py-2 w-full mt-8 rounded 
+            className={` text-sm font-semibold text-white py-4 w-full mt-8 rounded 
             cursor-pointer flex items-center justify-center gap-2 relative overflow-hidden 
             ${isSubmitting ? " cursor-not-allowed" : ""}
             ${startCar === true
                 ? "bg-[#ffffff] border border-[#e18243] "
-                : "bg-[#FF6C0C]"
+                : "bg-primary"
               }
             `}
           >
@@ -575,7 +541,7 @@ const CheckOutForm: React.FC<Props> = ({
                           className="h-8 w-full"
                           height={100}
                           width={100}
-                          src={orderGift}
+                          src="/assets/gift/animation.gif"
                           alt="order-gift"
                         />
                       </motion.div>
@@ -594,7 +560,7 @@ const CheckOutForm: React.FC<Props> = ({
               "Confirm Order"
             )}
           </button>
-          </div>
+        </div>
       </form>
     </div>
   );

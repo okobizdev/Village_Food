@@ -1,18 +1,14 @@
 "use client";
 import React, { useState } from "react";
-
-import Image from "next/image";
-import { rajdhani } from "@/app/font";
 import { FiPlus } from "react-icons/fi";
 import { FiMinus } from "react-icons/fi";
-import { TProduct } from "@/types";
-import { apiBaseUrl } from "@/config/config";
 import ProductDetailsSlide from "@/slider/ProductDetailsSlide/ProductDetailsSlide";
 import { addToCart } from "@/services/cart";
 import { toast } from "react-toastify";
 import { getUser } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { useAnimation } from "framer-motion";
+import { TProduct } from "@/types/product";
 interface Props {
   product: TProduct;
 }
@@ -22,11 +18,13 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [level, setLevel] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [addedToCart, setAddedToCart] = useState(false);
+
 
   const [levelError, setLevelError] = useState(false);
-  const [colorError, setColorError] = useState(false);
   const router = useRouter();
   const controls = useAnimation();
+
   const handleIncrement = () => {
     setCount((prev) => prev + 1);
   };
@@ -39,21 +37,18 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
     name,
     thumbnailImage,
     backViewImage,
-    sizeChartImage,
     description,
+    optionalImages,
     mrpPrice,
     price,
     inventoryRef,
     inventoryType,
-    images,
     _id,
   } = product;
 
-  // const userId = "67f4c99c11813048a36a2496";
 
   const handleAddToCart = async () => {
     const user = await getUser();
-    // if not logged in then redirect to login page
     if (!user) {
       toast.error("Please login to add product to cart.");
       router.push("/login");
@@ -73,7 +68,6 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
         inventoryType === "colorInventory") &&
       !selectedColor
     ) {
-      setColorError(true);
       return;
     }
     try {
@@ -102,8 +96,8 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
       await addToCart(product);
       // router.push("/cart");
       toast.success("Product added to cart!");
+      setAddedToCart(true)
       setLevelError(false);
-      setColorError(false);
       controls.start({
         scale: 0.01,
         x: 1200,
@@ -119,21 +113,22 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
       toast.error("Failed to add product to cart.");
     }
   };
-  
+
 
   return (
-    <div className="Container  py-8  lg:mt-14 mt-16">
+    <div className="max-w-7xl mx-auto  py-8  lg:mt-14 mt-16">
       <div className="grid lg:grid-cols-2 gap-8 ">
         <ProductDetailsSlide
           controls={controls}
           thumbnailImage={thumbnailImage}
           backViewImage={backViewImage}
-          images={images}
+          optionalImages={optionalImages}
+          videoUrl={product.videoUrl}
           name={name}
         />
 
         <div className="">
-          <h2 className={`text-2xl lg:text-3xl font-bold text-gray-700 ${rajdhani.className}`}>
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-700">
             {name}
           </h2>
 
@@ -159,7 +154,7 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
             {(inventoryType === "levelInventory" ||
               inventoryType === "colorLevelInventory") && (
                 <div className="flex flex-col">
-                  <h3 className={`text-base md:text-lg font-semibold ${rajdhani.className}`}>
+                  <h3 className="text-base md:text-lg font-semibold">
                     Select Size:
                   </h3>
                   <div className="flex items-center gap-2 text-sm font-semibold text-[#262626]/60 mt-1 cursor-pointer">
@@ -177,7 +172,7 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
                             setSelectedColor(null);
                             setLevelError(false);
                           }}
-                          className={`w-[40px] h-[30px] border border-[#FF6C0C] hover:text-[#FF6C0C] duration-300 cursor-pointer rounded text-center flex items-center justify-center uppercase ${level === size.level ? "bg-primary text-white" : "border-primary"
+                          className={` p-1 border border-primary hover:bg-white hover:text-primary duration-300 cursor-pointer rounded text-center flex items-center justify-center uppercase ${level === size.level ? "bg-primary text-white" : "border-primary"
                             }`}
                         >
                           {size.level}
@@ -193,53 +188,9 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
               )}
           </div>
 
-          <div className="mt-3">
-            {(inventoryType === "colorLevelInventory" && selectedLevel) ||
-              inventoryType === "colorInventory" ? (
-              <div className="flex flex-col">
-                <h3
-                  className={`text-base md:text-lg font-semibold text-[#262626] ${rajdhani.className}`}
-                >
-                  Select Color:
-                </h3>
-                <div className="flex items-center gap-2 text-sm font-semibold text-[#262626]/60 mt-1">
-                  {inventoryRef
-                    ?.filter((item) =>
-                      inventoryType === "colorLevelInventory"
-                        ? item.level === level
-                        : true
-                    )
-                    .filter(
-                      (value, index, arr) =>
-                        index === arr.findIndex((t) => t.color === value.color)
-                    )
-                    .map((colorItem) => (
-                      <div
-                        key={colorItem._id}
-                        onClick={() => {
-                          setSelectedColor(colorItem._id);
-                          setColorError(false);
-                        }}
-                        className={`border ${selectedColor === colorItem._id
-                          ? "border-[#1F4193] border-2 w-[20px] h-[20px]"
-                          : "border-[#262626] w-[25px] h-[25px]"
-                          } rounded-full cursor-pointer`}
-                        style={{ backgroundColor: colorItem.color }}
-                      />
-                    ))}
-                </div>
-                {colorError && (
-                  <p className="text-red-500 text-sm mt-1">
-                    Please select color.
-                  </p>
-                )}
-              </div>
-            ) : null}
-          </div>
-
-          <div className="border-b-2 pb-4 border-[#FF6C0C]">
+          <div className="border-b-2 pb-4 border-primary">
             <div className="mt-4 flex items-center gap-2 ">
-              <div className="flex items-center justify-between border border-[#FF6C0C] rounded px-3 py-[7px] md:w-[25%] w-[30%]">
+              <div className="flex items-center justify-between border border-primary rounded px-3 py-[7px] md:w-[25%] w-[30%]">
                 <p onClick={handleDecrement} className="cursor-pointer">
                   <FiMinus />
                 </p>
@@ -249,45 +200,27 @@ const ProductDetails: React.FC<Props> = ({ product }) => {
                 </p>
               </div>
               <div className="w-full cursor-pointer">
-                <button
-                  onClick={handleAddToCart}
-                  className="bg-[#FF6C0C] flex items-center gap-1 px-6 py-2.5 font-semibold text-sm  rounded text-[#fff] cursor-pointer"
-                >
-                  <span>
+                {!addedToCart ? (
+                  <button
+                    onClick={handleAddToCart}
+                    className="bg-primary flex items-center gap-1 px-6 py-2.5 font-semibold text-sm rounded text-white cursor-pointer "
+                  >
                     <FiPlus />
-                  </span>
-                  <span>অর্ডার করুন </span>
-                </button>
+                    <span>Add to Cart</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => router.push("/checkout")}
+                    className="bg-green-600 flex items-center gap-1 px-6 py-2.5 font-semibold text-sm rounded text-white hover:bg-green-700 transition cursor-pointer"
+                  >
+                    Go to Checkout
+                  </button>
+                )}
               </div>
-              {/* <div className="w-full cursor-pointer">
-                <button
-                  onClick={handleAddToCart}
-                  className="bg-[#FF6C0C] flex items-center gap-1 px-6 py-2.5 font-semibold text-sm  rounded text-[#fff] cursor-pointer"
-                >
-                  <span>
-                    <FiPlus />
-                  </span>
-                  <span>Order Via Whatsapp</span>
-                </button>
-              </div> */}
             </div>
           </div>
           <div className="mt-3 flex flex-col gap-2">
             <div dangerouslySetInnerHTML={{ __html: description }} />
-          </div>
-
-          <div className="mt-3">
-            <div className="mt-2">
-              {sizeChartImage && (
-                <Image
-                  src={apiBaseUrl + sizeChartImage}
-                  alt={`${name} sizeChartImage`}
-                  width={500}
-                  height={500}
-                  className="w-full h-full rounded"
-                />
-              )}
-            </div>
           </div>
         </div>
       </div>

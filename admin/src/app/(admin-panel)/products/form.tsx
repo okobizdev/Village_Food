@@ -30,8 +30,8 @@ import { createFormAction } from "./actions";
 import { Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Label } from "@/components/ui/label";
-import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
-import { getAllChildCategory } from "@/app/(admin-panel)/category/childcategory/child-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/service";
+import { getAllChildCategory } from "@/app/(admin-panel)/category/childcategory/service";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { TCategory } from "../category/category/types";
@@ -55,7 +55,7 @@ const defaultValues = {
   inventoryType: "",
   thumbnailImage: [],
   optionalImages: [],
-  inventories: [{ quantity: "" }], // initial entry
+  inventories: [{ size: "" }],
 };
 
 export const discountTypes = [
@@ -63,10 +63,6 @@ export const discountTypes = [
   { name: "Percentage", key: "percent" },
 ];
 
-export const inventoryTypes = [
-  { name: "Size", key: "levelInventory" },
-  { name: "Without Any", key: "inventory" },
-];
 
 export const CreateProductForm: React.FC = () => {
   const { toast } = useToast();
@@ -95,12 +91,10 @@ export const CreateProductForm: React.FC = () => {
     name: "inventories",
   });
 
-  const getDefaultInventory = () => {
-    const base = { quantity: "" };
-    if (selectedInventoryType === "levelInventory")
-      return { ...base, size: "" };
-    return base;
-  };
+  const getDefaultInventory = () => ({
+    size: "",
+  });
+
 
 
   useEffect(() => {
@@ -160,7 +154,7 @@ export const CreateProductForm: React.FC = () => {
       }
 
       // Upload thumbnail image to Cloudinary (required)
-      const thumbnailsImageFile = values.thumbnailImage[0];
+      const thumbnailsImageFile = values.thumbnailImage[0] as File;
       const thumbnailsUploadResult = await uploadImageToCloudinary(
         thumbnailsImageFile,
         "products/thumbnails"
@@ -168,7 +162,7 @@ export const CreateProductForm: React.FC = () => {
 
       const optionalImagesFiles = values.optionalImages || [];
       const optionalImagesUploadResults = await Promise.all(
-        optionalImagesFiles.map((file) => uploadImageToCloudinary(file, "products/optional"))
+        optionalImagesFiles.map((file) => uploadImageToCloudinary(file as File, "products/optional"))
       );
 
       const formData = new FormData();
@@ -215,6 +209,12 @@ export const CreateProductForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+
+  useEffect(() => {
+    form.setValue("inventoryType", "levelInventory");
+  }, [form]);
+
 
   return (
     <Card className="m-6 mt-1 p-4 rounded-lg">
@@ -472,43 +472,6 @@ export const CreateProductForm: React.FC = () => {
                   </div>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="inventoryType"
-                render={({ field }) => (
-                  <div className="flex items-end gap-2 w-full">
-                    <FormItem className="flex-1">
-                      <FormLabel>
-                        Inventory Type <b className="text-red-500">*</b>
-                      </FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select inventory type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {inventoryTypes.map((type) => (
-                              <SelectItem
-                                key={type.key}
-                                value={String(type.key)}
-                              >
-                                {type.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription className="text-red-400 text-xs min-h-4">
-                        {form.formState.errors.inventoryType?.message}
-                      </FormDescription>
-                    </FormItem>
-                  </div>
-                )}
-              />
             </div>
 
             {selectedInventoryType !== "" &&
@@ -517,40 +480,19 @@ export const CreateProductForm: React.FC = () => {
                   key={field.id}
                   className="grid grid-cols-4 gap-1 border p-2 mb-2 rounded-md space-y-2 relative justify-center items-center"
                 >
-                  {selectedInventoryType === "levelInventory" && (
-                    <FormItem>
-                      <FormLabel>Size</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter size"
-                          {...register(`inventories.${index}.size`)}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-red-400 text-xs min-h-4">
-                        {formState.errors?.inventories?.[index]?.size?.message}
-                      </FormDescription>
-                    </FormItem>
-                  )}
 
-                  {selectedInventoryType !== "" && (
-                    <FormItem>
-                      <FormLabel>
-                        Quantity <b className="text-red-500">*</b>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter quantity"
-                          {...register(`inventories.${index}.quantity`)}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-red-400 text-xs min-h-4">
-                        {
-                          formState.errors?.inventories?.[index]?.quantity
-                            ?.message
-                        }
-                      </FormDescription>
-                    </FormItem>
-                  )}
+                  <FormItem>
+                    <FormLabel>Size</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter size"
+                        {...register(`inventories.${index}.size`)}
+                      />
+                    </FormControl>
+                    <FormDescription className="text-red-400 text-xs min-h-4">
+                      {formState.errors?.inventories?.[index]?.size?.message}
+                    </FormDescription>
+                  </FormItem>
 
                   {fields.length > 1 && (
                     <Button
@@ -613,7 +555,7 @@ export const CreateProductForm: React.FC = () => {
               <div className="mt-4">
                 {form.getValues("thumbnailImage") &&
                   form.getValues("thumbnailImage").length > 0 &&
-                  form.getValues("thumbnailImage").map((file, i) => (
+                  form.getValues("thumbnailImage").map((file: any, i: number) => (
                     <div className="border-dashed border-2 rounded-lg p-2 px-3">
                       <div
                         key={i}
@@ -661,7 +603,7 @@ export const CreateProductForm: React.FC = () => {
               <div className="mt-4">
                 {form.getValues("optionalImages") &&
                   form.getValues("optionalImages").length > 0 &&
-                  form.getValues("optionalImages").map((file, i) => (
+                  form.getValues("optionalImages").map((file: any, i: number) => (
                     <div className="border-dashed border-2 rounded-lg p-2 px-3">
                       <div
                         key={i}

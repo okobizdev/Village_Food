@@ -120,7 +120,7 @@ class OrderRepository extends BaseRepository {
           shippingCost,
           couponDiscount: totalCouponDiscount,
           productDiscount: productDiscountTotal,
-          status: "OrderPlaced",
+          status: "Pending",
           ...query,
           couponRef: appliedCoupon?._id || null,
           customerName,

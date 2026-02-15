@@ -19,12 +19,11 @@ import {
 } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileUp, MoreHorizontal, Paperclip, Plus, Trash } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteSubCategoryAction, updateFormAction } from "./actions";
-import { TSubCategory } from "@/types/shared";
 import { confirmation } from "@/components/modals/confirm-modal";
 import { subCategoryFormSchema } from "./form-schema";
 import {
@@ -34,13 +33,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, UploadFile } from "antd";
-import { fileUrlGenerator, humanFileSize, makeFormData } from "@/utils/helpers";
-import { UploadOutlined } from "@ant-design/icons";
+import { makeFormData } from "@/utils/helpers";
 import "react-quill/dist/quill.snow.css";
-import { Label } from "@/components/ui/label";
 import { TCategory } from "../category/types";
 import { getAllCategory } from "../category/service";
+import { TSubCategory } from "./types";
 
 interface Props {
   subCategory: TSubCategory;
@@ -71,9 +68,13 @@ export const SubCategoryDetailsSheet: React.FC<Props> = ({ subCategory }) => {
     values: z.infer<typeof subCategoryFormSchema>
   ) => {
     setUpdating(true);
-    const data = makeFormData(values);
     try {
-      await updateFormAction(String(subCategory._id), data);
+
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("categoryRef", String(values.categoryRef));
+
+      await updateFormAction(String(subCategory._id), formData);
       toast({
         title: "SubCategory updated successfully",
       });

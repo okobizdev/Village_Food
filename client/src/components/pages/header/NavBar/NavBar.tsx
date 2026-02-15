@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-// import SearchForm from "../SearchForm/SearchForm";
 import Link from "next/link";
 import { BsCart2 } from "react-icons/bs";
 import { FiUser, FiPhone } from "react-icons/fi";
@@ -12,12 +11,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import ResponsiveSearchForm from "../ResponsiveSearchForm/ResponsiveSearchForm";
 import ResponsiveNavSidBar from "../ResponsiveNavSidBar/ResponsiveNavSidBar";
 import "../NavBar/NavBar.css";
-// import { useLanguage } from "@/context/LanguageContext";
 import { getShopSidebar } from "@/services/shopSidebar";
 import { getUser, setCorrelation } from "@/services/auth";
 import UserPopover from "@/shared/UserPopover/UserPopover";
-import { TUser } from "@/types";
-// import { usePathname } from "next/navigation";
+import { TUser } from "@/types/user";
 
 interface NavBarProps {
   userCartProducts: {
@@ -34,9 +31,6 @@ const NavBar: React.FC<NavBarProps> = ({ userCartProducts }) => {
   const [categories, setCategories] = useState<any[]>([]);
   const [usersId, setUsersId] = useState<TUser | null>(null);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
-
-  // const pathname = usePathname();
-  // const isShopPage = pathname === "/shop";
 
   // Animated placeholder texts
   const placeholders = [
@@ -195,55 +189,60 @@ const NavBar: React.FC<NavBarProps> = ({ userCartProducts }) => {
       </div>
 
       {/* Secondary Navbar - Categories (Smaller) */}
-      <div className="hidden lg:block w-full  bg-primary text-white sticky top-[80px] z-30 shadow-sm backdrop-blur-lg">
-        <div className="lg:px-[220px] px-4 py-2">
-          <div className="flex items-center justify-center gap-6">
+      <div className="hidden lg:block w-full bg-primary text-white sticky top-[80px] z-30 shadow-sm backdrop-blur-lg">
+        <div className="lg:px-[220px]  py-3">
+          <div className="flex items-center justify-center">
             {categories?.map((category, index) => (
-              <div
-                onMouseEnter={() => setActiveCategory(category.id || category.name)}
-                onMouseLeave={() => setActiveCategory(null)}
-                key={index}
-                className="relative group"
-              >
-                <Link href={`/shop?category=${category.id || category.slug}`}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="text-sm font-medium text-gray-0 hover:text-primary tracking-wide
-                     duration-300 cursor-pointer whitespace-nowrap py-1.5 px-3 rounded-md group-hover:bg-white transition-all"
-                  >
-                    {category.name || category.title}
-                  </motion.div>
-                </Link>
-
-                {/* Show dropdown if category has subcategories */}
-                {category.subCategories &&
-                  category.subCategories.length > 0 &&
-                  activeCategory === (category.id || category.name) && (
+              <React.Fragment key={index}>
+                <div
+                  onMouseEnter={() => setActiveCategory(category.id || category.name)}
+                  onMouseLeave={() => setActiveCategory(null)}
+                  className="relative group"
+                >
+                  <Link href={`/shop?category=${category.slug}`}>
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute top-full left-0 mt-2 bg-white shadow-xl rounded-lg p-3 min-w-[200px] z-50 border border-gray-200"
+                      whileHover={{ scale: 1.05 }}
+                      className="text-sm lg:text-lg font-bold text-white tracking-wide duration-300 cursor-pointer whitespace-nowrap py-1.5  rounded-md  transition-all"
                     >
-                      <div className="flex flex-col gap-0.5">
-                        {category.subCategories.map((subCat: any, subIndex: number) => (
-                          <Link
-                            key={subIndex}
-                            href={`/shop?category=${category.id || category.slug}&subcategory=${subCat.id || subCat.slug}`}
-                          >
-                            <motion.div
-                              whileHover={{ x: 5 }}
-                              className="text-sm text-gray-600 hover:text-primary hover:bg-orange-50 p-2 rounded-md transition-all duration-200"
-                            >
-                              {subCat.name || subCat.title}
-                            </motion.div>
-                          </Link>
-                        ))}
-                      </div>
+                      {category.name || category.title}
                     </motion.div>
-                  )}
-              </div>
+                  </Link>
+
+                  {/* Show dropdown if category has subcategories */}
+                  {category.subCategories &&
+                    category.subCategories.length > 0 &&
+                    activeCategory === (category.id || category.name) && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute  top-full  bg-white shadow-xl rounded-lg p-3 min-w-[120px] z-50 border border-gray-200"
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          {category.subCategories.map((subCat: any, subIndex: number) => (
+                            <Link
+                              key={subIndex}
+                              href={`/shop?category=${category.slug}&subCategory=${subCat.slug}`}
+                            >
+                              <motion.div
+                                whileHover={{ x: 5 }}
+                                className="text-sm text-gray-600 hover:text-primary hover:bg-orange-50 p-2 rounded-md transition-all duration-200"
+                              >
+                                {subCat.name || subCat.title}
+                              </motion.div>
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                </div>
+
+                {/* Divider: only if not last item */}
+                {index !== categories.length - 1 && (
+                  <span className="h-10 w-px bg-white/50 mx-3"></span>
+                )}
+              </React.Fragment>
             ))}
           </div>
         </div>

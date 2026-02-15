@@ -7,35 +7,39 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import Image from "next/image";
-import { apiBaseUrl } from "@/config/config";
 import { Swiper as SwiperClass } from "swiper";
-import { AnimationControls } from "framer-motion";
-import InnerImageZoom from "react-inner-image-zoom";
 import { motion } from "framer-motion";
+import InnerImageZoom from "react-inner-image-zoom";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { FaYoutube } from "react-icons/fa";
+
 interface Props {
   thumbnailImage: string;
   backViewImage: string;
-  images: string[];
+  optionalImages: string[];
   name: string;
-  controls: AnimationControls;
+  controls: any;
+  videoUrl?: string;
 }
 
 const ProductDetailsSlide: React.FC<Props> = ({
   controls,
-  images,
+  optionalImages,
   thumbnailImage,
   backViewImage,
+  videoUrl,
+  name,
+
 }) => {
   const swiperRef = useRef<SwiperClass | null>(null);
-  const allImages = [
-    ...(thumbnailImage ? [thumbnailImage] : []),
-    ...(backViewImage ? [backViewImage] : []),
-    ...images,
-  ];
-
-
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const allMedia = [
+    ...(thumbnailImage ? [{ type: "image", src: thumbnailImage }] : []),
+    ...(backViewImage ? [{ type: "image", src: backViewImage }] : []),
+    ...optionalImages.map((img) => ({ type: "image", src: img })),
+    ...(videoUrl ? [{ type: "video", src: videoUrl }] : []),
+  ];
 
   interface ThumbnailClickHandler {
     (index: number): void;
@@ -48,6 +52,14 @@ const ProductDetailsSlide: React.FC<Props> = ({
     }
   };
 
+  const extractYouTubeId = (url: string) => {
+    const regExp =
+      /(?:youtube\.com\/(?:.*v=|.*\/)|youtu\.be\/)([^&\n?#]+)/;
+    const match = url.match(regExp);
+    return match ? match[1] : url;
+  };
+
+
   return (
     <div>
       <div className="relative flex justify-center mt-6 md:mt-8 lg:mt-0">
@@ -55,25 +67,35 @@ const ProductDetailsSlide: React.FC<Props> = ({
         <div className="w-full  max-w-[360px] h-[300px] sm:max-w-[590px] md:max-w-[710px] md:h-[400px] xl:max-w-[720px] xl:h-[500px] rounded overflow-hidden">
           <Swiper
             modules={[Navigation]}
-            // navigation
             onSlideChange={(swiper) => setSelectedImageIndex(swiper.activeIndex)}
             onSwiper={(swiper) => (swiperRef.current = swiper)}
             initialSlide={selectedImageIndex}
             className="w-full h-full"
           >
-            {allImages.map((img, index) => (
+            {allMedia.map((item, index) => (
               <SwiperSlide key={index}>
-                <div className="relative w-full h-full  bg-white">
-                  <InnerImageZoom
-                    src={apiBaseUrl + img}
-                    zoomSrc={apiBaseUrl + img}
-                    zoomType="hover"
-                    zoomScale={1}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="relative w-full h-full bg-white flex items-center justify-center">
+
+                  {item.type === "image" ? (
+                    <InnerImageZoom
+                      src={item.src}
+                      zoomSrc={item.src}
+                      zoomType="hover"
+                      zoomScale={1}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${extractYouTubeId(item.src)}`}
+                      className="w-full h-full"
+                      allowFullScreen
+                    />
+                  )}
+
                 </div>
               </SwiperSlide>
             ))}
+
           </Swiper>
 
           {/* Custom Navigation Buttons */}
@@ -95,21 +117,31 @@ const ProductDetailsSlide: React.FC<Props> = ({
         <div className="hidden   md:block absolute top-0 w-full max-w-[590px] h-[400px] md:h-[400px] rounded  pointer-events-none">
           <motion.div animate={controls}>
             <div className="relative w-full h-[400px] md:h-[400px] bg-white">
-              <Image
-                src={apiBaseUrl + allImages[selectedImageIndex]}
-                alt={"Product Image"}
-                width={500}
-                height={500}
-                className="w-full h-full z-10  object-cover rounded"
-              />
+              {allMedia[selectedImageIndex]?.type === "image" ? (
+                <Image
+                  src={allMedia[selectedImageIndex]?.src}
+                  alt="Product Image"
+                  width={500}
+                  height={500}
+                  className="w-full h-full object-cover rounded"
+                />
+              ) : (
+                <iframe
+                  src={`https://www.youtube.com/embed/${extractYouTubeId(
+                    allMedia[selectedImageIndex]?.src
+                  )}`}
+                  className="w-full h-full"
+                  allowFullScreen
+                />
+              )}
             </div>
           </motion.div>
         </div>
       </div>
 
       <div className="overflow-x-auto scrollbar-none">
-        <div className="flex gap-4  min-w-fit py-2 rounded">
-          {allImages.map((img, index) => (
+        <div className="flex gap-4 min-w-fit py-2 rounded">
+          {allMedia.map((item, index) => (
             <div
               key={index}
               onClick={() => handleThumbnailClick(index)}
@@ -120,17 +152,33 @@ const ProductDetailsSlide: React.FC<Props> = ({
               }}
             >
               <div className="relative w-[55px] h-[55px] md:w-[125px] md:h-[125px] lg:w-[119px] lg:h-[119px] xl:w-[125px] xl:h-[125px]">
-                <Image
-                  src={apiBaseUrl + img}
-                  alt={`Thumbnail ${index}`}
-                  fill
-                  className="rounded"
-                />
+                {item.type === "image" ? (
+                  <Image
+                    src={item.src}
+                    alt={`Thumbnail ${index}`}
+                    fill
+                    className="rounded object-cover"
+                  />
+                ) : (
+                  <div className="relative w-full h-full rounded overflow-hidden">
+                    <Image
+                      src={`https://img.youtube.com/vi/${extractYouTubeId(item.src)}/hqdefault.jpg`}
+                      alt="Video Thumbnail"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <FaYoutube className="text-red-600 text-7xl drop-shadow-xl" />
+                    </div>
+                  </div>
+                )}
+
               </div>
             </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 };

@@ -1,5 +1,4 @@
 "use client";
-import { rajdhani } from "@/app/font";
 import { addReview } from "@/services/productReview";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -67,7 +66,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ userRef, productRef }) => {
 
   return (
     <div className="mt-8">
-      <h2 className={`text-xl font-semibold ${rajdhani.className}`}>
+      <h2 className="text-xl font-semibold">
         Add Your Review :
       </h2>
 
@@ -80,11 +79,10 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ userRef, productRef }) => {
             {[1, 2, 3, 4, 5].map((star) => (
               <FaRegStar
                 key={star}
-                className={`w-5 h-5 cursor-pointer ${
-                  selectedRating >= star
-                    ? "fill-[#FFA500] stroke-[#FFA500]"
-                    : "stroke-gray-400"
-                }`}
+                className={`w-5 h-5 cursor-pointer ${selectedRating >= star
+                  ? "fill-[#FFA500] stroke-[#FFA500]"
+                  : "stroke-gray-400"
+                  }`}
                 onClick={() => handleStarClick(star)}
               />
             ))}
@@ -130,7 +128,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ userRef, productRef }) => {
         <input
           type="submit"
           value="Add Review"
-          className="py-2 rounded bg-[#FF6C0C] text-white mt-2 cursor-pointer"
+          className="py-2 rounded bg-primary text-white mt-2 cursor-pointer"
         />
       </form>
     </div>

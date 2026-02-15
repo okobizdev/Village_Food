@@ -1,7 +1,7 @@
 "use server";
 
 import { createSteadfastOrder } from "@/services/courier";
-import { deleteOrder, updateOrderStatus } from "@/services/order";
+import { deleteOrder, updateOrderStatus } from "@/app/(admin-panel)/order-list/service";
 import { SteadfastOrderPayload } from "@/types/shared";
 import { revalidatePath } from "next/cache";
 
@@ -14,7 +14,6 @@ export async function UpdateOrderStatus(orderId: string, status: string) {
     revalidatePath("/");
     return { success: true, data: res };
   } catch (error: any) {
-    console.log(error.message);
     throw new error(error.message);
   }
 }
@@ -26,7 +25,6 @@ export async function SendOrderToSteadfast(courierData: SteadfastOrderPayload) {
     revalidatePath("/");
     return { success: true, data: response };
   } catch (error: any) {
-    console.log(error.message);
     throw new error(error.message);
   }
 }

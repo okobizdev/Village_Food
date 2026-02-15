@@ -21,7 +21,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileUp, MoreHorizontal, Paperclip, Plus, Trash } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { deleteProductAction, updateFormAction } from "./actions";
 import { confirmation } from "@/components/modals/confirm-modal";
@@ -34,15 +34,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload, UploadFile } from "antd";
-import { fileUrlGenerator, humanFileSize } from "@/utils/helpers";
+import { humanFileSize } from "@/utils/helpers";
 import { UploadOutlined } from "@ant-design/icons";
-import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/sub-category";
-import { getAllChildCategory } from "@/app/(admin-panel)/category/childcategory/child-category";
+import { getAllSubCategory } from "@/app/(admin-panel)/category/subcategory/service";
+import { getAllChildCategory } from "@/app/(admin-panel)/category/childcategory/service";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { discountTypes, inventoryTypes } from "./form";
+import { discountTypes } from "./form";
 import { Label } from "@/components/ui/label";
-import { upperCase, upperFirst } from "lodash";
+import { upperCase } from "lodash";
 import { TCategory } from "../category/category/types";
 import { TSubCategory } from "../category/subcategory/types";
 import { getAllCategory } from "../category/category/service";
@@ -106,10 +106,10 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
       optionalImages: product.optionalImages || [],
       inventories: product.inventoryRef?.length
         ? product.inventoryRef.map((item: any) => ({
-          quantity: String(item.quantity),
-          ...(item.level && { size: upperCase(item.level) }),
+          size: upperCase(item.level),
         }))
-        : [{ quantity: product.mainInventory }],
+        : [{ size: "" }],
+
     },
   });
 
@@ -124,13 +124,7 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
     name: "inventories",
   });
 
-  const getDefaultInventory = () => {
-    const base = { quantity: "" };
-    if (selectedInventoryType === "levelInventory")
-      return { ...base, size: "" };
-    return base;
-  };
-
+  const getDefaultInventory = () => ({ size: "" });
 
   useEffect(() => {
     getAllCategory().then((data) => setCategories(data.data));
@@ -278,6 +272,10 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
     }
     setDeleting(false);
   };
+
+  useEffect(() => {
+    form.setValue("inventoryType", "levelInventory");
+  }, [form]);
 
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -551,42 +549,6 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                     </div>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="inventoryType"
-                  render={({ field }) => (
-                    <div className="flex items-end gap-2 w-full">
-                      <FormItem className="flex-1">
-                        <FormLabel>
-                          Inventory Type <b className="text-red-500">*</b>
-                        </FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select inventory type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {inventoryTypes.map((type) => (
-                                <SelectItem
-                                  key={type.key}
-                                  value={String(type.key)}
-                                >
-                                  {type.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormDescription className="text-red-400 text-xs min-h-4">
-                          {form.formState.errors.inventoryType?.message}
-                        </FormDescription>
-                      </FormItem>
-                    </div>
-                  )}
-                />
               </div>
 
               {selectedInventoryType !== "" &&
@@ -607,26 +569,6 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                         <FormDescription className="text-red-400 text-xs min-h-4">
                           {
                             formState.errors?.inventories?.[index]?.size
-                              ?.message
-                          }
-                        </FormDescription>
-                      </FormItem>
-                    )}
-
-                    {selectedInventoryType !== "" && (
-                      <FormItem>
-                        <FormLabel>
-                          Quantity <b className="text-red-500">*</b>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter quantity"
-                            {...register(`inventories.${index}.quantity`)}
-                          />
-                        </FormControl>
-                        <FormDescription className="text-red-400 text-xs min-h-4">
-                          {
-                            formState.errors?.inventories?.[index]?.quantity
                               ?.message
                           }
                         </FormDescription>
@@ -711,23 +653,28 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                 <div className="mt-4">
                   {form.getValues("thumbnailImage") &&
                     form.getValues("thumbnailImage").length > 0 &&
-                    form.getValues("thumbnailImage").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
+                    form.getValues("thumbnailImage").map((file, i) => {
+
+                      const isString = typeof file === "string";
+
+                      return (
+                        <div className="border-dashed border-2 rounded-lg p-2 px-3">
+                          <div
+                            key={i}
+                            className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Paperclip className="h-4 w-4 stroke-current" />
+                              <span>{isString ? file.split("/").pop() : file.name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <FileUp className="h-4 w-4 stroke-current" />
+                              <span>{!isString && file?.size && humanFileSize(file.size)}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                        </div>)
+                    }
+                    )}
                 </div>
 
                 <div className="text-red-400 text-xs min-h-4">
@@ -760,23 +707,28 @@ export const ProductDetailsSheet: React.FC<Props> = ({ product }) => {
                 <div className="mt-4">
                   {form.getValues("optionalImages") &&
                     form.getValues("optionalImages").length > 0 &&
-                    form.getValues("optionalImages").map((file, i) => (
-                      <div className="border-dashed border-2 rounded-lg p-2 px-3">
-                        <div
-                          key={i}
-                          className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <FileUp className="h-4 w-4 stroke-current" />
-                            <span>{humanFileSize(file.size)}</span>
+                    form.getValues("optionalImages").map((file, i) => {
+
+                      const isString = typeof file === "string";
+
+                      return (
+                        <div className="border-dashed border-2 rounded-lg p-2 px-3">
+                          <div
+                            key={i}
+                            className="flex flex-col gap-2 text-xs text-gray-500 justify-center h-full"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Paperclip className="h-4 w-4 stroke-current" />
+                              <span>{isString ? file.split("/").pop() : file.name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <FileUp className="h-4 w-4 stroke-current" />
+                              <span>{!isString && file?.size && humanFileSize(file.size)}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                 </div>
 
                 <div className="text-red-400 text-xs min-h-4">

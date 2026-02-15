@@ -1,8 +1,11 @@
 "use client";
 
-import { TChildCategory, TShopSideBar, TSubCategory } from "@/types";
+
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { TShopSideBar } from "@/types/shopSideBar";
+import { TSubCategory } from "@/types/subCategory";
+import { TChildCategory } from "@/types/childCategory";
 
 interface ShopPageSidebarProps {
   shopSideBar: TShopSideBar[];

@@ -1,6 +1,4 @@
-// import NavBar from "@/components/pages/header/NavBar/NavBar";
-// import { getUser } from "@/services/auth";
-// import { getCartProducts } from "@/services/cart";
+
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,15 +7,11 @@ export const metadata: Metadata = {
 };
 
 const PrivacyPolicy = async () => {
-  // const user = await getUser();
-  // const userId = user?.id;
-  // const coupon = "";
-  // const products = await getCartProducts(userId, coupon);
+
   return (
     <>
-      {/* <NavBar userCartProducts={products?.data} /> */}
-      <div className="Container py-10 lg:w-10/12 mx-auto lg:px-20 px:6 w-full ">
-        <div className="flex flex-col gap-2 lg:gap-4">
+      <div className=" py-10 max-w-7xl mx-auto lg:px-20 px:6 w-full">
+        <div className="flex flex-col gap-2 lg:gap-4 ">
           <h1 className="text-2xl lg:text-4xl font-semibold text-[#262626] text-center mt-14 lg:mt-0">
             Return & Refund Policy
           </h1>

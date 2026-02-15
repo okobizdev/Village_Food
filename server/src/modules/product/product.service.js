@@ -1,14 +1,8 @@
 const { NotFoundError } = require("../../utils/errors.js");
 const BaseService = require("../base/base.service.js");
 const productRepository = require("./product.repository.js");
-const {
-  removeUploadFile,
-} = require("../../middleware/upload/removeUploadFile.js");
 const inventoryRepository = require("../inventory/inventory.repository.js");
 const { calculateDiscountAmount } = require("../../utils/calculation.js");
-const ImgUploader = require("../../middleware/upload/ImgUploder.js");
-const { default: mongoose } = require("mongoose");
-const { ProductSchema } = require("../../models/index.js");
 const { idGenerate } = require("../../utils/IdGenerator.js");
 const { generateEAN13Barcode } = require("../../utils/barcodeGenerate.js");
 const subCategoryRepository = require("../subCategory/sub.category.repository.js");
@@ -40,7 +34,7 @@ class ProductService extends BaseService {
   }
 
   async createProduct(payloadFiles, payload, session) {
-    // console.log("Payload", payload);
+
     const { files } = payloadFiles;
     const {
       name,
@@ -135,10 +129,10 @@ class ProductService extends BaseService {
         invenoryIds.push(createNewInventory[0]._id);
       }
     } else if (inventoryType == "colorLevelInventory") {
-      // console.log('inventory color level', inventoryArray[0]?.colorLevel)
+
       let newInventoryID = "";
       for (const item of inventoryArray) {
-        // console.log('inventory color level', item)
+
         const level = item.level || "Unknown";
         const variants = item.colorLevel;
         const itemQuantity = variants.reduce(
@@ -168,8 +162,7 @@ class ProductService extends BaseService {
             barcode: item.barcode || generateEAN13Barcode(),
             inventoryID: newInventoryID,
           };
-          // console.log("newInventory", newInventory);
-          // console.log("newInventory", newInventory?.variants)
+
           const createNewInventory = await this.#inventoryRepository.create(
             newInventory,
             session
@@ -265,6 +258,12 @@ class ProductService extends BaseService {
     }
     return productData;
   }
+
+  async getProductsByStatus(status) {
+    const products = await this.#repository.getProductsByStatus(status);
+    return products;
+  }
+
 
   async getAllProduct(payload) {
     const { warehouseRef } = payload;
@@ -588,16 +587,6 @@ class ProductService extends BaseService {
           inventoryRef,
           session
         );
-      }
-    }
-    if (deletedProduct) {
-      if (deletedProduct?.thumbnailImage) {
-        await removeUploadFile(product?.thumbnailImage);
-      }
-      if (Array.isArray(deletedProduct?.optionalImages)) {
-        deletedProduct?.optionalImages.forEach(async (image) => {
-          await removeUploadFile(image);
-        });
       }
     }
 

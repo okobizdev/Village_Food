@@ -40,7 +40,7 @@ export const columns: ColumnDef<TChildCategory>[] = [
     },
   },
   {
-    header: "Category",
+    header: " Sub Category",
     accessorKey: "categoryRef",
     cell: ({ row }) => {
       return (

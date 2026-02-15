@@ -1,8 +1,5 @@
-// import NavBar from "@/components/pages/header/NavBar/NavBar";
-// import { getUser } from "@/services/auth";
-// import { getCartProducts } from "@/services/cart";
 import { Metadata } from "next";
-import React from "react";
+
 
 
 export const metadata: Metadata = {
@@ -11,14 +8,10 @@ export const metadata: Metadata = {
 };
 
 const ReturnPolicy = async () => {
-  // const user = await getUser();
-  // const userId = user?.id;
-  // const coupon = "";
-  // const products = await getCartProducts(userId, coupon);
   return (
     <>
       {/* <NavBar  userCartProducts ={ products?.data}/> */}
-      <div className="policy-container text-gray-800 leading-relaxed  lg:px-20  px-6 lg:w-10/12 w-full  mx-auto mt-24 ">
+      <div className="policy-container text-gray-800 leading-relaxed  lg:px-20  px-6 lg:max-w-7xl w-full  mx-auto mt-24 ">
 
         <p>
           <strong>Village Food</strong> considers each of our customers to be a part of our family.

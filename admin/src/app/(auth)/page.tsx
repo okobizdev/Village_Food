@@ -50,11 +50,6 @@ export default function LoginPage() {
     try {
       const loggedIn = await loginUser(values);
       const { accessToken, refreshToken, user } = loggedIn.data.data;
-      // console.log(loggedIn, "logged in from page?????????????");
-      // console.log(
-      //   { accessToken: accessToken, refreshToken: refreshToken, user: user },
-      //   "data from login....."
-      // );
 
       if (loggedIn.success) {
         saveAuthData(loggedIn.data.data);
